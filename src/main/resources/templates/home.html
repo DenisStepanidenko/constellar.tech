@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>constellar.tech</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background: linear-gradient(135deg, #0a0f2b, #1a1a40);
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        .logo::after {
+            content: "";
+            display: block;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, #00ffff, #ff00ff);
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        .btn-it {
+            background: linear-gradient(135deg, #00ffff, #00ffaa);
+            color: #0a0f2b;
+        }
+
+        .btn-company {
+            background: linear-gradient(135deg, #ffcc00, #ffaa00);
+            color: #0a0f2b;
+        }
+
+        @keyframes twinkle {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        @keyframes moveStar {
+            0% {
+                transform: translate(0, 0);
+            }
+            100% {
+                transform: translate(calc(-50vw + 100px), calc(-50vh + 100px));
+            }
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 2s infinite, moveStar 10s linear infinite;
+        }
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="logo">constellar.tech</div>
+    <div class="buttons">
+        <a href="/login-user-page" class="btn btn-it">Для IT-специалистов</a>
+        <a href="login-company.html" class="btn btn-company">Для компаний</a>
+    </div>
+</div>
+
+<script>
+    // Анимация звёзд на фоне
+    const starCount = 100;
+    const starsContainer = document.createElement('div');
+    starsContainer.style.position = 'absolute';
+    starsContainer.style.top = '0';
+    starsContainer.style.left = '0';
+    starsContainer.style.width = '100%';
+    starsContainer.style.height = '100%';
+    starsContainer.style.pointerEvents = 'none';
+    document.body.appendChild(starsContainer);
+
+    for (let i = 0; i < starCount; i++) {
+        const star = document.createElement('div');
+        star.classList.add('star');
+        star.style.top = `${Math.random() * 100}%`;
+        star.style.left = `${Math.random() * 100}%`;
+        star.style.animationDelay = `${Math.random() * 2}s`;
+        star.style.animationDuration = `${5 + Math.random() * 10}s`; // Разная скорость движения
+        starsContainer.appendChild(star);
+    }
+</script>
+</body>
+</html>

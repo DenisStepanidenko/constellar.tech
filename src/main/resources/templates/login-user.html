@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход | constellar.tech</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background: linear-gradient(135deg, #0a0f2b, #1a1a40);
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 3rem;
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+            position: relative;
+            z-index: 2;
+            width: 400px;
+            max-width: 90%;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .logo::after {
+            content: "";
+            display: block;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, #00ffff, #ff00ff);
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+
+        .auth-form input {
+            padding: 0.8rem;
+            font-size: 1rem;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            outline: none;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .auth-form input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .auth-form button {
+            padding: 0.8rem;
+            font-size: 1rem;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #00ffff, #00ffaa);
+            color: #0a0f2b;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+
+        .auth-form button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 1.5rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: color 0.3s, text-shadow 0.3s;
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .back-link:hover {
+            color: #00ffff;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+            background: rgba(0, 255, 255, 0.1);
+        }
+
+        .switch-form {
+            margin-top: 1.5rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        .switch-form a {
+            color: #00ffff;
+            text-decoration: none;
+            transition: text-shadow 0.3s;
+        }
+
+        .switch-form a:hover {
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @keyframes moveStar {
+            0% {
+                transform: translate(0, 0);
+            }
+            100% {
+                transform: translate(calc(-50vw + 100px), calc(-50vh + 100px));
+            }
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 2s infinite, moveStar 10s linear infinite;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="logo">constellar.tech</div>
+    <form class="auth-form" id="login-form">
+        <input type="text" placeholder="Логин" required>
+        <input type="password" placeholder="Пароль" required>
+        <button type="submit">Войти</button>
+    </form>
+    <div class="switch-form">
+        Нет аккаунта? <a href="/register-user-page">Зарегистрироваться</a>
+    </div>
+    <a href="/home" class="back-link">Вернуться на главную</a>
+</div>
+
+<script>
+    // Создание звездного фона
+    const starCount = 150;
+    const starsContainer = document.createElement('div');
+    starsContainer.style.position = 'absolute';
+    starsContainer.style.top = '0';
+    starsContainer.style.left = '0';
+    starsContainer.style.width = '100%';
+    starsContainer.style.height = '100%';
+    starsContainer.style.pointerEvents = 'none';
+    document.body.appendChild(starsContainer);
+
+    for (let i = 0; i < starCount; i++) {
+        const star = document.createElement('div');
+        star.classList.add('star');
+        star.style.top = `${Math.random() * 100}%`;
+        star.style.left = `${Math.random() * 100}%`;
+        star.style.animationDelay = `${Math.random() * 2}s`;
+        star.style.animationDuration = `${5 + Math.random() * 10}s`;
+        starsContainer.appendChild(star);
+    }
+
+    // Обработка формы входа
+    document.getElementById('login-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        // Здесь будет реальная обработка входа
+        alert('Форма входа отправлена!');
+    });
+</script>
+</body>
+</html>

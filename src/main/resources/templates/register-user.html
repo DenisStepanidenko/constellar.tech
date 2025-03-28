@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация | constellar.tech</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background: linear-gradient(135deg, #0a0f2b, #1a1a40);
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 3rem;
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+            position: relative;
+            z-index: 2;
+            width: 400px;
+            max-width: 90%;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .logo::after {
+            content: "";
+            display: block;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, #00ffff, #ff00ff);
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+
+        .auth-form input {
+            padding: 0.8rem;
+            font-size: 1rem;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            outline: none;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .auth-form input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .auth-form button {
+            padding: 0.8rem;
+            font-size: 1rem;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #00ffff, #00ffaa);
+            color: #0a0f2b;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+
+        .auth-form button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+        }
+
+        .switch-form {
+            margin-top: 1.5rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        .switch-form a {
+            color: #00ffff;
+            text-decoration: none;
+            transition: text-shadow 0.3s;
+        }
+
+        .switch-form a:hover {
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
+        }
+
+        .error-message {
+            color: #ff5555;
+            font-size: 0.8rem;
+            margin-top: -0.8rem;
+            margin-bottom: 0.5rem;
+            text-align: left;
+            height: 12px;
+        }
+
+        @keyframes twinkle {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        @keyframes moveStar {
+            0% {
+                transform: translate(0, 0);
+            }
+            100% {
+                transform: translate(calc(-50vw + 100px), calc(-50vh + 100px));
+            }
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 2s infinite, moveStar 10s linear infinite;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="logo">constellar.tech</div>
+    <form class="auth-form" id="register-form">
+        <input type="text" name="username" placeholder="Имя пользователя" required>
+        <div class="error-message" id="username-error"></div>
+
+        <input type="email" name="email" placeholder="Email" required>
+        <div class="error-message" id="email-error"></div>
+
+        <input type="password" name="password" placeholder="Пароль" required>
+        <div class="error-message" id="password-error"></div>
+
+        <input type="password" name="confirmPassword" placeholder="Подтвердите пароль" required>
+        <div class="error-message" id="confirmPassword-error"></div>
+
+        <button type="submit">Зарегистрироваться</button>
+    </form>
+    <div class="switch-form">
+        Уже есть аккаунт? <a href="/home">Войти</a>
+    </div>
+</div>
+
+<script>
+    // Создание звездного фона
+    const starCount = 150;
+    const starsContainer = document.createElement('div');
+    starsContainer.style.position = 'absolute';
+    starsContainer.style.top = '0';
+    starsContainer.style.left = '0';
+    starsContainer.style.width = '100%';
+    starsContainer.style.height = '100%';
+    starsContainer.style.pointerEvents = 'none';
+    document.body.appendChild(starsContainer);
+
+    for (let i = 0; i < starCount; i++) {
+        const star = document.createElement('div');
+        star.classList.add('star');
+        star.style.top = `${Math.random() * 100}%`;
+        star.style.left = `${Math.random() * 100}%`;
+        star.style.animationDelay = `${Math.random() * 2}s`;
+        star.style.animationDuration = `${5 + Math.random() * 10}s`;
+        starsContainer.appendChild(star);
+    }
+
+    // Обработка формы регистрации
+    document.getElementById('register-form').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const formData = {
+            username: this.querySelector('[name="username"]').value,
+            email: this.querySelector('[name="email"]').value,
+            password: this.querySelector('[name="password"]').value,
+            confirmPassword: this.querySelector('[name="confirmPassword"]').value
+        };
+
+        // Очистка предыдущих ошибок
+        document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
+
+        // Показываем loader (можно добавить стили для него)
+        const submitButton = this.querySelector('button[type="submit"]');
+        const originalButtonText = submitButton.textContent;
+        submitButton.textContent = 'Загрузка...';
+        submitButton.disabled = true;
+
+        fetch('/constellar.tech/api/v1/auth/register-user', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => Promise.reject(err));
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    // Перенаправление после успешной регистрации
+                    window.location.href = '/home';
+                } else {
+                    // Отображение ошибок
+                    if (data.errors) {
+                        for (const [field, message] of Object.entries(data.errors)) {
+                            const errorElement = document.getElementById(`${field}-error`);
+                            if (errorElement) {
+                                errorElement.textContent = message;
+                            }
+                        }
+                    } else {
+                        alert(data.message);
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Произошла ошибка при отправке формы');
+            })
+            .finally(() => {
+                submitButton.textContent = originalButtonText;
+                submitButton.disabled = false;
+            });
+    });
+</script>
+</body>
+</html>
