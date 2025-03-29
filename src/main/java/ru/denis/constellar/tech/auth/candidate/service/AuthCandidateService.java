@@ -6,7 +6,7 @@ import ru.denis.constellar.tech.auth.candidate.dto.RequestCandidateRegistration;
 
 public interface AuthCandidateService {
 
-    RegistrationResponse registerCandidate(RequestCandidateRegistration requestRegistration);
+    void registerCandidate(RequestCandidateRegistration requestRegistration);
 
 
 }

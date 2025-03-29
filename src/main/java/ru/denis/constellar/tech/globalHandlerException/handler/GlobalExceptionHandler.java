@@ -6,8 +6,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import ru.denis.constellar.tech.auth.exceptions.EmailAlreadyExists;
 import ru.denis.constellar.tech.globalHandlerException.dto.ErrorResponse;
-import ru.denis.constellar.tech.auth.exceptions.PasswordConfirmNotEqualsPassword;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -18,7 +18,7 @@ public class GlobalExceptionHandler {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ErrorResponse handlerValidationException(MethodArgumentNotValidException ex) {
+    public ErrorResponse handleValidationException(MethodArgumentNotValidException ex) {
 
         List<String> errors = ex.getFieldErrors().stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
@@ -29,5 +29,16 @@ public class GlobalExceptionHandler {
                 .errors(errors)
                 .build();
     }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(EmailAlreadyExists.class)
+    public ErrorResponse handleEmailAlreadyExistsException(EmailAlreadyExists ex) {
+
+        return ErrorResponse.builder()
+                .timeOfError(LocalDateTime.now())
+                .errors(Collections.singletonList(ex.getMessage()))
+                .build();
+    }
+
 
 }
