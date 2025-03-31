@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.denis.constellar.tech.auth.exceptions.EmailAlreadyExists;
+import ru.denis.constellar.tech.auth.exceptions.PasswordOrEmailIncorrect;
 import ru.denis.constellar.tech.globalHandlerException.dto.ErrorResponse;
 
 import java.time.LocalDateTime;
@@ -34,6 +35,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(EmailAlreadyExists.class)
     public ErrorResponse handleEmailAlreadyExistsException(EmailAlreadyExists ex) {
 
+        return ErrorResponse.builder()
+                .timeOfError(LocalDateTime.now())
+                .errors(Collections.singletonList(ex.getMessage()))
+                .build();
+    }
+
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(PasswordOrEmailIncorrect.class)
+    public ErrorResponse handlePasswordOrEmailIncorrectException(PasswordOrEmailIncorrect ex) {
         return ErrorResponse.builder()
                 .timeOfError(LocalDateTime.now())
                 .errors(Collections.singletonList(ex.getMessage()))

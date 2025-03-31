@@ -122,9 +122,20 @@
             text-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
         }
 
+        .error-message {
+            color: #ff5555;
+            margin-top: 1rem;
+            text-align: center;
+            min-height: 1.5rem;
+        }
+
         @keyframes twinkle {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
         }
 
         @keyframes moveStar {
@@ -150,8 +161,9 @@
 <div class="container">
     <div class="logo">constellar.tech</div>
     <form class="auth-form" id="login-form">
-        <input type="text" placeholder="Логин" required>
-        <input type="password" placeholder="Пароль" required>
+        <input type="text" name="email" placeholder="Почта" required>
+        <input type="password" name="password" placeholder="Пароль" required>
+        <div id="error-message" class="error-message"></div>
         <button type="submit">Войти</button>
     </form>
     <div class="switch-form">
@@ -183,10 +195,63 @@
     }
 
     // Обработка формы входа
-    document.getElementById('login-form').addEventListener('submit', function(e) {
+    document.getElementById('login-form').addEventListener('submit', function (e) {
         e.preventDefault();
-        // Здесь будет реальная обработка входа
-        alert('Форма входа отправлена!');
+
+        const formData = {
+            email: this.querySelector('[name="email"]').value,
+            password: this.querySelector('[name="password"]').value
+        };
+
+        // Очистка предыдущих ошибок
+        document.getElementById('error-message').textContent = '';
+
+        // Показываем loader
+        const submitButton = this.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
+        const originalText = submitButton.textContent;
+        submitButton.textContent = 'Вход...';
+
+        fetch('/constellar.tech/api/v1/auth/login-candidate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        })
+            .then(async response => {
+                if (response.ok) {
+                    // Успешный вход (200 OK) - перенаправляем на профиль
+                    window.location.href = '/profile';
+                } else {
+                    // Обработка ошибок (400, 401 и т.д.)
+                    const errorData = await response.json().catch(() => ({}));
+                    const error = new Error(errorData.message || 'Ошибка входа');
+                    error.data = errorData;
+                    error.status = response.status;
+                    throw error;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                const errorContainer = document.getElementById('error-message');
+
+                // Обрабатываем ошибки с полем errors (как в ErrorResponse)
+                if (error.data?.errors) {
+                    errorContainer.textContent =
+                        Array.isArray(error.data.errors)
+                            ? error.data.errors.join('\n')
+                            : String(error.data.errors);
+                } else if (error.message) {
+                    errorContainer.textContent = error.message;
+                } else {
+                    errorContainer.textContent = 'Произошла ошибка при входе';
+                }
+            })
+            .finally(() => {
+                submitButton.textContent = originalText;
+                submitButton.disabled = false;
+            });
     });
 </script>
 </body>

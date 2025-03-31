@@ -8,6 +8,8 @@ import ru.denis.constellar.tech.candidate.jpa.CandidateRepository;
 import ru.denis.constellar.tech.candidate.model.Candidate;
 import ru.denis.constellar.tech.candidate.service.CandidateService;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class CandidateServiceImpl implements CandidateService {
@@ -35,6 +37,11 @@ public class CandidateServiceImpl implements CandidateService {
     @Override
     public void saveCandidate(Candidate candidate) {
         candidateRepository.save(candidate);
+    }
+
+    @Override
+    public Optional<Candidate> findByEmail(String email) {
+        return candidateRepository.findByEmail(email);
     }
 
 
