@@ -2,7 +2,6 @@ package ru.denis.constellar.tech.auth.candidate.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.denis.constellar.tech.auth.candidate.dto.RegistrationResponse;
 import ru.denis.constellar.tech.auth.candidate.dto.RequestCandidateRegistration;
 import ru.denis.constellar.tech.auth.candidate.service.AuthCandidateService;
 import ru.denis.constellar.tech.auth.exceptions.EmailAlreadyExists;

@@ -34,4 +34,5 @@ public class PasswordMatchesValidator implements ConstraintValidator<PasswordMat
         constraintValidatorContext.disableDefaultConstraintViolation();
         constraintValidatorContext.buildConstraintViolationWithTemplate(message).addPropertyNode("password").addConstraintViolation();
     }
+
 }
