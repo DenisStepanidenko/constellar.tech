@@ -220,9 +220,10 @@
             body: JSON.stringify(formData)
         })
             .then(async response => {
-                if (response.ok) {
+                if (response.redirected) {
+                    window.location.href = response.url;
                     // Успешный вход (200 OK) - перенаправляем на профиль
-                    window.location.href = '/profile';
+                    //window.location.href = '/candidate-personal-account';
                 } else {
                     // Обработка ошибок (400, 401 и т.д.)
                     const errorData = await response.json().catch(() => ({}));

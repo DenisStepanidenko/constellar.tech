@@ -1,8 +1,12 @@
 package ru.denis.constellar.tech.auth.candidate.service.impl;
 
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.denis.constellar.tech.auth.candidate.dto.RequestCandidateLogin;
@@ -12,6 +16,8 @@ import ru.denis.constellar.tech.auth.exceptions.EmailAlreadyExists;
 import ru.denis.constellar.tech.auth.exceptions.PasswordOrEmailIncorrect;
 import ru.denis.constellar.tech.candidate.model.Candidate;
 import ru.denis.constellar.tech.candidate.service.CandidateService;
+
+import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +40,7 @@ public class AuthCandidateServiceImpl implements AuthCandidateService {
     }
 
     @Override
-    public void loginCandidate(RequestCandidateLogin requestLogin, HttpSession httpSession) {
+    public void loginCandidate(RequestCandidateLogin requestLogin, HttpSession httpSession, HttpServletResponse response) {
 
         Candidate candidate = candidateService.findByEmail(requestLogin.getEmail()).orElseThrow(() -> new PasswordOrEmailIncorrect("Пароль или почта введены неверно."));
 
@@ -46,6 +52,12 @@ public class AuthCandidateServiceImpl implements AuthCandidateService {
 
         log.info("Пользователь с почтой " + requestLogin.getEmail() + " успешно вошёл");
         httpSession.setAttribute("candidate", candidate);
+
+        try {
+            response.sendRedirect("http://localhost:8080/candidate-personal-account");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 

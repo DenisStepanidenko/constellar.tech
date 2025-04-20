@@ -1,8 +1,11 @@
 package ru.denis.constellar.tech.auth.candidate.controller.impl;
 
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,6 +14,8 @@ import ru.denis.constellar.tech.auth.candidate.controller.AuthCandidateControlle
 import ru.denis.constellar.tech.auth.candidate.dto.RequestCandidateLogin;
 import ru.denis.constellar.tech.auth.candidate.dto.RequestCandidateRegistration;
 import ru.denis.constellar.tech.auth.candidate.service.AuthCandidateService;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/constellar.tech/api/v1/auth")
@@ -28,9 +33,23 @@ public class AuthCandidateControllerImpl implements AuthCandidateController {
 
     @PostMapping("/login-candidate")
     @Override
-    public void loginCandidate(@RequestBody RequestCandidateLogin requestLogin, HttpSession httpSession) {
+    public void loginCandidate(@RequestBody RequestCandidateLogin requestLogin, HttpSession httpSession, HttpServletResponse response) {
 
-        authService.loginCandidate(requestLogin, httpSession);
+        authService.loginCandidate(requestLogin, httpSession, response);
+
+    }
+
+    @Override
+    @PostMapping("/logout-candidate")
+    public void logoutCandidate(HttpSession httpSession, HttpServletResponse response) throws IOException {
+
+        if(httpSession == null || httpSession.getAttribute("candidate") == null){
+            response.sendRedirect("http://localhost:8080/home");
+        }
+
+
+        httpSession.removeAttribute("candidate");
+        response.sendRedirect("http://localhost:8080/home");
 
     }
 

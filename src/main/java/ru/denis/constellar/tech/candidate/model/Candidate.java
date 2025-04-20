@@ -22,4 +22,13 @@ public class Candidate {
 
     private String password;
 
+    private String fullName;
+    private String position;
+    private String skills;
+    private String experience;
+    private String githubUsername;
+    private String about;
+
+    private String avatarUrl;
+
 }

@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>constellar.tech | Смена аватарки</title>
+    <style>
+        /* Основные переменные */
+        :root {
+            --primary-dark: #0a0f2b;
+            --secondary-dark: #1a1a40;
+            --accent-blue: #00ffff;
+            --accent-pink: #ff00ff;
+            --accent-green: #00ffaa;
+        }
+
+        /* Базовые стили */
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--primary-dark), var(--secondary-dark));
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Звёздный фон */
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 2s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Шапка */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: rgba(10, 15, 43, 0.9);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-sizing: border-box;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+        }
+
+        .logo-small {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+            position: relative;
+        }
+
+        .logo-small::after {
+            content: "";
+            display: block;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-pink));
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+        }
+
+        .back-btn {
+            padding: 0.5rem 1rem;
+            background: transparent;
+            color: var(--accent-blue);
+            border: 1px solid var(--accent-blue);
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        .back-btn:hover {
+            background: rgba(0, 255, 255, 0.1);
+        }
+
+        /* Основной контент */
+        .upload-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 5rem 2rem 2rem;
+            box-sizing: border-box;
+        }
+
+        .upload-card {
+            width: 100%;
+            max-width: 500px;
+            padding: 2.5rem;
+            background: rgba(10, 15, 43, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.1);
+            text-align: center;
+            position: relative;
+            z-index: 100;
+        }
+
+        .upload-logo {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .upload-logo::after {
+            content: "";
+            display: block;
+            width: 50%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-pink));
+            position: absolute;
+            bottom: -10px;
+            left: 25%;
+        }
+
+        .upload-title {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            color: var(--accent-blue);
+        }
+
+        /* Форма загрузки */
+        .upload-form {
+            margin-top: 2rem;
+        }
+
+        .file-upload-wrapper {
+            margin-bottom: 2rem;
+        }
+
+        .file-upload-label {
+            display: inline-block;
+            padding: 0.8rem 1.5rem;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-green));
+            color: var(--primary-dark);
+            border-radius: 50px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .file-upload-label:hover {
+            transform: scale(1.05);
+        }
+
+        .file-name {
+            display: block;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        #avatarFile {
+            display: none;
+        }
+
+        /* Кнопки */
+        .form-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn-upload {
+            padding: 0.8rem 2rem;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-green));
+            color: var(--primary-dark);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: transform 0.3s;
+        }
+
+        .btn-upload:hover {
+            transform: scale(1.05);
+        }
+
+        .btn-cancel {
+            padding: 0.8rem 2rem;
+            background: transparent;
+            color: var(--accent-blue);
+            border: 1px solid var(--accent-blue);
+            border-radius: 50px;
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+
+        .btn-cancel:hover {
+            background: rgba(0, 255, 255, 0.1);
+        }
+
+        /* Сообщения */
+        .alert {
+            padding: 1rem;
+            border-radius: 5px;
+            margin-top: 1.5rem;
+        }
+
+        .alert.success {
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            color: #00ffaa;
+        }
+
+        .alert.error {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            color: #ff5555;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 600px) {
+            .upload-card {
+                padding: 1.5rem;
+            }
+
+            .upload-logo {
+                font-size: 1.5rem;
+            }
+
+            .form-actions {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .btn-upload, .btn-cancel {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Звёздный фон -->
+<div th:each="i : ${#numbers.sequence(1, 100)}"
+     class="star"
+     th:style="'top: ' + ${T(java.lang.Math).random() * 100} + '%; ' +
+                  'left: ' + ${T(java.lang.Math).random() * 100} + '%; ' +
+                  'animation-delay: ' + ${T(java.lang.Math).random() * 2} + 's; ' +
+                  'animation-duration: ' + (5 + ${T(java.lang.Math).random() * 10}) + 's;'">
+</div>
+
+<!-- Шапка -->
+<header class="header">
+    <a href="/dashboard" class="logo-small">constellar.tech</a>
+    <a th:href="@{/candidate-personal-account}" class="back-btn">Назад</a>
+</header>
+
+<!-- Основной контент -->
+<div class="upload-container">
+    <div class="upload-card">
+        <div class="upload-logo">constellar.tech</div>
+        <h2 class="upload-title">Смена аватарки</h2>
+
+        <form th:action="@{/image/candidate/upload-avatar}" method="post" enctype="multipart/form-data" class="upload-form">
+            <div class="file-upload-wrapper">
+                <label for="avatarFile" class="file-upload-label">
+                    Выбрать файл
+                </label>
+                <span class="file-name" id="fileName">Файл не выбран</span>
+                <input type="file" id="avatarFile" name="avatarFile" accept="image/*" required>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-upload">Загрузить</button>
+                <a th:href="@{/candidate-personal-account}" class="btn-cancel">Отмена</a>
+            </div>
+        </form>
+
+        <div th:if="${message}" class="alert success" th:text="${message}"></div>
+        <div th:if="${error}" class="alert error" th:text="${error}"></div>
+    </div>
+</div>
+
+<script>
+    // Показываем имя выбранного файла
+    document.getElementById('avatarFile').addEventListener('change', function(e) {
+        const fileName = this.files[0] ? this.files[0].name : 'Файл не выбран';
+        document.getElementById('fileName').textContent = fileName;
+    });
+</script>
+
+</body>
+</html>
