@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>constellar.tech | Новый репозиторий</title>
+    <link th:href="@{https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap}" rel="stylesheet">
+    <link th:href="@{/candidate-repository-list.css}" rel="stylesheet">
+<!--    <link th:href="@{/candidate-personal-account.css}" rel="stylesheet">-->
+    <style>
+        /* Дополнительные стили для формы */
+        .add-repo-form {
+            background: rgba(10, 15, 43, 0.5);
+            border-radius: 10px;
+            padding: 2rem;
+            margin-top: 2rem;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--accent-blue);
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.8rem;
+            background: rgba(26, 26, 64, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 2px rgba(0, 255, 255, 0.2);
+            outline: none;
+        }
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem;
+            background: rgba(26, 26, 64, 0.5);
+            border-radius: 5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .file-info {
+            flex: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .file-size {
+            color: var(--text-light);
+            font-size: 0.8rem;
+            margin-left: 1rem;
+        }
+
+        .remove-file-btn {
+            background: none;
+            border: none;
+            color: var(--accent-pink);
+            cursor: pointer;
+            padding: 0.3rem;
+            margin-left: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+
+        .remove-file-btn:hover {
+            background: rgba(255, 0, 255, 0.1);
+            transform: scale(1.1);
+        }
+
+        .remove-file-btn svg {
+            display: block;
+        }
+        .file-upload-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            background: rgba(26, 26, 64, 0.3);
+            border: 2px dashed var(--accent-blue);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            gap: 0.5rem;
+        }
+
+        .file-upload-label.drag-active {
+            background: rgba(0, 255, 255, 0.1);
+            border-color: var(--accent-green);
+        }
+
+        .file-upload-icon {
+            font-size: 2rem;
+            color: var(--accent-blue);
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem;
+            background: rgba(26, 26, 64, 0.5);
+            border-radius: 5px;
+            margin-bottom: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .file-item:hover {
+            background: rgba(26, 26, 64, 0.7);
+        }
+
+        .file-info {
+            flex: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .file-info span:first-child {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-right: 1rem;
+        }
+
+        .file-size {
+            color: var(--text-light);
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .file-upload-wrapper {
+            position: relative;
+            margin-top: 1rem;
+        }
+
+        .file-upload-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            background: rgba(26, 26, 64, 0.3);
+            border: 2px dashed var(--accent-blue);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+
+        .file-upload-label:hover {
+            background: rgba(26, 26, 64, 0.5);
+        }
+
+        .file-upload-icon {
+            font-size: 2rem;
+            color: var(--accent-blue);
+            margin-right: 1rem;
+        }
+
+        .file-upload-input {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-list {
+            margin-top: 1rem;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.8rem;
+            background: rgba(26, 26, 64, 0.5);
+            border-radius: 5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .submit-btn {
+            padding: 0.8rem 2rem;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-green));
+            color: var(--primary-dark);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            margin-top: 1.5rem;
+            transition: transform 0.3s;
+            font-family: 'Montserrat', sans-serif; /* Добавляем шрифт */
+            /* Можно указать размер как у других элементов */
+            text-transform: none; /* Убираем автоматическое преобразование текста */
+            letter-spacing: normal; /* Нормальный интервал между буквами */
+        }
+
+        .submit-btn:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+<!-- Звёздный фон -->
+<div th:each="i : ${#numbers.sequence(1, 100)}"
+     class="star"
+     th:style="'top: ' + ${T(java.lang.Math).random() * 100} + '%; ' +
+              'left: ' + ${T(java.lang.Math).random() * 100} + '%; ' +
+              'animation-delay: ' + ${T(java.lang.Math).random() * 2} + 's; ' +
+              'animation-duration: ' + (5 + ${T(java.lang.Math).random() * 10}) + 's;'">
+</div>
+
+<!-- Шапка -->
+<header class="header" id="mainHeader">
+    <a href="/dashboard" class="logo-small">constellar.tech</a>
+    <form th:action="@{/constellar.tech/api/v1/auth/logout-candidate}" method="post">
+        <button type="submit" class="logout-btn">Выйти</button>
+    </form>
+</header>
+
+<!-- Основной контент -->
+<div class="dashboard-container">
+    <!-- Боковая панель -->
+    <aside class="sidebar">
+        <div class="profile-card">
+            <div th:if="${session.candidate.avatar != null}">
+                <img th:src="@{/image/candidate/getAvatar/{id}(id = ${session.candidate.id})}" alt="Аватар" class="avatar-image">
+            </div>
+            <div th:if="${session.candidate.avatar == null}" class="avatar-placeholder"
+                 th:text="${#strings.substring(session.candidate.username, 0, 2)}">
+            </div>
+            <a href="/change-avatar-candidate" class="change-avatar-btn">Изменить аватар</a>
+            <div class="username" th:text="${session.candidate.username}">Username</div>
+            <div class="position" th:text="${session.candidate.position ?: 'Должность не указана'}">Position</div>
+        </div>
+
+        <ul class="nav-menu">
+            <li class="nav-item"><a href="/candidate-personal-account" class="nav-link">Профиль</a></li>
+            <li class="nav-item"><a href="/candidate-repository-list" class="nav-link active">Репозитории</a></li>
+            <li class="nav-item"><a href="#settings" class="nav-link">Настройки</a></li>
+        </ul>
+    </aside>
+
+    <!-- Основное содержимое -->
+    <main class="main-content">
+        <h2 class="section-title">Создать новый репозиторий</h2>
+
+        <form class="add-repo-form" th:action="@{/constellar.tech/api/v1/repository/add}" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="repoName" class="form-label">Название репозитория</label>
+                <input type="text" id="repoName" name="name" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label for="repoDescription" class="form-label">Описание</label>
+                <textarea id="repoDescription" name="description" class="form-control"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="repoLanguage" class="form-label">Язык программирования</label>
+                <input type="text" id="repoLanguage" name="primaryLanguage" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Файлы репозитория</label>
+                <div class="file-upload-wrapper">
+                    <label class="file-upload-label">
+                        <span class="file-upload-icon">+</span>
+                        <span>Перетащите файлы сюда или кликните для выбора</span>
+                        <input type="file" id="repoFiles" name="files" class="file-upload-input" multiple>
+                    </label>
+                </div>
+
+                <div class="file-list" id="fileListContainer">
+                    <div class="empty-state">Файлы не добавлены</div>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn">Создать репозиторий</button>
+        </form>
+    </main>
+</div>
+
+
+<script>
+
+    // Скрипт для скрытия шапки при скролле
+    let lastScroll = 0;
+    const header = document.getElementById('mainHeader');
+    const SCROLL_THRESHOLD = 5;
+
+    window.addEventListener('scroll', function() {
+        const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+
+        if (currentScroll > lastScroll + SCROLL_THRESHOLD) {
+            header.classList.add('hidden');
+        } else if (currentScroll < lastScroll - SCROLL_THRESHOLD && currentScroll <= SCROLL_THRESHOLD) {
+            header.classList.remove('hidden');
+        }
+
+        lastScroll = currentScroll;
+    });
+</script>
+<script>
+    // Хранилище выбранных файлов
+    let selectedFiles = [];
+
+    // Элементы DOM
+    const fileInput = document.getElementById('repoFiles');
+    const fileListContainer = document.getElementById('fileListContainer');
+
+    // Обработчик изменения input[type=file]
+    fileInput.addEventListener('change', function(e) {
+        // Добавляем новые файлы к уже выбранным
+        if (this.files.length > 0) {
+            selectedFiles = [...selectedFiles, ...Array.from(this.files)];
+            updateFileList();
+            updateFileInput();
+        }
+    });
+
+    // Функция обновления списка файлов
+    function updateFileList() {
+        fileListContainer.innerHTML = '';
+
+        if (selectedFiles.length === 0) {
+            fileListContainer.innerHTML = '<div class="empty-state">Файлы не добавлены</div>';
+            return;
+        }
+
+        selectedFiles.forEach((file, index) => {
+            const fileItem = document.createElement('div');
+            fileItem.className = 'file-item';
+            fileItem.innerHTML = `
+            <div class="file-info">
+                <span>${file.name}</span>
+                <span class="file-size">${formatFileSize(file.size)}</span>
+            </div>
+            <button class="remove-file-btn" data-index="${index}">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        `;
+            fileListContainer.appendChild(fileItem);
+        });
+
+        // Добавляем обработчики для кнопок удаления
+        document.querySelectorAll('.remove-file-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const index = parseInt(this.getAttribute('data-index'));
+                selectedFiles.splice(index, 1);
+                updateFileList();
+                updateFileInput();
+            });
+        });
+    }
+
+    // Функция обновления файлового input
+    function updateFileInput() {
+        const dataTransfer = new DataTransfer();
+        selectedFiles.forEach(file => dataTransfer.items.add(file));
+        fileInput.files = dataTransfer.files;
+    }
+
+    // Форматирование размера файла
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    // Drag and drop функционал
+    const fileUploadLabel = document.querySelector('.file-upload-label');
+
+    ['dragover', 'dragenter'].forEach(eventName => {
+        fileUploadLabel.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            fileUploadLabel.style.background = 'rgba(0, 255, 255, 0.1)';
+            fileUploadLabel.style.borderColor = 'var(--accent-green)';
+        });
+    });
+
+    ['dragleave', 'dragend'].forEach(eventName => {
+        fileUploadLabel.addEventListener(eventName, () => {
+            fileUploadLabel.style.background = 'rgba(26, 26, 64, 0.3)';
+            fileUploadLabel.style.borderColor = 'var(--accent-blue)';
+        });
+    });
+
+    fileUploadLabel.addEventListener('drop', (e) => {
+        e.preventDefault();
+        fileUploadLabel.style.background = 'rgba(26, 26, 64, 0.3)';
+        fileUploadLabel.style.borderColor = 'var(--accent-blue)';
+
+        if (e.dataTransfer.files.length) {
+            selectedFiles = [...selectedFiles, ...Array.from(e.dataTransfer.files)];
+            updateFileList();
+            updateFileInput();
+        }
+    });
+
+    // Очистка input при каждом открытии файлового диалога
+    fileInput.addEventListener('click', function() {
+        this.value = ''; // Позволяет выбирать одинаковые файлы повторно
+    });
+</script>
+</body>
+</html>

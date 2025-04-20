@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="ru">
 <head>
@@ -8,7 +10,7 @@
     <link th:href="@{https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap}"
           rel="stylesheet">
     <!-- Внутренний ресурс через Thymeleaf -->
-    <link th:href="@{/candidate-personal-account.css}" rel="stylesheet">
+    <link th:href="@{/candidate-repository-list.css}" rel="stylesheet">
 </head>
 <body>
 <!-- Звёздный фон -->
@@ -34,7 +36,8 @@
     <aside class="sidebar">
         <div class="profile-card">
             <div th:if="${session.candidate.avatar != null}">
-                <img th:src="@{/image/candidate/getAvatar/{id}(id = ${session.candidate.id})}" alt="Аватар" class="avatar-image">
+                <img th:src="@{/image/candidate/getAvatar/{id}(id = ${session.candidate.id})}" alt="Аватар"
+                     class="avatar-image">
             </div>
             <div th:if="${session.candidate.avatar == null}" class="avatar-placeholder"
                  th:text="${#strings.substring(session.candidate.username, 0, 2)}">
@@ -45,61 +48,42 @@
         </div>
 
         <ul class="nav-menu">
-            <li class="nav-item"><a href="/candidate-personal-account" class="nav-link active">Профиль</a></li>
-            <li class="nav-item"><a href="/candidate-repository-list" class="nav-link" id="repositoriesLink">Репозитории</a></li>
+            <li class="nav-item"><a href="/candidate-personal-account" class="nav-link ">Профиль</a></li>
+            <li class="nav-item"><a href="/candidate-repository-list" class="nav-link active"
+                                    id="repositoriesLink">Репозитории</a></li>
             <li class="nav-item"><a href="#settings" class="nav-link">Настройки</a></li>
         </ul>
     </aside>
 
     <!-- Основное содержимое -->
     <main class="main-content">
-        <!-- Секция профиля -->
-        <section id="profile" class="profile-section">
-            <h2 class="section-title">Мой профиль</h2>
+        <section class="repositories-section">
+            <h2 class="section-title">Мои репозитории</h2>
 
-            <div class="profile-grid">
-                <div class="profile-field">
-                    <span class="field-label">Полное имя</span>
-                    <div class="field-value" th:class="${session.candidate.fullName == null} ? 'empty-field'"
-                         th:text="${session.candidate.fullName != null} ? ${session.candidate.fullName} : 'Не заполнено'"></div>
+            <div class="repositories-grid">
+                <!-- Карточки репозиториев -->
+                <div th:each="repo : ${session.candidate.repositories}" class="repo-card"
+                     th:onclick="'location.href=\'/repository/' + ${repo.id} + '\''">
+                    <div class="repo-name" th:text="${repo.name}">Название репозитория</div>
+                    <div class="repo-description" th:text="${repo.description} ?: 'Описание отсутствует'">
+                        Описание репозитория. Здесь может быть краткое описание проекта и используемых технологий.
+                    </div>
+                    <div class="repo-meta">
+                        <span th:text="${repo.primaryLanguage} ?: 'Язык не указан'">JavaScript</span>
+                        <span th:text="'⭐ ' + (${repo.stars} != null ? ${repo.stars} : '0')">⭐ 42</span>
+                        <span th:text="'Обновлён ' + ${#temporals.format(repo.lastUpdated, 'dd MMM yyyy')}">Обновлён 2 дня назад</span>
+                    </div>
                 </div>
 
-                <div class="profile-field">
-                    <span class="field-label">Должность</span>
-                    <div class="field-value" th:class="${session.candidate.position == null} ? 'empty-field'"
-                         th:text="${session.candidate.position != null} ? ${session.candidate.position} : 'Не заполнено'"></div>
-                </div>
-
-                <div class="profile-field">
-                    <span class="field-label">Навыки</span>
-                    <div class="field-value" th:class="${session.candidate.skills == null} ? 'empty-field'"
-                         th:text="${session.candidate.skills != null} ? ${session.candidate.skills} : 'Не заполнено'"></div>
-                </div>
-
-                <div class="profile-field">
-                    <span class="field-label">Опыт работы</span>
-                    <div class="field-value" th:class="${session.candidate.experience == null} ? 'empty-field'"
-                         th:text="${session.candidate.experience != null} ? ${session.candidate.experience} : 'Не заполнено'"></div>
-                </div>
-
-                <div class="profile-field">
-                    <span class="field-label">GitHub</span>
-                    <div class="field-value" th:class="${session.candidate.githubUsername == null} ? 'empty-field'"
-                         th:text="${session.candidate.githubUsername != null} ? ${session.candidate.githubUsername} : 'Не заполнено'"></div>
-                </div>
-
-                <div class="profile-field">
-                    <span class="field-label">О себе</span>
-                    <div class="field-value" th:class="${session.candidate.about == null} ? 'empty-field'"
-                         th:text="${session.candidate.about != null} ? ${session.candidate.about} : 'Не заполнено'"></div>
+                <!-- Кнопка добавления нового репозитория -->
+                <div class="repo-card add-repo-btn" onclick="location.href='/candidate-repository-add'">
+                    <div class="add-repo-icon">+</div>
                 </div>
             </div>
-
-            <button class="edit-btn" onclick="location.href='/edit-profile-candidate'">Редактировать профиль</button>
         </section>
-
-
     </main>
+
+
 </div>
 
 <script>

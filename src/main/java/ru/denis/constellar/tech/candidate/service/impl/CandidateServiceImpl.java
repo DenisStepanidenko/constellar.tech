@@ -1,9 +1,11 @@
 package ru.denis.constellar.tech.candidate.service.impl;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.denis.constellar.tech.auth.candidate.dto.RequestCandidateRegistration;
+import ru.denis.constellar.tech.candidate.dto.CandidateUpdateRequest;
 import ru.denis.constellar.tech.candidate.jpa.CandidateRepository;
 import ru.denis.constellar.tech.candidate.model.Candidate;
 import ru.denis.constellar.tech.candidate.service.CandidateService;
@@ -42,6 +44,19 @@ public class CandidateServiceImpl implements CandidateService {
     @Override
     public Optional<Candidate> findByEmail(String email) {
         return candidateRepository.findByEmail(email);
+    }
+
+    @Override
+    public void updateCandidate(CandidateUpdateRequest candidateUpdateRequest, Candidate candidate) {
+
+        candidate.setAbout(candidateUpdateRequest.getAbout());
+        candidate.setExperience(candidateUpdateRequest.getExperience());
+        candidate.setPosition(candidateUpdateRequest.getPosition());
+        candidate.setSkills(candidateUpdateRequest.getSkills());
+        candidate.setFullName(candidateUpdateRequest.getFullName());
+        candidate.setGithubUsername(candidateUpdateRequest.getGithubUsername());
+        candidate.setUsername(candidateUpdateRequest.getUsername());
+        candidateRepository.save(candidate);
     }
 
 

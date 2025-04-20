@@ -16,7 +16,7 @@ import ru.denis.constellar.tech.auth.validation.annotations.ValidPassword;
 public class RequestCandidateRegistration {
 
     @NotBlank(message = "Имя пользователя не может быть пустым")
-    @Size(max = 15, message = "Имя пользователя не может быть длиннее 15 символов")
+    @Size(min = 2, max = 15, message = "Длина имени пользователя может от 2-ух до 15-ти символов.")
     private String username;
 
     @Email(message = "Email не соответствует шаблону")

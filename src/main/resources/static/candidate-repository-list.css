@@ -246,6 +246,9 @@ body {
     margin-bottom: 1.5rem;
     position: relative;
     display: inline-block;
+    font-family: 'Montserrat', sans-serif; /* Добавляем шрифт */
+    text-transform: none; /* Убираем автоматическое преобразование текста */
+    letter-spacing: normal; /* Нормальный интервал между буквами */
 }
 
 .section-title::after {
@@ -330,6 +333,18 @@ body {
     padding: 1.5rem;
     border: 1px solid rgba(255, 255, 255, 0.1);
     transition: transform 0.3s, box-shadow 0.3s;
+    cursor: pointer; /* Устанавливаем курсор-указатель */
+    user-select: none; /* Запрещаем выделение текста */
+    -webkit-user-select: none; /* Для Safari */
+    -moz-user-select: none; /* Для Firefox */
+    -ms-user-select: none; /* Для IE/Edge */
+}
+.repo-card * {
+    user-select: none; /* Применяем ко всем элементам внутри карточки */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    cursor: pointer; /* Наследуем курсор */
 }
 
 .repo-card:hover {

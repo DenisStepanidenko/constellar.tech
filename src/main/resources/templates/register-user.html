@@ -18,6 +18,13 @@
             overflow: hidden;
         }
 
+        .registration-wrapper {
+            display: flex;
+            width: 900px;
+            max-width: 90%;
+            gap: 30px;
+        }
+
         .container {
             text-align: center;
             background: rgba(0, 0, 0, 0.7);
@@ -26,8 +33,60 @@
             box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
             position: relative;
             z-index: 2;
-            width: 400px;
-            max-width: 90%;
+            width: 100%;
+        }
+
+        .requirements-panel {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(255, 0, 255, 0.3);
+            width: 300px;
+            min-width: 300px;
+            border-left: 3px solid #00ffff;
+        }
+
+        .requirements-panel h3 {
+            color: #00ffff;
+            margin-top: 0;
+            font-size: 1.3rem;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .requirements-panel h3::after {
+            content: "";
+            display: block;
+            width: 50%;
+            height: 2px;
+            background: linear-gradient(90deg, #00ffff, #ff00ff);
+            position: absolute;
+            bottom: 0;
+            left: 0;
+        }
+
+        .requirements-list {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0 0 0;
+            text-align: left;
+        }
+
+        .requirements-list li {
+            margin-bottom: 15px;
+            position: relative;
+            padding-left: 25px;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .requirements-list li::before {
+            content: "•";
+            color: #00ffaa;
+            font-size: 1.5rem;
+            position: absolute;
+            left: 0;
+            top: -5px;
         }
 
         .logo {
@@ -64,6 +123,11 @@
             outline: none;
             width: 100%;
             box-sizing: border-box;
+            transition: all 0.3s;
+        }
+
+        .auth-form input:focus {
+            box-shadow: 0 0 0 2px rgba(0, 255, 255, 0.5);
         }
 
         .auth-form input::placeholder {
@@ -81,6 +145,7 @@
             transition: transform 0.3s, box-shadow 0.3s;
             width: 100%;
             margin-top: 0.5rem;
+            font-weight: 600;
         }
 
         .auth-form button:hover {
@@ -145,30 +210,60 @@
             border-radius: 50%;
             animation: twinkle 2s infinite, moveStar 10s linear infinite;
         }
+
+        @media (max-width: 768px) {
+            .registration-wrapper {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .requirements-panel {
+                width: 100%;
+                min-width: auto;
+                order: -1;
+                margin-bottom: 20px;
+            }
+        }
     </style>
 </head>
 <body>
-<div class="container">
-    <div class="logo">constellar.tech</div>
-    <form class="auth-form" id="register-form">
-        <div id="global-errors" class="global-errors"></div>
+<div class="registration-wrapper">
+    <div class="container">
+        <div class="logo">constellar.tech</div>
+        <form class="auth-form" id="register-form">
+            <div id="global-errors" class="global-errors"></div>
 
-        <input type="text" name="username" placeholder="Имя пользователя" required>
-        <div class="error-message" id="username-error"></div>
+            <input type="text" name="username" placeholder="Имя пользователя" required>
+            <div class="error-message" id="username-error"></div>
 
-        <input type="email" name="email" placeholder="Email" required>
-        <div class="error-message" id="email-error"></div>
+            <input type="email" name="email" placeholder="Email" required>
+            <div class="error-message" id="email-error"></div>
 
-        <input type="password" name="password" placeholder="Пароль" required>
-        <div class="error-message" id="password-error"></div>
+            <input type="password" name="password" placeholder="Пароль" required>
+            <div class="error-message" id="password-error"></div>
 
-        <input type="password" name="confirmPassword" placeholder="Подтвердите пароль" required>
-        <div class="error-message" id="confirmPassword-error"></div>
+            <input type="password" name="confirmPassword" placeholder="Подтвердите пароль" required>
+            <div class="error-message" id="confirmPassword-error"></div>
 
-        <button type="submit">Зарегистрироваться</button>
-    </form>
-    <div class="switch-form">
-        Уже есть аккаунт? <a href="/home">Войти</a>
+            <button type="submit">Зарегистрироваться</button>
+        </form>
+        <div class="switch-form">
+            Уже есть аккаунт? <a href="/home">Войти</a>
+        </div>
+    </div>
+
+    <div class="requirements-panel">
+        <h3>Требования к данным</h3>
+        <ul class="requirements-list">
+            <li><strong>Имя пользователя:</strong> от 2 до 15 символов</li>
+            <li><strong>Email:</strong> должен быть корректным email-адресом</li>
+            <li><strong>Пароль:</strong> минимум 8 символов</li>
+            <li><strong>Пароль:</strong> должен содержать цифры</li>
+            <li><strong>Пароль:</strong> должен содержать заглавные буквы</li>
+            <li><strong>Пароль:</strong> должен содержать строчные буквы</li>
+            <li><strong>Пароль:</strong> должен содержать специальный символ</li>
+            <li><strong>Подтверждение:</strong> должно совпадать с паролем</li>
+        </ul>
     </div>
 </div>
 

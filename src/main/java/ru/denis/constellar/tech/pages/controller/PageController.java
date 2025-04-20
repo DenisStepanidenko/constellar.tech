@@ -58,5 +58,31 @@ public class PageController {
         return "edit-profile-candidate";
     }
 
+    @GetMapping("/candidate-repository-list")
+    public String getCandidateAllRepositories(HttpSession session) {
+        if (Objects.isNull(session)) {
+            return "home";
+        }
+
+        if (Objects.isNull(session.getAttribute("candidate"))) {
+            return "home";
+        }
+
+        return "candidate-repository-list";
+    }
+
+    @GetMapping("/candidate-repository-add")
+    public String getCandidateAddRepository(HttpSession session) {
+        if (Objects.isNull(session)) {
+            return "home";
+        }
+
+        if (Objects.isNull(session.getAttribute("candidate"))) {
+            return "home";
+        }
+
+        return "add-candidate-repository";
+    }
+
 
 }
