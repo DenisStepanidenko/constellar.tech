@@ -275,8 +275,7 @@
     <!-- Основное содержимое -->
     <main class="main-content">
         <h2 class="section-title">Создать новый репозиторий</h2>
-
-        <form class="add-repo-form" th:action="@{/constellar.tech/api/v1/repository/add}" method="post" enctype="multipart/form-data">
+        <form class="add-repo-form" id="repoForm" th:action="@{/constellar.tech/api/v1/repository/add}" method="post" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="repoName" class="form-label">Название репозитория</label>
                 <input type="text" id="repoName" name="name" class="form-control" required>
@@ -309,6 +308,40 @@
 
             <button type="submit" class="submit-btn">Создать репозиторий</button>
         </form>
+
+<!--        <form class="add-repo-form" th:action="@{/constellar.tech/api/v1/repository/add}" method="post" enctype="multipart/form-data">-->
+<!--            <div class="form-group">-->
+<!--                <label for="repoName" class="form-label">Название репозитория</label>-->
+<!--                <input type="text" id="repoName" name="name" class="form-control" required>-->
+<!--            </div>-->
+
+<!--            <div class="form-group">-->
+<!--                <label for="repoDescription" class="form-label">Описание</label>-->
+<!--                <textarea id="repoDescription" name="description" class="form-control"></textarea>-->
+<!--            </div>-->
+
+<!--            <div class="form-group">-->
+<!--                <label for="repoLanguage" class="form-label">Язык программирования</label>-->
+<!--                <input type="text" id="repoLanguage" name="primaryLanguage" class="form-control" required>-->
+<!--            </div>-->
+
+<!--            <div class="form-group">-->
+<!--                <label class="form-label">Файлы репозитория</label>-->
+<!--                <div class="file-upload-wrapper">-->
+<!--                    <label class="file-upload-label">-->
+<!--                        <span class="file-upload-icon">+</span>-->
+<!--                        <span>Перетащите файлы сюда или кликните для выбора</span>-->
+<!--                        <input type="file" id="repoFiles" name="files" class="file-upload-input" multiple>-->
+<!--                    </label>-->
+<!--                </div>-->
+
+<!--                <div class="file-list" id="fileListContainer">-->
+<!--                    <div class="empty-state">Файлы не добавлены</div>-->
+<!--                </div>-->
+<!--            </div>-->
+
+<!--            <button type="submit" class="submit-btn">Создать репозиторий</button>-->
+<!--        </form>-->
     </main>
 </div>
 
@@ -335,18 +368,15 @@
 <script>
     // Хранилище выбранных файлов
     let selectedFiles = [];
-
-    // Элементы DOM
     const fileInput = document.getElementById('repoFiles');
     const fileListContainer = document.getElementById('fileListContainer');
+    const form = document.getElementById('repoForm');
 
-    // Обработчик изменения input[type=file]
+    // Обработчик выбора файлов
     fileInput.addEventListener('change', function(e) {
-        // Добавляем новые файлы к уже выбранным
         if (this.files.length > 0) {
             selectedFiles = [...selectedFiles, ...Array.from(this.files)];
             updateFileList();
-            updateFileInput();
         }
     });
 
@@ -363,36 +393,28 @@
             const fileItem = document.createElement('div');
             fileItem.className = 'file-item';
             fileItem.innerHTML = `
-            <div class="file-info">
-                <span>${file.name}</span>
-                <span class="file-size">${formatFileSize(file.size)}</span>
-            </div>
-            <button class="remove-file-btn" data-index="${index}">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                </svg>
-            </button>
-        `;
+                <div class="file-info">
+                    <span>${file.name}</span>
+                    <span class="file-size">${formatFileSize(file.size)}</span>
+                </div>
+                <button class="remove-file-btn" data-index="${index}">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            `;
             fileListContainer.appendChild(fileItem);
         });
 
-        // Добавляем обработчики для кнопок удаления
+        // Обработчики для кнопок удаления
         document.querySelectorAll('.remove-file-btn').forEach(btn => {
             btn.addEventListener('click', function(e) {
-                e.stopPropagation();
+                e.preventDefault();
                 const index = parseInt(this.getAttribute('data-index'));
                 selectedFiles.splice(index, 1);
                 updateFileList();
-                updateFileInput();
             });
         });
-    }
-
-    // Функция обновления файлового input
-    function updateFileInput() {
-        const dataTransfer = new DataTransfer();
-        selectedFiles.forEach(file => dataTransfer.items.add(file));
-        fileInput.files = dataTransfer.files;
     }
 
     // Форматирование размера файла
@@ -404,40 +426,165 @@
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     }
 
-    // Drag and drop функционал
+    // Drag and drop
     const fileUploadLabel = document.querySelector('.file-upload-label');
 
     ['dragover', 'dragenter'].forEach(eventName => {
         fileUploadLabel.addEventListener(eventName, (e) => {
             e.preventDefault();
-            fileUploadLabel.style.background = 'rgba(0, 255, 255, 0.1)';
-            fileUploadLabel.style.borderColor = 'var(--accent-green)';
+            fileUploadLabel.classList.add('drag-active');
         });
     });
 
-    ['dragleave', 'dragend'].forEach(eventName => {
+    ['dragleave', 'dragend', 'drop'].forEach(eventName => {
         fileUploadLabel.addEventListener(eventName, () => {
-            fileUploadLabel.style.background = 'rgba(26, 26, 64, 0.3)';
-            fileUploadLabel.style.borderColor = 'var(--accent-blue)';
+            fileUploadLabel.classList.remove('drag-active');
         });
     });
 
     fileUploadLabel.addEventListener('drop', (e) => {
         e.preventDefault();
-        fileUploadLabel.style.background = 'rgba(26, 26, 64, 0.3)';
-        fileUploadLabel.style.borderColor = 'var(--accent-blue)';
-
         if (e.dataTransfer.files.length) {
             selectedFiles = [...selectedFiles, ...Array.from(e.dataTransfer.files)];
             updateFileList();
-            updateFileInput();
         }
     });
 
-    // Очистка input при каждом открытии файлового диалога
-    fileInput.addEventListener('click', function() {
-        this.value = ''; // Позволяет выбирать одинаковые файлы повторно
+    // Отправка формы через Fetch API
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+
+        // Очищаем старые файлы в FormData и добавляем выбранные
+        formData.delete('files'); // Удаляем пустой список файлов из формы
+        selectedFiles.forEach(file => {
+            formData.append('files', file); // Добавляем каждый файл
+        });
+
+        try {
+            const response = await fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                // Заголовки не нужны — FormData автоматически устанавливает multipart/form-data
+            });
+
+            if (response.ok) {
+                window.location.href = '/candidate-repository-list'; // Перенаправление после успеха
+            } else {
+                console.error('Ошибка сервера:', await response.text());
+            }
+        } catch (error) {
+            console.error('Ошибка:', error);
+        }
     });
 </script>
+<!--<script>-->
+<!--    // Хранилище выбранных файлов-->
+<!--    let selectedFiles = [];-->
+
+<!--    // Элементы DOM-->
+<!--    const fileInput = document.getElementById('repoFiles');-->
+<!--    const fileListContainer = document.getElementById('fileListContainer');-->
+
+<!--    // Обработчик изменения input[type=file]-->
+<!--    fileInput.addEventListener('change', function(e) {-->
+<!--        // Добавляем новые файлы к уже выбранным-->
+<!--        if (this.files.length > 0) {-->
+<!--            selectedFiles = [...selectedFiles, ...Array.from(this.files)];-->
+<!--            updateFileList();-->
+<!--            updateFileInput();-->
+<!--        }-->
+<!--    });-->
+
+<!--    // Функция обновления списка файлов-->
+<!--    function updateFileList() {-->
+<!--        fileListContainer.innerHTML = '';-->
+
+<!--        if (selectedFiles.length === 0) {-->
+<!--            fileListContainer.innerHTML = '<div class="empty-state">Файлы не добавлены</div>';-->
+<!--            return;-->
+<!--        }-->
+
+<!--        selectedFiles.forEach((file, index) => {-->
+<!--            const fileItem = document.createElement('div');-->
+<!--            fileItem.className = 'file-item';-->
+<!--            fileItem.innerHTML = `-->
+<!--            <div class="file-info">-->
+<!--                <span>${file.name}</span>-->
+<!--                <span class="file-size">${formatFileSize(file.size)}</span>-->
+<!--            </div>-->
+<!--            <button class="remove-file-btn" data-index="${index}">-->
+<!--                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">-->
+<!--                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>-->
+<!--                </svg>-->
+<!--            </button>-->
+<!--        `;-->
+<!--            fileListContainer.appendChild(fileItem);-->
+<!--        });-->
+
+<!--        // Добавляем обработчики для кнопок удаления-->
+<!--        document.querySelectorAll('.remove-file-btn').forEach(btn => {-->
+<!--            btn.addEventListener('click', function(e) {-->
+<!--                e.stopPropagation();-->
+<!--                const index = parseInt(this.getAttribute('data-index'));-->
+<!--                selectedFiles.splice(index, 1);-->
+<!--                updateFileList();-->
+<!--                updateFileInput();-->
+<!--            });-->
+<!--        });-->
+<!--    }-->
+
+<!--    // Функция обновления файлового input-->
+<!--    function updateFileInput() {-->
+<!--        const dataTransfer = new DataTransfer();-->
+<!--        selectedFiles.forEach(file => dataTransfer.items.add(file));-->
+<!--        fileInput.files = dataTransfer.files;-->
+<!--    }-->
+
+<!--    // Форматирование размера файла-->
+<!--    function formatFileSize(bytes) {-->
+<!--        if (bytes === 0) return '0 Bytes';-->
+<!--        const k = 1024;-->
+<!--        const sizes = ['Bytes', 'KB', 'MB', 'GB'];-->
+<!--        const i = Math.floor(Math.log(bytes) / Math.log(k));-->
+<!--        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];-->
+<!--    }-->
+
+<!--    // Drag and drop функционал-->
+<!--    const fileUploadLabel = document.querySelector('.file-upload-label');-->
+
+<!--    ['dragover', 'dragenter'].forEach(eventName => {-->
+<!--        fileUploadLabel.addEventListener(eventName, (e) => {-->
+<!--            e.preventDefault();-->
+<!--            fileUploadLabel.style.background = 'rgba(0, 255, 255, 0.1)';-->
+<!--            fileUploadLabel.style.borderColor = 'var(&#45;&#45;accent-green)';-->
+<!--        });-->
+<!--    });-->
+
+<!--    ['dragleave', 'dragend'].forEach(eventName => {-->
+<!--        fileUploadLabel.addEventListener(eventName, () => {-->
+<!--            fileUploadLabel.style.background = 'rgba(26, 26, 64, 0.3)';-->
+<!--            fileUploadLabel.style.borderColor = 'var(&#45;&#45;accent-blue)';-->
+<!--        });-->
+<!--    });-->
+
+<!--    fileUploadLabel.addEventListener('drop', (e) => {-->
+<!--        e.preventDefault();-->
+<!--        fileUploadLabel.style.background = 'rgba(26, 26, 64, 0.3)';-->
+<!--        fileUploadLabel.style.borderColor = 'var(&#45;&#45;accent-blue)';-->
+
+<!--        if (e.dataTransfer.files.length) {-->
+<!--            selectedFiles = [...selectedFiles, ...Array.from(e.dataTransfer.files)];-->
+<!--            updateFileList();-->
+<!--            updateFileInput();-->
+<!--        }-->
+<!--    });-->
+
+<!--    // Очистка input при каждом открытии файлового диалога-->
+<!--    fileInput.addEventListener('click', function() {-->
+<!--        this.value = ''; // Позволяет выбирать одинаковые файлы повторно-->
+<!--    });-->
+<!--</script>-->
 </body>
 </html>

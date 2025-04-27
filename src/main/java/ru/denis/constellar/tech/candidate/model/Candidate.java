@@ -5,6 +5,7 @@ import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.Type;
 import org.hibernate.type.SqlTypes;
+import ru.denis.constellar.tech.achievement.model.Achievement;
 import ru.denis.constellar.tech.repository.model.Repository;
 
 import java.util.ArrayList;
@@ -45,6 +46,9 @@ public class Candidate {
 
     @OneToMany(mappedBy = "candidate", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Repository> repositories = new ArrayList<>();
+
+    @OneToMany(mappedBy = "candidate", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<Achievement> achievements = new ArrayList<>();
 
 
 }

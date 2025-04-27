@@ -3,7 +3,6 @@ package ru.denis.constellar.tech.pages.controller;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import ru.denis.constellar.tech.candidate.model.Candidate;
 
 import java.util.Objects;
 
@@ -82,6 +81,43 @@ public class PageController {
         }
 
         return "add-candidate-repository";
+    }
+
+    @GetMapping("/candidate-repository-page")
+    public String getCandidateRepository(HttpSession session) {
+        if (Objects.isNull(session)) {
+            return "home";
+        }
+
+        if (Objects.isNull(session.getAttribute("candidate"))) {
+            return "home";
+        }
+
+        return "candidate-repository";
+    }
+
+    @GetMapping("/candidate-achievements")
+    public String getAchievements(HttpSession session) {
+        if (Objects.isNull(session)) {
+            return "home";
+        }
+
+        if (Objects.isNull(session.getAttribute("candidate"))) {
+            return "home";
+        }
+
+        return "achivements-list";
+    }
+
+    @GetMapping("/login-company")
+    public String getLoginCompany() {
+
+        return "login-company";
+    }
+
+    @GetMapping("/register-company")
+    public String getRegisterCompany() {
+        return "register-company";
     }
 
 

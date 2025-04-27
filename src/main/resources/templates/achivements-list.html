@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>constellar.tech | Мои достижения</title>
+    <link th:href="@{https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap}"
+          rel="stylesheet">
+    <link th:href="@{/candidate-personal-account.css}" rel="stylesheet">
+    <style>
+        /* Дополнительные стили для страницы достижений */
+        .achievements-section {
+            background: rgba(10, 15, 43, 0.5);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .achievements-section {
+            background: rgba(10, 15, 43, 0.5);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .achievement-card {
+            background: rgba(26, 26, 64, 0.7);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .achievement-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            border-color: var(--accent-blue);
+        }
+
+        .achievement-preview {
+            height: 200px;
+            background: rgba(10, 15, 43, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pdf-preview-icon {
+            font-size: 5rem;
+            color: var(--accent-pink);
+        }
+
+        .achievement-info {
+            padding: 1.5rem;
+        }
+
+        .achievement-title {
+            font-size: 1.2rem;
+            color: var(--accent-blue);
+            margin: 0 0 0.5rem 0;
+            font-weight: 500;
+        }
+
+        .achievement-date {
+            font-size: 0.9rem;
+            color: #ccc;
+            margin-bottom: 1rem;
+        }
+
+        .achievement-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 1rem;
+        }
+
+        .action-group {
+            display: flex;
+            gap: 0.8rem;
+        }
+
+        .achievement-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            background: rgba(0, 255, 255, 0.1);
+            transition: all 0.3s;
+        }
+
+        .achievement-action:hover {
+            background: rgba(0, 255, 255, 0.2);
+        }
+
+        .delete-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-pink);
+            background: rgba(255, 0, 255, 0.1);
+            border: none;
+            border-radius: 4px;
+            padding: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .delete-btn:hover {
+            background: rgba(255, 0, 255, 0.2);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-light);
+            grid-column: 1 / -1;
+        }
+
+        .empty-state p {
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .certificate-icon {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 1.5rem;
+            opacity: 0.7;
+        }
+
+        /* Кнопка добавления в сетке */
+        .add-achievement-card {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(26, 26, 64, 0.3);
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s;
+            min-height: 200px;
+        }
+
+        .add-achievement-card:hover {
+            background: rgba(26, 26, 64, 0.5);
+        }
+
+        .add-achievement-icon {
+            font-size: 2rem;
+            color: var(--accent-blue);
+        }
+
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .achievement-card {
+            background: rgba(26, 26, 64, 0.7);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .achievement-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            border-color: var(--accent-blue);
+        }
+
+        .achievement-preview {
+            height: 200px;
+            background: rgba(10, 15, 43, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pdf-preview-icon {
+            font-size: 5rem;
+            color: var(--accent-pink);
+        }
+
+        .achievement-info {
+            padding: 1.5rem;
+        }
+
+        .achievement-title {
+            font-size: 1.2rem;
+            color: var(--accent-blue);
+            margin: 0 0 0.5rem 0;
+            font-weight: 500;
+        }
+
+        .achievement-date {
+            font-size: 0.9rem;
+            color: #ccc;
+            margin-bottom: 1rem;
+        }
+
+        .achievement-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 1rem;
+        }
+
+        .achievement-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            background: rgba(0, 255, 255, 0.1);
+            transition: all 0.3s;
+        }
+
+        .achievement-action:hover {
+            background: rgba(0, 255, 255, 0.2);
+        }
+
+        .achievement-action.delete {
+            background: rgba(255, 0, 255, 0.1);
+            color: var(--accent-pink);
+        }
+
+        .achievement-action.delete:hover {
+            background: rgba(255, 0, 255, 0.2);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-light);
+            grid-column: 1 / -1;
+        }
+
+        .empty-state p {
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .certificate-icon {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 1.5rem;
+            opacity: 0.7;
+        }
+
+        /* Кнопка добавления в сетке */
+        .add-achievement-card {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(26, 26, 64, 0.3);
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s;
+            min-height: 200px;
+        }
+
+        .add-achievement-card:hover {
+            background: rgba(26, 26, 64, 0.5);
+        }
+
+        .add-achievement-icon {
+            font-size: 2rem;
+            color: var(--accent-blue);
+        }
+
+        /* Модальное окно */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(10, 15, 43, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: var(--secondary-dark);
+            border-radius: 12px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 500px;
+            border: 1px solid var(--accent-blue);
+            box-shadow: 0 0 40px rgba(0, 255, 255, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            color: var(--accent-blue);
+            margin: 0;
+            font-size: 1.3rem;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .close-modal:hover {
+            color: var(--accent-pink);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            color: var(--text-light);
+            font-family: 'Montserrat', sans-serif;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 2px rgba(0, 255, 255, 0.1);
+        }
+
+        .file-upload {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .file-upload:hover {
+            border-color: var(--accent-blue);
+            background: rgba(0, 255, 255, 0.05);
+        }
+
+        .file-upload-icon {
+            font-size: 2rem;
+            color: var(--accent-blue);
+            margin-bottom: 1rem;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-pink));
+            border: none;
+            border-radius: 50px;
+            color: var(--primary-dark);
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+            box-shadow: 0 4px 15px rgba(0, 255, 255, 0.2);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body>
+<!-- Звёздный фон -->
+<div th:each="i : ${#numbers.sequence(1, 100)}"
+     class="star"
+     th:style="'top: ' + ${T(java.lang.Math).random() * 100} + '%; ' +
+              'left: ' + ${T(java.lang.Math).random() * 100} + '%; ' +
+              'animation-delay: ' + ${T(java.lang.Math).random() * 2} + 's; ' +
+              'animation-duration: ' + (5 + ${T(java.lang.Math).random() * 10}) + 's;'">
+</div>
+
+<!-- Шапка -->
+<header class="header" id="mainHeader">
+    <a href="/dashboard" class="logo-small">constellar.tech</a>
+    <form th:action="@{/constellar.tech/api/v1/auth/logout-candidate}" method="post">
+        <button type="submit" class="logout-btn">Выйти</button>
+    </form>
+</header>
+
+<!-- Основной контент -->
+<div class="dashboard-container">
+    <!-- Боковая панель -->
+    <aside class="sidebar">
+        <div class="profile-card">
+            <div th:if="${session.candidate.avatar != null}">
+                <img th:src="@{/image/candidate/getAvatar/{id}(id = ${session.candidate.id})}" alt="Аватар"
+                     class="avatar-image">
+            </div>
+            <div th:if="${session.candidate.avatar == null}" class="avatar-placeholder"
+                 th:text="${#strings.substring(session.candidate.username, 0, 2)}">
+            </div>
+            <a href="/change-avatar-candidate" class="change-avatar-btn">Изменить аватар</a>
+            <div class="username" th:text="${session.candidate.username}">Username</div>
+            <div class="position" th:text="${session.candidate.position ?: 'Должность не указана'}">Position</div>
+        </div>
+
+        <ul class="nav-menu">
+            <li class="nav-item"><a href="/candidate-personal-account" class="nav-link">Профиль</a></li>
+            <li class="nav-item"><a href="/candidate-repository-list" class="nav-link">Репозитории</a></li>
+            <li class="nav-item"><a href="/candidate-achievements" class="nav-link active">Достижения</a></li>
+            <li class="nav-item"><a href="#settings" class="nav-link">Настройки</a></li>
+        </ul>
+    </aside>
+
+    <main class="main-content">
+        <section class="achievements-section">
+            <h2 class="section-title">Мои достижения</h2>
+
+            <div class="achievements-grid" id="achievementsContainer">
+                <!-- Список достижений -->
+                <div th:each="achievement : ${session.candidate.achievements}" class="achievement-card">
+                    <div class="achievement-preview">
+                        <div class="pdf-preview-icon">
+                            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="var(--accent-pink)"
+                                 stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <path d="M10 11v5"></path>
+                                <path d="M8 15h4"></path>
+                                <path d="M16 15v-3a2 2 0 0 0-4 0"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="achievement-info">
+                        <h3 class="achievement-title" th:text="${achievement.title}">Название достижения</h3>
+                        <div class="achievement-date"
+                             th:text="${#temporals.format(achievement.date, 'd MMMM yyyy', new java.util.Locale('ru'))}">
+                            10 мая 2023
+                        </div>
+                        <div class="achievement-actions">
+                            <div class="action-group">
+                                <a th:href="@{'/constellar.tech/api/v1/achievement/view/' + ${achievement.id}}"
+                                   class="achievement-action">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                    </svg>
+                                    Просмотреть
+                                </a>
+                                <a th:href="@{'/constellar.tech/api/v1/achievement/download/' + ${achievement.id}}"
+                                   class="achievement-action">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                    </svg>
+                                    Скачать
+                                </a>
+                            </div>
+                            <button class="delete-btn" th:onclick="'deleteAchievement(' + ${achievement.id} + ')'">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Кнопка добавления в сетке -->
+                <div class="add-achievement-card"
+                     onclick="document.getElementById('addAchievementModal').classList.add('active')">
+                    <div class="add-achievement-icon">+</div>
+                </div>
+
+                <!-- Пустое состояние -->
+                <div th:if="${session.candidate.achievements.empty}" class="empty-state">
+                    <svg class="certificate-icon" viewBox="0 0 24 24" fill="none" stroke="rgba(0,255,255,0.5)"
+                         stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <p>У вас пока нет добавленных достижений</p>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<!-- Модальное окно для добавления достижения -->
+<div class="modal-overlay" id="addAchievementModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Добавить достижение</h3>
+            <button class="close-modal" id="closeModalBtn">&times;</button>
+        </div>
+        <form th:action="@{/constellar.tech/api/v1/achievement/add}" method="post" enctype="multipart/form-data"
+              id="achievementForm">
+            <div class="form-group">
+                <label for="achievementTitle" class="form-label">Название достижения *</label>
+                <input type="text" id="achievementTitle" name="title" class="form-input" required>
+            </div>
+
+            <div class="form-group">
+                <label for="achievementDate" class="form-label">Дата получения *</label>
+                <input type="date" id="achievementDate" name="date" class="form-input" required>
+            </div>
+
+            <div class="file-upload" id="fileUploadArea">
+                <div class="file-upload-icon">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                </div>
+                <p>Перетащите файл сюда или кликните для выбора *</p>
+                <input type="file" id="achievementFile" name="file" accept=".pdf,.jpg,.jpeg,.png" style="display: none;"
+                       required>
+                <div id="fileName" style="margin-top: 10px; color: var(--accent-blue);"></div>
+            </div>
+
+            <button type="submit" class="submit-btn">Добавить достижение</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    let lastScroll = 0;
+    const header = document.getElementById('mainHeader');
+    const SCROLL_THRESHOLD = 5;
+
+    window.addEventListener('scroll', function () {
+        const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+
+        if (currentScroll > lastScroll + SCROLL_THRESHOLD) {
+            header.classList.add('hidden');
+        } else if (currentScroll < lastScroll - SCROLL_THRESHOLD) {
+            if (currentScroll <= SCROLL_THRESHOLD) {
+                header.classList.remove('hidden');
+            }
+        }
+
+        if (currentScroll <= SCROLL_THRESHOLD) {
+            header.classList.remove('hidden');
+        }
+
+        lastScroll = currentScroll;
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Элементы модального окна
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const addAchievementModal = document.getElementById('addAchievementModal');
+
+        // Элементы для загрузки файлов
+        const fileUploadArea = document.getElementById('fileUploadArea');
+        const achievementFileInput = document.getElementById('achievementFile');
+        const fileNameDisplay = document.getElementById('fileName');
+
+        // Настройка модального окна
+        function setupModal() {
+            // Закрытие по крестику
+            closeModalBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                addAchievementModal.classList.remove('active');
+            });
+
+            // Закрытие по клику вне окна
+            addAchievementModal.addEventListener('click', function (e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
+                }
+            });
+        }
+
+        // Настройка drag-and-drop
+        function setupFileUpload() {
+            const preventDefaults = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            };
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                fileUploadArea.addEventListener(eventName, function (e) {
+                    preventDefaults(e);
+                    this.classList.add('highlight');
+                }, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                fileUploadArea.addEventListener(eventName, function (e) {
+                    preventDefaults(e);
+                    this.classList.remove('highlight');
+                }, false);
+            });
+
+            fileUploadArea.addEventListener('drop', function (e) {
+                const files = e.dataTransfer.files;
+                if (files.length) {
+                    achievementFileInput.files = files;
+                    updateFileName(files[0]);
+                }
+            }, false);
+
+            achievementFileInput.addEventListener('change', function () {
+                if (this.files.length) {
+                    updateFileName(this.files[0]);
+                }
+            });
+
+            fileUploadArea.addEventListener('click', function () {
+                achievementFileInput.click();
+            });
+
+            function updateFileName(file) {
+                fileNameDisplay.textContent = file.name;
+                fileNameDisplay.style.display = 'block';
+            }
+        }
+
+
+        window.deleteAchievement = async function (id) {
+            if (!confirm('Вы уверены, что хотите удалить это достижение?')) return;
+
+            // Блокируем кнопку на время выполнения
+            const btn = document.querySelector(`button[onclick="deleteAchievement(${id})"]`);
+            if (btn) btn.disabled = true;
+
+            const response = await fetch(`/constellar.tech/api/v1/achievement/delete/${id}`, {
+                method: 'POST', // Изменили на POST
+                credentials: 'include'
+            });
+
+            window.location.reload();
+        };
+
+        // Инициализация
+        setupModal();
+        setupFileUpload();
+
+        // Бесконечный скролл
+        window.addEventListener('scroll', function () {
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) {
+                // Здесь можно добавить загрузку дополнительных достижений
+                // Например, через fetch запрос к API
+            }
+        });
+    });
+</script>
+</body>
+</html>

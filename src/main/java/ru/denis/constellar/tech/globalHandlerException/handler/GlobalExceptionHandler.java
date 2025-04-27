@@ -2,14 +2,17 @@ package ru.denis.constellar.tech.globalHandlerException.handler;
 
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.denis.constellar.tech.auth.exceptions.EmailAlreadyExists;
 import ru.denis.constellar.tech.auth.exceptions.PasswordOrEmailIncorrect;
+import ru.denis.constellar.tech.auth.exceptions.UnauthorizedAccessException;
 import ru.denis.constellar.tech.globalHandlerException.dto.ErrorResponse;
 
+import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -48,6 +51,13 @@ public class GlobalExceptionHandler {
         return ErrorResponse.builder()
                 .timeOfError(LocalDateTime.now())
                 .errors(Collections.singletonList(ex.getMessage()))
+                .build();
+    }
+
+    @ExceptionHandler(UnauthorizedAccessException.class)
+    public ResponseEntity<Void> handleUnauthorized() {
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .location(URI.create("http://localhost:8080/home"))
                 .build();
     }
 

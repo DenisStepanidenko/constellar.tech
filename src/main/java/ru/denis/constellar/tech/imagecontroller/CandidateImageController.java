@@ -56,7 +56,7 @@ public class CandidateImageController {
                                       HttpSession session, HttpServletResponse response) throws IOException {
 
         if (session == null || session.getAttribute("candidate") == null) {
-            response.sendRedirect("http://localhost:/home");
+            response.sendRedirect("http://localhost:8080/home");
             return;
         }
 

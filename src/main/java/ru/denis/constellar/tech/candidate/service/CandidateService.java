@@ -18,4 +18,6 @@ public interface CandidateService {
 
     void updateCandidate(CandidateUpdateRequest candidateUpdateRequest, Candidate candidate);
 
+    Candidate saveCandidateAndReturn(Candidate candidate);
+
 }

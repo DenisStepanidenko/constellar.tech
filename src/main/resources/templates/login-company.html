@@ -1,10 +1,252 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход для компаний | constellar.tech</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background: linear-gradient(135deg, #0a0f2b, #1a1a40);
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 3rem;
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(255, 165, 0, 0.3);
+            position: relative;
+            z-index: 2;
+            width: 400px;
+            max-width: 90%;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .logo::after {
+            content: "";
+            display: block;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, #ffa500, #ff4500);
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+        }
+
+        .company-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #ffa500;
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+
+        .auth-form input {
+            padding: 0.8rem;
+            font-size: 1rem;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            outline: none;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .auth-form input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .auth-form button {
+            padding: 0.8rem;
+            font-size: 1rem;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #ffa500, #ff8c00);
+            color: #0a0f2b;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            width: 100%;
+            margin-top: 0.5rem;
+            font-weight: 500;
+        }
+
+        .auth-form button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 165, 0, 0.5);
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 1.5rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: color 0.3s, text-shadow 0.3s;
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .back-link:hover {
+            color: #ffa500;
+            text-shadow: 0 0 10px rgba(255, 165, 0, 0.5);
+            background: rgba(255, 165, 0, 0.1);
+        }
+
+        .switch-form {
+            margin-top: 1.5rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        .switch-form a {
+            color: #ffa500;
+            text-decoration: none;
+            transition: text-shadow 0.3s;
+        }
+
+        .switch-form a:hover {
+            text-shadow: 0 0 10px rgba(255, 165, 0, 0.7);
+        }
+
+        .error-message {
+            color: #ff5555;
+            margin-top: 1rem;
+            text-align: center;
+            min-height: 1.5rem;
+        }
+
+        /* Анимации для звезд (оранжевые) */
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #ffa500;
+            border-radius: 50%;
+            animation: twinkle 2s infinite, moveStar 10s linear infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        @keyframes moveStar {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(calc(-50vw + 100px), calc(-50vh + 100px)); }
+        }
+    </style>
 </head>
 <body>
+<!-- Звёздный фон -->
+<div th:each="i : ${#numbers.sequence(1, 100)}"
+     class="star"
+     th:style="'top: ' + ${T(java.lang.Math).random() * 100} + '%; ' +
+              'left: ' + ${T(java.lang.Math).random() * 100} + '%; ' +
+              'animation-delay: ' + ${T(java.lang.Math).random() * 2} + 's; ' +
+              'animation-duration: ' + (5 + ${T(java.lang.Math).random() * 10}) + 's;'">
+</div>
 
+<div class="container">
+    <div class="logo">constellar.tech</div>
+    <div class="company-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        </svg>
+    </div>
+    <form class="auth-form" id="login-form" th:action="@{/constellar.tech/api/v1/auth/login-company}" method="post">
+        <input type="email" name="email" placeholder="Корпоративная почта" required>
+        <input type="password" name="password" placeholder="Пароль" required>
+        <div id="error-message" class="error-message"></div>
+        <button type="submit">Войти в компанию</button>
+    </form>
+    <div class="switch-form">
+        Нет аккаунта компании? <a href="/register-company">Зарегистрировать компанию</a>
+    </div>
+    <a href="/home" class="back-link">Вернуться на главную</a>
+</div>
+
+<script>
+    document.getElementById('login-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const formData = {
+            email: this.querySelector('[name="email"]').value,
+            password: this.querySelector('[name="password"]').value
+        };
+
+        const submitButton = this.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
+        const originalText = submitButton.textContent;
+        submitButton.textContent = 'Вход...';
+
+        fetch('/constellar.tech/api/v1/auth/employer/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData),
+            credentials: 'include'
+        })
+            .then(async response => {
+                if (response.redirected) {
+                    window.location.href = response.url;
+                    // Успешный вход (200 OK) - перенаправляем на профиль
+                    //window.location.href = '/candidate-personal-account';
+                } else {
+                    // Обработка ошибок (400, 401 и т.д.)
+                    const errorData = await response.json().catch(() => ({}));
+                    const error = new Error(errorData.message || 'Ошибка входа');
+                    error.data = errorData;
+                    error.status = response.status;
+                    throw error;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                const errorContainer = document.getElementById('error-message');
+
+                // Обрабатываем ошибки с полем errors (как в ErrorResponse)
+                if (error.data?.errors) {
+                    errorContainer.textContent =
+                        Array.isArray(error.data.errors)
+                            ? error.data.errors.join('\n')
+                            : String(error.data.errors);
+                } else if (error.message) {
+                    errorContainer.textContent = error.message;
+                } else {
+                    errorContainer.textContent = 'Произошла ошибка при входе';
+                }
+            })
+            .finally(() => {
+                submitButton.textContent = originalText;
+                submitButton.disabled = false;
+            });
+    });
+</script>
 </body>
 </html>

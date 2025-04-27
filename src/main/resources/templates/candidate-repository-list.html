@@ -51,6 +51,7 @@
             <li class="nav-item"><a href="/candidate-personal-account" class="nav-link ">Профиль</a></li>
             <li class="nav-item"><a href="/candidate-repository-list" class="nav-link active"
                                     id="repositoriesLink">Репозитории</a></li>
+            <li class="nav-item"><a href="/candidate-achievements" class="nav-link">Достижения</a></li>
             <li class="nav-item"><a href="#settings" class="nav-link">Настройки</a></li>
         </ul>
     </aside>
@@ -63,7 +64,7 @@
             <div class="repositories-grid">
                 <!-- Карточки репозиториев -->
                 <div th:each="repo : ${session.candidate.repositories}" class="repo-card"
-                     th:onclick="'location.href=\'/repository/' + ${repo.id} + '\''">
+                     th:onclick="'location.href=\'/constellar.tech/api/v1/repository/' + ${repo.id} + '\''">
                     <div class="repo-name" th:text="${repo.name}">Название репозитория</div>
                     <div class="repo-description" th:text="${repo.description} ?: 'Описание отсутствует'">
                         Описание репозитория. Здесь может быть краткое описание проекта и используемых технологий.
