@@ -12,6 +12,8 @@ import ru.denis.constellar.tech.auth.exceptions.PasswordOrEmailIncorrect;
 import ru.denis.constellar.tech.employer.jpa.EmployerJpa;
 import ru.denis.constellar.tech.employer.model.Employer;
 
+import java.io.IOException;
+
 @Service
 @RequiredArgsConstructor
 public class CompanyAuthService {
@@ -31,11 +33,12 @@ public class CompanyAuthService {
 
         session.setAttribute("employer", employer);
 
-//        try {
-//            //response.sendRedirect("http://localhost:8080/candidate-personal-account");
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
+
+        try {
+            response.sendRedirect("http://localhost:8080/company-personal-account-home");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 
@@ -51,6 +54,8 @@ public class CompanyAuthService {
         Employer employer = Employer.builder()
                 .email(companyRegistrationRequest.getEmail())
                 .password(passwordEncoder.encode(companyRegistrationRequest.getPassword()))
+                .companyName(companyRegistrationRequest.getCompanyName())
+                .inn(companyRegistrationRequest.getInn())
                 .build();
 
         employerJpa.save(employer);

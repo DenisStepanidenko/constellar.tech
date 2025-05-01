@@ -14,4 +14,5 @@ public class AuthPageController {
     @GetMapping("/register-user-page")
     public String getRegisterUserPage() {return "register-user";
     }
+
 }

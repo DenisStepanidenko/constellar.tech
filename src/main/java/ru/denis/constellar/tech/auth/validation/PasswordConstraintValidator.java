@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 public class PasswordConstraintValidator implements ConstraintValidator<ValidPassword, String> {
 
     private final String messageIfPasswordNull = "Пароль не должен равняться null.";
+
     private final String messageIfPasswordNotContainsNumbers = "Пароль должен содержать цифры.";
 
     private final String messageIfPasswordNotContainsUppercaseLetters = "Пароль должен содержать заглавные буквы.";

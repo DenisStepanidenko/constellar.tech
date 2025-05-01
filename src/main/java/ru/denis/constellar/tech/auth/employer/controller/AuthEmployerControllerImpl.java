@@ -12,6 +12,8 @@ import ru.denis.constellar.tech.auth.employer.dto.CompanyRegistrationRequest;
 import ru.denis.constellar.tech.auth.employer.dto.RequestCompanyLogin;
 import ru.denis.constellar.tech.auth.employer.service.CompanyAuthService;
 
+import java.io.IOException;
+
 @RestController
 @RequestMapping("/constellar.tech/api/v1/auth/employer")
 @RequiredArgsConstructor
@@ -30,5 +32,19 @@ public class AuthEmployerControllerImpl {
     @PostMapping("/register")
     public void register(@RequestBody @Valid CompanyRegistrationRequest companyRegistrationRequest) {
         companyAuthService.registerCompany(companyRegistrationRequest);
+    }
+
+    @PostMapping("/logout")
+    public void logout(HttpSession session, HttpServletResponse response) throws IOException {
+
+        if(session == null || session.getAttribute("candidate") == null){
+            response.sendRedirect("http://localhost:8080/home");
+            return;
+        }
+
+
+        session.removeAttribute("employer");
+        response.sendRedirect("http://localhost:8080/home");
+
     }
 }

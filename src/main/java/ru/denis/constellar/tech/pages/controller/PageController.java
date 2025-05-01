@@ -2,7 +2,9 @@ package ru.denis.constellar.tech.pages.controller;
 
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import ru.denis.constellar.tech.vacancy.dto.VacancyDto;
 
 import java.util.Objects;
 
@@ -118,6 +120,94 @@ public class PageController {
     @GetMapping("/register-company")
     public String getRegisterCompany() {
         return "register-company";
+    }
+
+    @GetMapping("/company-personal-account-home")
+    public String getCompanyPersonalAccountHome(HttpSession session) {
+
+        if (Objects.isNull(session)) {
+            return "home";
+        }
+
+        if (Objects.isNull(session.getAttribute("employer"))) {
+            return "home";
+        }
+
+        return "company-personal-account-home";
+
+    }
+
+    @GetMapping("/edit-employer-profile")
+    public String getCompanyEditProfile(HttpSession session) {
+
+        if (Objects.isNull(session)) {
+            return "home";
+        }
+
+        if (Objects.isNull(session.getAttribute("employer"))) {
+            return "home";
+        }
+
+        return "edit-employer-profile";
+    }
+
+    @GetMapping("/company-change-avatar")
+    public String getCompanyChangeAvatar(HttpSession session) {
+
+        if (Objects.isNull(session)) {
+            return "home";
+        }
+
+        if (Objects.isNull(session.getAttribute("employer"))) {
+            return "home";
+        }
+
+        return "employer-change-avatar";
+    }
+
+    @GetMapping("/employer-list-vacancies")
+    public String getCompanyListVacancies(HttpSession session) {
+
+        if (Objects.isNull(session)) {
+            return "home";
+        }
+
+        if (Objects.isNull(session.getAttribute("employer"))) {
+            return "home";
+        }
+
+        return "employer-list-vacancies";
+    }
+
+    @GetMapping("/employer-add-vacancy")
+    public String getCompanyAddVacancy(HttpSession session, Model model) {
+
+        if (Objects.isNull(session)) {
+            return "home";
+        }
+
+        if (Objects.isNull(session.getAttribute("employer"))) {
+            return "home";
+        }
+
+        model.addAttribute("vacancyDto", new VacancyDto());
+
+        return "employer-add-vacancy";
+    }
+
+    @GetMapping("/employer-view-vacancy")
+    public String getCompanyVacancy(HttpSession session) {
+
+        if (Objects.isNull(session)) {
+            return "home";
+        }
+
+        if (Objects.isNull(session.getAttribute("employer"))) {
+            return "home";
+        }
+
+
+        return "employer-view-vacancy";
     }
 
 

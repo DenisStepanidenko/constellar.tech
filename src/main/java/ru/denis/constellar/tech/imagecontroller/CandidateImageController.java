@@ -64,42 +64,6 @@ public class CandidateImageController {
 
         candidate.setAvatar(file.getBytes());
         candidate.setAvatarMimeType(file.getContentType());
-
-//
-//        if (file.isEmpty()) {
-//            throw new IllegalArgumentException("Выберите файл для загрузки.");
-//        }
-//
-//        String contentType = file.getContentType();
-//
-//        if (!contentType.startsWith("image/")) {
-//            throw new IllegalArgumentException("Можно загружать только изображения.");
-//        }
-//
-//        Path baseDir = Paths.get(basePathToCandidateFiles);
-//
-//        if (!Files.exists(baseDir)) {
-//            Files.createDirectory(baseDir);
-//        }
-//
-//        baseDir = baseDir.resolve(candidate.getEmail());
-//
-//        if (!Files.exists(baseDir)) {
-//            Files.createDirectory(baseDir);
-//        }
-//
-//        String nameOfNewFile = file.getOriginalFilename();
-//
-//        Path pathToNewFile = baseDir.resolve(nameOfNewFile);
-//
-//
-//        if (Files.exists(pathToNewFile)) {
-//            Files.delete(pathToNewFile);
-//        }
-//
-//        Files.copy(file.getInputStream(), pathToNewFile);
-//
-//        candidate.setAvatarUrl(candidate.getEmail() + "/" + nameOfNewFile);
         candidateService.saveCandidate(candidate);
 
 

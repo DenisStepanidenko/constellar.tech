@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>constellar.tech | Кабинет компании</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    /* Основные стили */
+    body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0a0f2b, #1a1a40);
+      color: white;
+      font-family: 'Montserrat', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* Статичные звёзды */
+    .star {
+      position: fixed;
+      width: 2px;
+      height: 2px;
+      background: #ffa500;
+      border-radius: 50%;
+      animation: twinkle 4s infinite;
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.8; }
+      50% { opacity: 0.3; }
+    }
+
+    /* Шапка */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 100;
+      transition: transform 0.3s;
+      border-bottom: 1px solid rgba(255, 165, 0, 0.2);
+    }
+
+    .header.hidden {
+      transform: translateY(-100%);
+    }
+
+    .logo-small {
+      color: white;
+      font-size: 1.5rem;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .logout-btn {
+      background: linear-gradient(135deg, #ff4500, #ff8c00);
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+
+    .logout-btn:hover {
+      transform: scale(1.05);
+    }
+
+    /* Основной контейнер */
+    .dashboard-container {
+      display: flex;
+      min-height: 100vh;
+      padding-top: 70px;
+    }
+
+    /* Боковая панель */
+    .sidebar {
+      width: 280px;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 2rem 1rem;
+      border-right: 1px solid rgba(255, 165, 0, 0.2);
+      position: relative;
+      z-index: 10;
+    }
+
+    .profile-card {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .company-logo {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin: 0 auto 1rem;
+      border: 2px solid #ffa500;
+    }
+
+    .logo-placeholder {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: rgba(255, 165, 0, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1rem;
+      font-size: 2rem;
+      font-weight: bold;
+      border: 2px solid #ffa500;
+    }
+
+    .company-name {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+
+    .company-industry {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+
+    .change-logo-btn {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      background: rgba(255, 165, 0, 0.1);
+      color: #ffa500;
+      border-radius: 5px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: background 0.3s;
+    }
+
+    .change-logo-btn:hover {
+      background: rgba(255, 165, 0, 0.3);
+    }
+
+    .nav-menu {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .nav-item {
+      margin-bottom: 0.5rem;
+    }
+
+    .nav-link {
+      display: block;
+      padding: 0.8rem 1rem;
+      color: rgba(255, 255, 255, 0.8);
+      text-decoration: none;
+      border-radius: 5px;
+      transition: all 0.3s;
+    }
+
+    .nav-link:hover, .nav-link.active {
+      background: rgba(255, 165, 0, 0.2);
+      color: white;
+    }
+
+    .nav-link.active {
+      border-left: 3px solid #ffa500;
+    }
+
+    /* Основное содержимое */
+    .main-content {
+      flex: 1;
+      padding: 2rem;
+      position: relative;
+      z-index: 5;
+    }
+
+    .section-title {
+      font-size: 1.8rem;
+      margin-bottom: 2rem;
+      position: relative;
+      padding-bottom: 10px;
+    }
+
+    .section-title::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100px;
+      height: 3px;
+      background: linear-gradient(90deg, #ffa500, #ff4500);
+    }
+
+    /* Карточка компании */
+    .company-profile-card {
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 10px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 0 20px rgba(255, 165, 0, 0.1);
+      border: 1px solid rgba(255, 165, 0, 0.1);
+    }
+
+    .profile-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .profile-field {
+      margin-bottom: 1rem;
+    }
+
+    .field-label {
+      display: block;
+      color: #ffa500;
+      font-size: 0.9rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .field-value {
+      padding: 0.8rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 5px;
+      border-left: 3px solid rgba(255, 165, 0, 0.5);
+    }
+
+    .empty-field {
+      color: rgba(255, 255, 255, 0.5);
+      font-style: italic;
+    }
+
+    .btn {
+      padding: 0.6rem 1.2rem;
+      border-radius: 5px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s;
+      display: inline-block;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #ffa500, #ff8c00);
+      color: #0a0f2b;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 0 15px rgba(255, 165, 0, 0.5);
+    }
+
+    /* Адаптивность */
+    @media (max-width: 768px) {
+      .dashboard-container {
+        flex-direction: column;
+        padding-top: 60px;
+      }
+
+      .sidebar {
+        width: 100%;
+        padding: 1rem;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 165, 0, 0.2);
+      }
+
+      .main-content {
+        padding: 1rem;
+      }
+
+      .profile-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+<!-- Статичные звёзды (без движения) -->
+<div th:each="i : ${#numbers.sequence(1, 150)}"
+     class="star"
+     th:style="'top: ' + ${T(java.lang.Math).random() * 100} + '%; ' +
+              'left: ' + ${T(java.lang.Math).random() * 100} + '%; ' +
+              'animation-delay: ' + ${T(java.lang.Math).random() * 4} + 's;'">
+</div>
+
+<!-- Шапка -->
+<header class="header" id="mainHeader">
+  <a href="/dashboard" class="logo-small">constellar.tech</a>
+  <form th:action="@{/constellar.tech/api/v1/auth/employer/logout}" method="post">
+    <button type="submit" class="logout-btn">Выйти</button>
+  </form>
+</header>
+
+<!-- Основной контент -->
+<div class="dashboard-container">
+  <!-- Боковая панель -->
+  <aside class="sidebar">
+    <div class="profile-card">
+      <div th:if="${session.employer.avatar != null}">
+        <img th:src="@{/image/employer/getAvatar}" alt="Логотип компании" class="company-logo">
+      </div>
+      <div th:if="${session.employer.avatar == null}" class="logo-placeholder"
+           th:text="${#strings.substring(session.employer.companyName, 0, 2)}">
+      </div>
+      <a href="/company-change-avatar" class="change-logo-btn">Изменить логотип</a>
+      <div class="company-name" th:text="${session.employer.companyName}">Название компании</div>
+      <div class="company-industry" th:text="${session.employer.industry ?: 'Отрасль не указана'}">Отрасль</div>
+    </div>
+
+    <ul class="nav-menu">
+      <li class="nav-item"><a href="/employer-personal-account" class="nav-link active">Профиль компании</a></li>
+      <li class="nav-item"><a href="/employer-list-vacancies" class="nav-link">Вакансии</a></li>
+      <li class="nav-item"><a href="/employer-candidates" class="nav-link">Кандидаты</a></li>
+      <li class="nav-item"><a href="/employer-settings" class="nav-link">Настройки</a></li>
+    </ul>
+  </aside>
+
+  <!-- Основное содержимое -->
+  <main class="main-content">
+    <!-- Профиль компании -->
+    <section id="profile" class="company-profile-section">
+      <h2 class="section-title">Профиль компании</h2>
+
+      <div class="company-profile-card">
+        <div class="profile-grid">
+          <div class="profile-field">
+            <span class="field-label">Название компании</span>
+            <div class="field-value" th:text="${session.employer.companyName}"></div>
+          </div>
+
+          <div class="profile-field">
+            <span class="field-label">ИНН</span>
+            <div class="field-value" th:text="${session.employer.inn}"></div>
+          </div>
+
+          <div class="profile-field">
+            <span class="field-label">Отрасль</span>
+            <div class="field-value" th:class="${session.employer.industry == null} ? 'empty-field'"
+                 th:text="${session.employer.industry != null} ? ${session.employer.industry} : 'Не указана'"></div>
+          </div>
+
+          <div class="profile-field">
+            <span class="field-label">Веб-сайт</span>
+            <div class="field-value" th:class="${session.employer.website == null} ? 'empty-field'">
+              <a th:if="${session.employer.website != null}" th:href="${session.employer.website}"
+                 th:text="${session.employer.website}" target="_blank"></a>
+              <span th:if="${session.employer.website == null}">Не указан</span>
+            </div>
+          </div>
+
+          <div class="profile-field">
+            <span class="field-label">Телефон</span>
+            <div class="field-value" th:class="${session.employer.phoneNumber == null} ? 'empty-field'"
+                 th:text="${session.employer.phoneNumber != null} ? ${session.employer.phoneNumber} : 'Не указан'"></div>
+          </div>
+
+          <div class="profile-field">
+            <span class="field-label">Адрес</span>
+            <div class="field-value" th:class="${session.employer.address == null} ? 'empty-field'"
+                 th:text="${session.employer.address != null} ? ${session.employer.address} : 'Не указан'"></div>
+          </div>
+
+          <div class="profile-field">
+            <span class="field-label">Контактное лицо</span>
+            <div class="field-value" th:class="${session.employer.contactPerson == null} ? 'empty-field'"
+                 th:text="${session.employer.contactPerson != null} ? ${session.employer.contactPerson} : 'Не указано'"></div>
+          </div>
+
+          <div class="profile-field">
+            <span class="field-label">Должность контактного лица</span>
+            <div class="field-value" th:class="${session.employer.contactPosition == null} ? 'empty-field'"
+                 th:text="${session.employer.contactPosition != null} ? ${session.employer.contactPosition} : 'Не указана'"></div>
+          </div>
+
+          <div class="profile-field full-width">
+            <span class="field-label">Описание компании</span>
+            <div class="field-value" th:class="${session.employer.companyDescription == null} ? 'empty-field'"
+                 th:text="${session.employer.companyDescription != null} ? ${session.employer.companyDescription} : 'Не указано'"></div>
+          </div>
+        </div>
+
+        <a href="/edit-employer-profile" class="btn btn-primary">Редактировать профиль</a>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+  // Скрытие шапки при скролле
+  let lastScroll = 0;
+  const header = document.getElementById('mainHeader');
+  const SCROLL_THRESHOLD = 5;
+
+  window.addEventListener('scroll', function() {
+    const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+
+    if (currentScroll > lastScroll + SCROLL_THRESHOLD) {
+      header.classList.add('hidden');
+    } else if (currentScroll < lastScroll - SCROLL_THRESHOLD) {
+      if (currentScroll <= SCROLL_THRESHOLD) {
+        header.classList.remove('hidden');
+      }
+    }
+
+    if (currentScroll <= SCROLL_THRESHOLD) {
+      header.classList.remove('hidden');
+    }
+
+    lastScroll = currentScroll;
+  });
+</script>
+</body>
+</html>

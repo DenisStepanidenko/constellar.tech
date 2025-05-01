@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>constellar.tech | Редактирование профиля компании</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* Общие стили */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0a0f2b, #1a1a40);
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Шапка */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 100;
+            transition: transform 0.3s;
+            border-bottom: 1px solid rgba(255, 165, 0, 0.2);
+        }
+
+        .header.hidden {
+            transform: translateY(-100%);
+        }
+
+        .logo-small {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .logout-btn {
+            background: linear-gradient(135deg, #ff4500, #ff8c00);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .logout-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Звёздный фон */
+        .star {
+            position: fixed;
+            width: 2px;
+            height: 2px;
+            background: #ffa500;
+            border-radius: 50%;
+            animation: twinkle 4s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Основной контент */
+        .edit-container {
+            max-width: 800px;
+            margin: 80px auto 2rem;
+            padding: 0 1rem;
+            position: relative;
+            z-index: 5;
+        }
+
+        /* Заголовок секции */
+        .section-title {
+            font-size: 1.8rem;
+            margin-bottom: 2rem;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .section-title::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, #ffa500, #ff4500);
+        }
+
+        /* Форма редактирования */
+        .edit-form {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 0 20px rgba(255, 165, 0, 0.1);
+            border: 1px solid rgba(255, 165, 0, 0.1);
+        }
+
+        /* Сетка форм */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Группы полей */
+        .form-group {
+            margin-bottom: 1.5rem;
+            padding: 1.2rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 165, 0, 0.1);
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.8rem;
+            color: #ffa500;
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.8rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+            margin-top: 0.5rem;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #ffa500;
+            box-shadow: 0 0 0 2px rgba(255, 165, 0, 0.2);
+        }
+
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        /* Кнопки действий */
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 165, 0, 0.1);
+        }
+
+        .btn {
+            padding: 0.7rem 1.5rem;
+            border-radius: 5px;
+            font-weight: 500;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: none;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ffa500, #ff8c00);
+            color: #0a0f2b;
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 0 15px rgba(255, 165, 0, 0.5);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .edit-container {
+                margin-top: 70px;
+                padding: 0 0.5rem;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Звёздный фон -->
+<div th:each="i : ${#numbers.sequence(1, 150)}"
+     class="star"
+     th:style="'top: ' + ${T(java.lang.Math).random() * 100} + '%; ' +
+              'left: ' + ${T(java.lang.Math).random() * 100} + '%; ' +
+              'animation-delay: ' + ${T(java.lang.Math).random() * 4} + 's;'">
+</div>
+
+<!-- Шапка -->
+<header class="header" id="mainHeader">
+    <a href="/dashboard" class="logo-small">constellar.tech</a>
+    <form th:action="@{/constellar.tech/api/v1/auth/employer/logout}" method="post">
+        <button type="submit" class="logout-btn">Выйти</button>
+    </form>
+</header>
+
+<!-- Основной контент -->
+<div class="edit-container">
+    <h1 class="section-title">Редактирование профиля компании</h1>
+
+    <form class="edit-form" th:action="@{/constellar.tech/api/v1/employer/update}" method="post">
+        <div class="form-grid">
+            <!-- Основная информация -->
+            <div class="form-group">
+                <label for="companyName" class="form-label">Название компании*</label>
+                <input type="text" id="companyName" name="companyName" class="form-control"
+                       th:value="${session.employer.companyName}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="inn" class="form-label">ИНН*</label>
+                <input type="text" id="inn" name="inn" class="form-control"
+                       th:value="${session.employer.inn}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="industry" class="form-label">Отрасль</label>
+                <input type="text" id="industry" name="industry" class="form-control"
+                       th:value="${session.employer.industry}">
+            </div>
+
+            <div class="form-group">
+                <label for="website" class="form-label">Веб-сайт</label>
+                <input type="url" id="website" name="website" class="form-control"
+                       th:value="${session.employer.website}" placeholder="https://example.com">
+            </div>
+
+            <div class="form-group">
+                <label for="phoneNumber" class="form-label">Телефон</label>
+                <input type="tel" id="phoneNumber" name="phoneNumber" class="form-control"
+                       th:value="${session.employer.phoneNumber}">
+            </div>
+
+            <div class="form-group">
+                <label for="address" class="form-label">Адрес</label>
+                <input type="text" id="address" name="address" class="form-control"
+                       th:value="${session.employer.address}">
+            </div>
+
+            <!-- Контактное лицо -->
+            <div class="form-group">
+                <label for="contactPerson" class="form-label">Контактное лицо</label>
+                <input type="text" id="contactPerson" name="contactPerson" class="form-control"
+                       th:value="${session.employer.contactPerson}">
+            </div>
+
+            <div class="form-group">
+                <label for="contactPosition" class="form-label">Должность контактного лица</label>
+                <input type="text" id="contactPosition" name="contactPosition" class="form-control"
+                       th:value="${session.employer.contactPosition}">
+            </div>
+
+            <!-- Описание компании -->
+            <div class="form-group full-width">
+                <label for="companyDescription" class="form-label">Описание компании</label>
+                <textarea id="companyDescription" name="companyDescription" class="form-control"
+                          th:text="${session.employer.companyDescription}"></textarea>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="button" class="btn btn-secondary" onclick="location.href='/company-personal-account-home'">Отмена</button>
+            <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    // Скрытие шапки при скролле
+    let lastScroll = 0;
+    const header = document.getElementById('mainHeader');
+    const SCROLL_THRESHOLD = 5;
+
+    window.addEventListener('scroll', function() {
+        const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+
+        if (currentScroll > lastScroll + SCROLL_THRESHOLD) {
+            header.classList.add('hidden');
+        } else if (currentScroll < lastScroll - SCROLL_THRESHOLD) {
+            if (currentScroll <= SCROLL_THRESHOLD) {
+                header.classList.remove('hidden');
+            }
+        }
+
+        if (currentScroll <= SCROLL_THRESHOLD) {
+            header.classList.remove('hidden');
+        }
+
+        lastScroll = currentScroll;
+    });
+</script>
+</body>
+</html>

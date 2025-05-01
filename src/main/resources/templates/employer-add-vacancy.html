@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>constellar.tech | Создать вакансию</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    /* Основные стили (как в предыдущих шаблонах) */
+    /* Добавим только специфичные стили для формы */
+    /* Основные стили */
+    body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0a0f2b, #1a1a40);
+      color: white;
+      font-family: 'Montserrat', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* Статичные звёзды */
+    .star {
+      position: fixed;
+      width: 2px;
+      height: 2px;
+      background: #ffa500;
+      border-radius: 50%;
+      animation: twinkle 4s infinite;
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.8; }
+      50% { opacity: 0.3; }
+    }
+
+    /* Шапка */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 100;
+      transition: transform 0.3s;
+      border-bottom: 1px solid rgba(255, 165, 0, 0.2);
+    }
+
+    .header.hidden {
+      transform: translateY(-100%);
+    }
+
+    .logo-small {
+      color: white;
+      font-size: 1.5rem;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .logout-btn {
+      background: linear-gradient(135deg, #ff4500, #ff8c00);
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+
+    .logout-btn:hover {
+      transform: scale(1.05);
+    }
+
+    /* Основной контейнер */
+    .dashboard-container {
+      display: flex;
+      min-height: 100vh;
+      padding-top: 70px;
+    }
+
+    /* Боковая панель */
+    .sidebar {
+      width: 280px;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 2rem 1rem;
+      border-right: 1px solid rgba(255, 165, 0, 0.2);
+      position: relative;
+      z-index: 10;
+    }
+
+    .profile-card {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .company-logo {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin: 0 auto 1rem;
+      border: 2px solid #ffa500;
+    }
+
+    .logo-placeholder {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: rgba(255, 165, 0, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1rem;
+      font-size: 2rem;
+      font-weight: bold;
+      border: 2px solid #ffa500;
+    }
+
+    .company-name {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+
+    .company-industry {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+
+    .change-logo-btn {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      background: rgba(255, 165, 0, 0.1);
+      color: #ffa500;
+      border-radius: 5px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: background 0.3s;
+    }
+
+    .change-logo-btn:hover {
+      background: rgba(255, 165, 0, 0.3);
+    }
+
+    .nav-menu {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .nav-item {
+      margin-bottom: 0.5rem;
+    }
+
+    .nav-link {
+      display: block;
+      padding: 0.8rem 1rem;
+      color: rgba(255, 255, 255, 0.8);
+      text-decoration: none;
+      border-radius: 5px;
+      transition: all 0.3s;
+    }
+
+    .nav-link:hover, .nav-link.active {
+      background: rgba(255, 165, 0, 0.2);
+      color: white;
+    }
+
+    .nav-link.active {
+      border-left: 3px solid #ffa500;
+    }
+
+    /* Основное содержимое */
+    .main-content {
+      flex: 1;
+      padding: 2rem;
+      position: relative;
+      z-index: 5;
+    }
+
+    .section-title {
+      font-size: 1.8rem;
+      margin-bottom: 2rem;
+      position: relative;
+      padding-bottom: 10px;
+    }
+
+    .section-title::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100px;
+      height: 3px;
+      background: linear-gradient(90deg, #ffa500, #ff4500);
+    }
+
+    /* Карточка компании */
+    .company-profile-card {
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 10px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 0 20px rgba(255, 165, 0, 0.1);
+      border: 1px solid rgba(255, 165, 0, 0.1);
+    }
+
+    .profile-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .profile-field {
+      margin-bottom: 1rem;
+    }
+
+    .field-label {
+      display: block;
+      color: #ffa500;
+      font-size: 0.9rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .field-value {
+      padding: 0.8rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 5px;
+      border-left: 3px solid rgba(255, 165, 0, 0.5);
+    }
+
+    .empty-field {
+      color: rgba(255, 255, 255, 0.5);
+      font-style: italic;
+    }
+
+    .btn {
+      padding: 0.6rem 1.2rem;
+      border-radius: 5px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s;
+      display: inline-block;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #ffa500, #ff8c00);
+      color: #0a0f2b;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 0 15px rgba(255, 165, 0, 0.5);
+    }
+
+    /* Адаптивность */
+    @media (max-width: 768px) {
+      .dashboard-container {
+        flex-direction: column;
+        padding-top: 60px;
+      }
+
+      .sidebar {
+        width: 100%;
+        padding: 1rem;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 165, 0, 0.2);
+      }
+
+      .main-content {
+        padding: 1rem;
+      }
+
+      .profile-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .vacancy-form-container {
+      max-width: 95%;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+
+
+    .vacancy-form {
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 10px;
+      padding: 2rem;
+      box-shadow: 0 0 20px rgba(255, 165, 0, 0.1);
+      border: 1px solid rgba(255, 165, 0, 0.1);
+      width: 100%;
+      box-sizing: border-box;
+    }
+    select.form-control {
+      color: white;
+      background-color: rgba(0, 0, 0, 0.7);
+    }
+
+    select.form-control option {
+      color: white;
+      background-color: #1a1a40;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #ffa500;
+      font-size: 0.9rem;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.5rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 165, 0, 0.3);
+      border-radius: 5px;
+      color: white;
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: #ffa500;
+      box-shadow: 0 0 0 2px rgba(255, 165, 0, 0.2);
+    }
+
+    textarea.form-control {
+      min-height: 150px;
+      resize: vertical;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 1.5rem; /* Увеличиваем расстояние между элементами */
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap; /* Добавляем перенос на маленьких экранах */
+    }
+
+    .form-row .form-group {
+      flex: 1;
+      margin-bottom: 0;
+      min-width: 150px; /* Минимальная ширина для полей */
+    }
+
+    .skills-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .skill-tag {
+      background: rgba(255, 165, 0, 0.2);
+      padding: 0.3rem 0.8rem;
+      border-radius: 15px;
+      font-size: 0.8rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .remove-skill {
+      margin-left: 0.5rem;
+      cursor: pointer;
+      color: #ffa500;
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(255, 165, 0, 0.1);
+    }
+
+    .btn {
+      padding: 0.7rem 1.5rem;
+      border-radius: 5px;
+      font-weight: 500;
+      transition: all 0.3s;
+      cursor: pointer;
+      border: none;
+      font-size: 1rem;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #ffa500, #ff8c00);
+      color: #0a0f2b;
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 0 15px rgba(255, 165, 0, 0.5);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .error-message {
+      color: #f44336;
+      font-size: 0.8rem;
+      margin-top: 0.3rem;
+    }
+
+    /* Адаптивность */
+    @media (max-width: 768px) {
+      .form-row {
+        flex-direction: column;
+        gap: 1rem;
+      }
+      .form-row .form-group {
+        width: 100%;
+      }
+
+      .form-actions {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+<!-- Звёздный фон -->
+<div th:each="i : ${#numbers.sequence(1, 150)}"
+     class="star"
+     th:style="'top: ' + ${T(java.lang.Math).random() * 100} + '%; ' +
+              'left: ' + ${T(java.lang.Math).random() * 100} + '%; ' +
+              'animation-delay: ' + ${T(java.lang.Math).random() * 4} + 's;'">
+</div>
+
+<!-- Шапка -->
+<header class="header" id="mainHeader">
+  <a href="/dashboard" class="logo-small">constellar.tech</a>
+  <form th:action="@{/constellar.tech/api/v1/auth/employer/logout}" method="post">
+    <button type="submit" class="logout-btn">Выйти</button>
+  </form>
+</header>
+
+<!-- Основной контент -->
+<div class="dashboard-container">
+  <!-- Боковая панель -->
+  <aside class="sidebar">
+    <div class="profile-card">
+      <div th:if="${session.employer.avatar != null}">
+        <img th:src="@{/image/employer/getAvatar}" alt="Логотип компании" class="company-logo">
+      </div>
+      <div th:if="${session.employer.avatar == null}" class="logo-placeholder"
+           th:text="${#strings.substring(session.employer.companyName, 0, 2)}">
+      </div>
+      <a href="/company-change-avatar" class="change-logo-btn">Изменить логотип</a>
+      <div class="company-name" th:text="${session.employer.companyName}">Название компании</div>
+      <div class="company-industry" th:text="${session.employer.industry ?: 'Отрасль не указана'}">Отрасль</div>
+    </div>
+
+    <ul class="nav-menu">
+      <li class="nav-item"><a href="/company-personal-account-home" class="nav-link">Профиль компании</a></li>
+      <li class="nav-item"><a href="/employer-list-vacancies" class="nav-link active">Вакансии</a></li>
+      <li class="nav-item"><a href="/employer-candidates" class="nav-link">Кандидаты</a></li>
+      <li class="nav-item"><a href="/employer-settings" class="nav-link">Настройки</a></li>
+    </ul>
+  </aside>
+
+  <!-- Основное содержимое -->
+  <main class="main-content">
+    <section class="create-vacancy-section">
+      <h2 class="section-title">Создать вакансию</h2>
+
+      <div class="vacancy-form-container">
+        <form th:action="@{/constellar.tech/api/v1/vacancy/create}" th:object="${vacancyDto}" method="post" class="vacancy-form">
+          <!-- Основная информация -->
+          <div class="form-group">
+            <label for="title" class="form-label">Название вакансии*</label>
+            <input type="text" id="title" th:field="*{title}" class="form-control" required>
+            <div th:if="${#fields.hasErrors('title')}" class="error-message" th:errors="*{title}"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="position" class="form-label">Должность*</label>
+            <input type="text" id="position" th:field="*{position}" class="form-control" required>
+            <div th:if="${#fields.hasErrors('position')}" class="error-message" th:errors="*{position}"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="description" class="form-label">Описание вакансии*</label>
+            <textarea id="description" th:field="*{description}" class="form-control" required></textarea>
+            <div th:if="${#fields.hasErrors('description')}" class="error-message" th:errors="*{description}"></div>
+          </div>
+
+          <!-- Зарплата и опыт -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="salaryFrom" class="form-label">Зарплата от*</label>
+              <input type="number" id="salaryFrom" th:field="*{salaryFrom}" class="form-control" required>
+              <div th:if="${#fields.hasErrors('salaryFrom')}" class="error-message" th:errors="*{salaryFrom}"></div>
+            </div>
+
+            <div class="form-group">
+              <label for="salaryTo" class="form-label">Зарплата до*</label>
+              <input type="number" id="salaryTo" th:field="*{salaryTo}" class="form-control" required>
+              <div th:if="${#fields.hasErrors('salaryTo')}" class="error-message" th:errors="*{salaryTo}"></div>
+            </div>
+
+            <div class="form-group">
+              <label for="currency" class="form-label">Валюта*</label>
+              <select id="currency" th:field="*{currency}" class="form-control" required>
+                <option value="RUB">₽ (RUB)</option>
+                <option value="USD">$ (USD)</option>
+                <option value="EUR">€ (EUR)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Опыт и тип занятости -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="experienceLevel" class="form-label">Уровень опыта*</label>
+              <select id="experienceLevel" th:field="*{experienceLevel}" class="form-control" required>
+                <option th:each="level : ${T(ru.denis.constellar.tech.vacancy.model.ExperienceLevel).values()}"
+                        th:value="${level}"
+                        th:text="${#strings.capitalize(level.name().toLowerCase())}">
+                </option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="employmentType" class="form-label">Тип занятости*</label>
+              <select id="employmentType" th:field="*{employmentType}" class="form-control" required>
+                <option th:each="type : ${T(ru.denis.constellar.tech.vacancy.model.EmploymentType).values()}"
+                        th:value="${type}"
+                        th:text="${#strings.capitalize(type.name().replace('_', ' ').toLowerCase())}">
+                </option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="workSchedule" class="form-label">График работы*</label>
+              <select id="workSchedule" th:field="*{workSchedule}" class="form-control" required>
+                <option th:each="schedule : ${T(ru.denis.constellar.tech.vacancy.model.WorkSchedule).values()}"
+                        th:value="${schedule}"
+                        th:text="${#strings.capitalize(schedule.name().toLowerCase())}">
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Локация -->
+          <div class="form-group">
+            <label for="location" class="form-label">Локация*</label>
+            <input type="text" id="location" th:field="*{location}" class="form-control" required>
+            <div th:if="${#fields.hasErrors('location')}" class="error-message" th:errors="*{location}"></div>
+          </div>
+
+          <!-- Навыки -->
+          <div class="form-group">
+            <label for="skillsInput" class="form-label">Требуемые навыки</label>
+            <input type="text" id="skillsInput" name="skills" th:value="*{skills}" class="form-control" required>
+          </div>
+
+          <!-- Кнопки действий -->
+          <div class="form-actions">
+            <a href="/employer-list-vacancies" class="btn btn-secondary">Отмена</a>
+            <button type="submit" class="btn btn-primary">Опубликовать вакансию</button>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+  // Обработка добавления навыков
+  const skillsInput = document.getElementById('skillsInput');
+  const skillsContainer = document.getElementById('skillsContainer');
+  const hiddenSkillsInput = document.getElementById('skills');
+  let skills = [];
+
+  skillsInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && this.value.trim()) {
+      e.preventDefault();
+      const skill = this.value.trim();
+
+      if (!skills.includes(skill)) {
+        skills.push(skill);
+        updateSkillsDisplay();
+        this.value = '';
+      }
+    }
+  });
+
+  function updateSkillsDisplay() {
+    skillsContainer.innerHTML = '';
+    skills.forEach((skill, index) => {
+      const tag = document.createElement('div');
+      tag.className = 'skill-tag';
+      tag.innerHTML = `
+                ${skill}
+                <span class="remove-skill" data-index="${index}">×</span>
+            `;
+      skillsContainer.appendChild(tag);
+    });
+
+    hiddenSkillsInput.value = skills.join(',');
+
+    // Добавляем обработчики для удаления
+    document.querySelectorAll('.remove-skill').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const index = parseInt(this.getAttribute('data-index'));
+        skills.splice(index, 1);
+        updateSkillsDisplay();
+      });
+    });
+  }
+
+  // Скрытие шапки при скролле
+  let lastScroll = 0;
+  const header = document.getElementById('mainHeader');
+  const SCROLL_THRESHOLD = 5;
+
+  window.addEventListener('scroll', function() {
+    const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+
+    if (currentScroll > lastScroll + SCROLL_THRESHOLD) {
+      header.classList.add('hidden');
+    } else if (currentScroll < lastScroll - SCROLL_THRESHOLD) {
+      if (currentScroll <= SCROLL_THRESHOLD) {
+        header.classList.remove('hidden');
+      }
+    }
+
+    if (currentScroll <= SCROLL_THRESHOLD) {
+      header.classList.remove('hidden');
+    }
+
+    lastScroll = currentScroll;
+  });
+</script>
+</body>
+</html>

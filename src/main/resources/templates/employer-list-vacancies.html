@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>constellar.tech | Вакансии компании</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* Основные стили (как в предыдущих шаблонах) */
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0a0f2b, #1a1a40);
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .star {
+            position: fixed;
+            width: 2px;
+            height: 2px;
+            background: #ffa500;
+            border-radius: 50%;
+            animation: twinkle 4s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 0.3; }
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 100;
+            transition: transform 0.3s;
+            border-bottom: 1px solid rgba(255, 165, 0, 0.2);
+        }
+
+        .header.hidden {
+            transform: translateY(-100%);
+        }
+
+        .logo-small {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .logout-btn {
+            background: linear-gradient(135deg, #ff4500, #ff8c00);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .logout-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+            padding-top: 70px;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 2rem 1rem;
+            border-right: 1px solid rgba(255, 165, 0, 0.2);
+            position: relative;
+            z-index: 10;
+        }
+
+        .profile-card {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .company-logo {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 1rem;
+            border: 2px solid #ffa500;
+        }
+
+        .logo-placeholder {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: rgba(255, 165, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 2rem;
+            font-weight: bold;
+            border: 2px solid #ffa500;
+        }
+
+        .company-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .company-industry {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .change-logo-btn {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 165, 0, 0.1);
+            color: #ffa500;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: background 0.3s;
+        }
+
+        .change-logo-btn:hover {
+            background: rgba(255, 165, 0, 0.3);
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 0.8rem 1rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: rgba(255, 165, 0, 0.2);
+            color: white;
+        }
+
+        .nav-link.active {
+            border-left: 3px solid #ffa500;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            position: relative;
+            z-index: 5;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            margin-bottom: 2rem;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .section-title::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, #ffa500, #ff4500);
+        }
+
+        /* Стили для вакансий */
+        .vacancies-container {
+            position: relative;
+        }
+
+        .vacancies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .vacancy-card {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 1.5rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid rgba(255, 165, 0, 0.1);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .vacancy-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(255, 165, 0, 0.1);
+            border-color: rgba(255, 165, 0, 0.3);
+        }
+
+        .vacancy-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #ffa500;
+        }
+
+        .vacancy-position {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .vacancy-salary {
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #4CAF50;
+        }
+
+        .vacancy-experience {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            background: rgba(255, 165, 0, 0.2);
+            border-radius: 15px;
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .vacancy-description {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .vacancy-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .vacancy-status {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 5px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4CAF50;
+        }
+
+        .status-inactive {
+            background: rgba(244, 67, 54, 0.2);
+            color: #F44336;
+        }
+
+        .add-vacancy-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 165, 0, 0.1);
+            border: 2px dashed rgba(255, 165, 0, 0.5);
+            transition: all 0.3s;
+            min-height: 150px;
+        }
+
+        .add-vacancy-btn:hover {
+            background: rgba(255, 165, 0, 0.2);
+            border-color: rgba(255, 165, 0, 0.8);
+        }
+
+        .add-vacancy-icon {
+            font-size: 2rem;
+            color: rgba(255, 165, 0, 0.8);
+        }
+
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ffa500, #ff8c00);
+            color: #0a0f2b;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 0 15px rgba(255, 165, 0, 0.5);
+        }
+
+        /* Анимация загрузки для бесконечного скролла */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 40px;
+            height: 40px;
+            margin: 20px auto;
+            border: 4px solid rgba(255, 165, 0, 0.3);
+            border-top: 4px solid #ffa500;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .dashboard-container {
+                flex-direction: column;
+                padding-top: 60px;
+            }
+
+            .sidebar {
+                width: 100%;
+                padding: 1rem;
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 165, 0, 0.2);
+            }
+
+            .main-content {
+                padding: 1rem;
+            }
+
+            .vacancies-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Звёздный фон -->
+<div th:each="i : ${#numbers.sequence(1, 150)}"
+     class="star"
+     th:style="'top: ' + ${T(java.lang.Math).random() * 100} + '%; ' +
+              'left: ' + ${T(java.lang.Math).random() * 100} + '%; ' +
+              'animation-delay: ' + ${T(java.lang.Math).random() * 4} + 's;'">
+</div>
+
+<!-- Шапка -->
+<header class="header" id="mainHeader">
+    <a href="/dashboard" class="logo-small">constellar.tech</a>
+    <form th:action="@{/constellar.tech/api/v1/auth/employer/logout}" method="post">
+        <button type="submit" class="logout-btn">Выйти</button>
+    </form>
+</header>
+
+<!-- Основной контент -->
+<div class="dashboard-container">
+    <!-- Боковая панель -->
+    <aside class="sidebar">
+        <div class="profile-card">
+            <div th:if="${session.employer.avatar != null}">
+                <img th:src="@{/image/employer/getAvatar}" alt="Логотип компании" class="company-logo">
+            </div>
+            <div th:if="${session.employer.avatar == null}" class="logo-placeholder"
+                 th:text="${#strings.substring(session.employer.companyName, 0, 2)}">
+            </div>
+            <a href="/company-change-avatar" class="change-logo-btn">Изменить логотип</a>
+            <div class="company-name" th:text="${session.employer.companyName}">Название компании</div>
+            <div class="company-industry" th:text="${session.employer.industry ?: 'Отрасль не указана'}">Отрасль</div>
+        </div>
+
+        <ul class="nav-menu">
+            <li class="nav-item"><a href="/company-personal-account-home" class="nav-link">Профиль компании</a></li>
+            <li class="nav-item"><a href="/employer-list-vacancies" class="nav-link active">Вакансии</a></li>
+            <li class="nav-item"><a href="/employer-candidates" class="nav-link">Кандидаты</a></li>
+            <li class="nav-item"><a href="/employer-settings" class="nav-link">Настройки</a></li>
+        </ul>
+    </aside>
+
+    <!-- Основное содержимое -->
+    <main class="main-content">
+        <section class="vacancies-section">
+            <h2 class="section-title">Вакансии компании</h2>
+
+            <div class="vacancies-container">
+                <div class="vacancies-grid" id="vacanciesGrid">
+                    <!-- Карточки вакансий -->
+                    <div th:each="vacancy : ${session.employer.vacancies}" class="vacancy-card"
+                         th:onclick="'location.href=\'/constellar.tech/api/v1/vacancy/' + ${vacancy.id} + '\''">
+                        <div class="vacancy-status"
+                             th:class="${vacancy.isActive} ? 'status-active' : 'status-inactive'"
+                             th:text="${vacancy.isActive} ? 'Активна' : 'Неактивна'"></div>
+                        <h3 class="vacancy-title" th:text="${vacancy.title}">Название вакансии</h3>
+                        <div class="vacancy-position" th:text="${vacancy.position}">Должность</div>
+                        <div class="vacancy-salary"
+                             th:text="${vacancy.salaryFrom} + ' - ' + ${vacancy.salaryTo} + ' ' + ${vacancy.currency}">Зарплата</div>
+                        <div class="vacancy-experience" th:text="${vacancy.experienceLevel}">Опыт</div>
+                        <div class="vacancy-description" th:text="${vacancy.description}">Описание вакансии...</div>
+                        <div class="vacancy-meta">
+                            <span th:text="${vacancy.employmentType}">Тип занятости</span>
+                            <span th:text="${vacancy.location}">Локация</span>
+                        </div>
+                    </div>
+
+                    <!-- Кнопка добавления новой вакансии -->
+                    <div class="vacancy-card add-vacancy-btn" onclick="location.href='/employer-add-vacancy'">
+                        <div class="add-vacancy-icon">+</div>
+                        <div>Добавить вакансию</div>
+                    </div>
+                </div>
+
+                <div class="loading-spinner" id="loadingSpinner"></div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script>
+    // Бесконечный скролл (без дополнительных запросов)
+    let allVacancies = [];
+    let visibleVacancies = 6; // Начальное количество отображаемых вакансий
+    let isLoading = false;
+    const vacanciesGrid = document.getElementById('vacanciesGrid');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+
+    // Инициализация - скрываем все вакансии кроме первых visibleVacancies
+    document.addEventListener('DOMContentLoaded', function() {
+        const vacancyCards = document.querySelectorAll('.vacancy-card:not(.add-vacancy-btn)');
+        allVacancies = Array.from(vacancyCards);
+
+        // Сначала скрываем все
+        allVacancies.forEach((card, index) => {
+            if (index >= visibleVacancies) {
+                card.style.display = 'none';
+            }
+        });
+
+        // Если вакансий меньше, чем visibleVacancies, скрываем спиннер
+        if (allVacancies.length <= visibleVacancies) {
+            loadingSpinner.style.display = 'none';
+        }
+    });
+
+    // Обработка скролла
+    window.addEventListener('scroll', function() {
+        if (isLoading || allVacancies.length <= visibleVacancies) return;
+
+        const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+
+        // Если пользователь прокрутил почти до конца
+        if (scrollTop + clientHeight >= scrollHeight - 100) {
+            loadMoreVacancies();
+        }
+    });
+
+    function loadMoreVacancies() {
+        isLoading = true;
+        loadingSpinner.style.display = 'block';
+
+        // Имитация загрузки (можно убрать setTimeout в реальном коде)
+        setTimeout(() => {
+            const nextBatch = allVacancies.slice(visibleVacancies, visibleVacancies + 3);
+            nextBatch.forEach(card => {
+                card.style.display = 'block';
+            });
+
+            visibleVacancies += 3;
+
+            // Если показали все вакансии, скрываем спиннер
+            if (visibleVacancies >= allVacancies.length) {
+                loadingSpinner.style.display = 'none';
+            }
+
+            isLoading = false;
+        }, 500);
+    }
+
+    // Скрытие шапки при скролле
+    let lastScroll = 0;
+    const header = document.getElementById('mainHeader');
+    const SCROLL_THRESHOLD = 5;
+
+    window.addEventListener('scroll', function() {
+        const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+
+        if (currentScroll > lastScroll + SCROLL_THRESHOLD) {
+            header.classList.add('hidden');
+        } else if (currentScroll < lastScroll - SCROLL_THRESHOLD) {
+            if (currentScroll <= SCROLL_THRESHOLD) {
+                header.classList.remove('hidden');
+            }
+        }
+
+        if (currentScroll <= SCROLL_THRESHOLD) {
+            header.classList.remove('hidden');
+        }
+
+        lastScroll = currentScroll;
+    });
+</script>
+</body>
+</html>
