@@ -210,5 +210,20 @@ public class PageController {
         return "employer-view-vacancy";
     }
 
+    @GetMapping("/employer-edit-vacancy")
+    public String getCompanyEditVacancy(HttpSession session) {
+
+        if (Objects.isNull(session)) {
+            return "home";
+        }
+
+        if (Objects.isNull(session.getAttribute("employer"))) {
+            return "home";
+        }
+
+
+        return "employer-edit-vacancy";
+    }
+
 
 }

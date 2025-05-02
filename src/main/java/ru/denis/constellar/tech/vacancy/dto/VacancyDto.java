@@ -59,5 +59,7 @@ public class VacancyDto {
     @Size(max = 100, message = "Локация должна быть не длиннее 100 символов")
     private String location;
 
+    private Boolean isActive;
+
 
 }

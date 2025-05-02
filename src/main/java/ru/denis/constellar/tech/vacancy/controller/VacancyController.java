@@ -96,5 +96,39 @@ public class VacancyController {
         return ResponseEntity.ok(response);
     }
 
+    @PutMapping("/{vacancyId}/status")
+    public void updateStatus(@PathVariable Long vacancyId, HttpSession session) {
+
+        if (session == null || session.getAttribute("employer") == null) {
+            throw new UnauthorizedAccessException();
+        }
+
+        Vacancy vacancy = vacancyJpa.findById(vacancyId).orElseThrow(RuntimeException::new);
+
+        vacancy.setIsActive(!vacancy.getIsActive());
+        Vacancy savedVacancy = vacancyJpa.save(vacancy);
+
+        VacancyDetailsDto vacancyDetailsDto = (VacancyDetailsDto) session.getAttribute("vacancy");
+        vacancyDetailsDto.setActive(savedVacancy.getIsActive());
+
+        Employer employer = (Employer) session.getAttribute("employer");
+
+        session.setAttribute("employer", employerJpa.findById(employer.getId()).get());
+    }
+
+    @PutMapping("/{id}")
+    public void updateVacancy(@PathVariable Long id,
+                              @RequestBody VacancyDto vacancyDto,
+                              HttpSession session) {
+
+        if (session == null || session.getAttribute("employer") == null || session.getAttribute("vacancy") == null) {
+            throw new UnauthorizedAccessException();
+        }
+
+        vacancyService.updateVacancy(id, vacancyDto);
+
+        session.setAttribute("vacancy", vacancyService.createVacancyDetailsDtoFromVacancy(id));
+    }
+
 
 }

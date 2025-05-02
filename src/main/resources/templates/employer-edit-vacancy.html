@@ -1,9 +1,66 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="ru">
 <head>
-    <!-- Meta tags and styles from previous templates -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Редактирование вакансии | constellar.tech</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
+        /* Все стили из vacancy.html */
 
+        /* Дополнительные стили для формы редактирования */
+        .edit-vacancy-form {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 0 20px rgba(255, 165, 0, 0.1);
+            border: 1px solid rgba(255, 165, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            color: #ffa500;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: 'Montserrat', sans-serif;
+            cursor: pointer;
+            border: none;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ffa500, #ff8c00);
+            color: #0a0f2b;
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 0 15px rgba(255, 165, 0, 0.5);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
         .btn {
             padding: 0.6rem 1.2rem;
             border-radius: 5px;
@@ -53,6 +110,24 @@
             padding: 0.5rem;
             outline: none;
         }
+        /* Исправление для выпадающих списков */
+        select.form-control option {
+            background: #0a0f2b; /* Тёмный фон для пунктов */
+            color: white; /* Белый текст */
+            padding: 10px; /* Отступы для пунктов */
+        }
+
+        /* Для браузеров на WebKit (Chrome, Safari) */
+        select.form-control:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(255, 165, 0, 0.5);
+        }
+
+        /* Убедимся, что выпадающий список поверх других элементов */
+        select.form-select {
+            z-index: 10;
+            position: relative;
+        }
 
         .time-range-select:focus {
             border-color: #ffa500;
@@ -68,7 +143,6 @@
         .loading-indicator.active {
             display: block;
         }
-
         /* Основные стили */
         body {
             margin: 0;
@@ -263,6 +337,165 @@
             width: 100px;
             height: 3px;
             background: linear-gradient(90deg, #ffa500, #ff4500);
+        }
+        .edit-vacancy-form {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 0 20px rgba(255, 165, 0, 0.1);
+            border: 1px solid rgba(255, 165, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            color: #ffa500;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.8rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 165, 0, 0.3);
+            border-radius: 5px;
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #ffa500;
+            box-shadow: 0 0 0 2px rgba(255, 165, 0, 0.2);
+        }
+
+        textarea.form-control {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .form-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23ffa500' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 16px 12px;
+            color: white;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: 'Montserrat', sans-serif;
+            cursor: pointer;
+            border: none;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ffa500, #ff8c00);
+            color: #0a0f2b;
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 0 15px rgba(255, 165, 0, 0.5);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Стили для группы зарплаты */
+        .salary-group {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .salary-input-group {
+            flex: 1;
+        }
+
+        .salary-label {
+            display: block;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.8rem;
+            margin-bottom: 0.3rem;
+        }
+
+        /* Стили для переключателя активности */
+        .status-switch {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #F44336;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #4CAF50;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
         }
 
         /* Карточка компании */
@@ -591,6 +824,7 @@
     </style>
 </head>
 <body>
+<!-- Статичные звёзды и шапка как в vacancy.html -->
 <!-- Статичные звёзды (без движения) -->
 <div th:each="i : ${#numbers.sequence(1, 150)}"
      class="star"
@@ -598,7 +832,6 @@
               'left: ' + ${T(java.lang.Math).random() * 100} + '%; ' +
               'animation-delay: ' + ${T(java.lang.Math).random() * 4} + 's;'">
 </div>
-
 <!-- Шапка -->
 <header class="header" id="mainHeader">
     <a href="/dashboard" class="logo-small">constellar.tech</a>
@@ -606,149 +839,107 @@
         <button type="submit" class="logout-btn">Выйти</button>
     </form>
 </header>
-<!-- Звёздный фон и шапка как в предыдущих шаблонах -->
-
 
 <main class="main-content">
     <section class="vacancy-section">
         <div class="vacancy-header">
-            <div>
-                <h1 class="vacancy-title" th:text="${session.vacancy.title}">Название вакансии</h1>
-                <div class="vacancy-status-switch">
+            <h1 class="vacancy-title">Редактирование вакансии</h1>
+        </div>
+
+        <form id="editVacancyForm" class="edit-vacancy-form">
+            <input type="hidden" id="vacancyId" th:value="${session.vacancy.id}">
+
+            <div class="form-group">
+                <label for="title" class="form-label">Название вакансии</label>
+                <input type="text" id="title" class="form-control" th:value="${session.vacancy.title}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="position" class="form-label">Должность</label>
+                <input type="text" id="position" class="form-control" th:value="${session.vacancy.position}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="description" class="form-label">Описание</label>
+                <textarea id="description" class="form-control" required th:text="${session.vacancy.description}"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="skills" class="form-label">Требуемые навыки</label>
+                <textarea id="skills" class="form-control" required th:text="${session.vacancy.skills}"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Зарплата</label>
+                <div class="salary-group">
+                    <div class="salary-input-group">
+                        <span class="salary-label">От</span>
+                        <input type="number" id="salaryFrom" class="form-control" placeholder="0" th:value="${session.vacancy.salaryFrom}">
+                    </div>
+                    <div class="salary-input-group">
+                        <span class="salary-label">До</span>
+                        <input type="number" id="salaryTo" class="form-control" placeholder="0" th:value="${session.vacancy.salaryTo}">
+                    </div>
+                    <div class="salary-input-group">
+                        <span class="salary-label">Валюта</span>
+                        <select id="currency" class="form-control form-select" th:value="${session.vacancy.currency}">
+                            <option value="RUB">₽ (Рубли)</option>
+                            <option value="USD">$ (Доллары)</option>
+                            <option value="EUR">€ (Евро)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="experienceLevel" class="form-label">Требуемый опыт</label>
+                <select id="experienceLevel" class="form-control form-select" th:value="${session.vacancy.experienceLevel}">
+                    <option value="JUNIOR">Junior</option>
+                    <option value="MIDDLE">Middle</option>
+                    <option value="SENIOR">Senior</option>
+                    <option value="LEAD">Lead</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="employmentType" class="form-label">Тип занятости</label>
+                <select id="employmentType" class="form-control form-select" th:value="${session.vacancy.employmentType}">
+                    <option value="FULL_TIME">Полная занятость</option>
+                    <option value="PART_TIME">Частичная занятость</option>
+                    <option value="CONTRACT">Контракт</option>
+                    <option value="INTERNSHIP">Стажировка</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="workSchedule" class="form-label">График работы</label>
+                <select id="workSchedule" class="form-control form-select" th:value="${session.vacancy.workSchedule}">
+                    <option value="REMOTE">Удаленная работа</option>
+                    <option value="OFFICE">Офис</option>
+                    <option value="HYBRID">Гибридный формат</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="location" class="form-label">Локация</label>
+                <input type="text" id="location" class="form-control" th:value="${session.vacancy.location}">
+            </div>
+
+            <div class="form-group">
+                <div class="status-switch">
                     <label class="switch">
-                        <input type="checkbox" th:checked="${session.vacancy.active}" id="vacancyStatus">
+                        <input type="checkbox" id="isActive" th:checked="${session.vacancy.active}">
                         <span class="slider"></span>
                     </label>
-                    <span id="vacancyStatusText" th:text="${session.vacancy.active} ? 'Активна' : 'Неактивна'"></span>
+                    <span id="statusText" th:text="${session.vacancy.active} ? 'Вакансия активна' : 'Вакансия неактивна'"></span>
                 </div>
             </div>
 
-            <div class="vacancy-actions">
-                <a th:href="@{'/employer-edit-vacancy'}" class="btn btn-secondary">
-                    <svg class="btn-icon" viewBox="0 0 24 24">
-                        <path d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"/>
-                    </svg>
-                    Редактировать
-                </a>
-                <button class="btn btn-danger">
-                    <svg class="btn-icon" viewBox="0 0 24 24">
-                        <path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z"/>
-                    </svg>
-                    Удалить
-                </button>
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="history.back()">Отмена</button>
+                <button type="submit" class="btn btn-primary">Сохранить изменения</button>
             </div>
-        </div>
-
-        <div class="vacancy-details-grid">
-            <!-- Основные параметры -->
-            <div class="details-card">
-                <h3>Основные параметры</h3>
-                <div class="detail-row">
-                    <div class="detail-label">Должность:</div>
-                    <div class="detail-value" th:text="${session.vacancy.position}">Middle Backend Developer</div>
-                </div>
-                <div class="detail-row">
-                    <div class="detail-label">Зарплата:</div>
-                    <div class="detail-value"
-                         th:text="${session.vacancy.salaryFrom} + ' - ' + ${session.vacancy.salaryTo} + ' ' + ${session.vacancy.currency}">
-                        120000 - 180000 ₽
-                    </div>
-                </div>
-                <div class="detail-row">
-                    <div class="detail-label">Опыт работы:</div>
-                    <div class="detail-value" th:text="${session.vacancy.experienceLevel}">Middle</div>
-                </div>
-                <div class="detail-row">
-                    <div class="detail-label">Тип занятости:</div>
-                    <div class="detail-value" th:text="${session.vacancy.employmentType}">Полная занятость</div>
-                </div>
-                <div class="detail-row">
-                    <div class="detail-label">График работы:</div>
-                    <div class="detail-value" th:text="${session.vacancy.workSchedule}">Полный день</div>
-                </div>
-                <div class="detail-row">
-                    <div class="detail-label">Локация:</div>
-                    <div class="detail-value" th:text="${session.vacancy.location}">Москва</div>
-                </div>
-                <div class="detail-row">
-                    <div class="detail-label">Дата публикации:</div>
-                    <div class="detail-value" th:text="${#temporals.format(session.vacancy.createdAt, 'dd.MM.yyyy')}">
-                        15.05.2023
-                    </div>
-                </div>
-            </div>
-
-            <!-- Статистика откликов -->
-            <div class="details-card">
-                <h3>Статистика откликов</h3>
-                <div class="stats-grid">
-                    <div class="stat-card stat-total">
-                        <div class="stat-value" th:text="${session.vacancy.totalResponses}">0</div>
-                        <div class="stat-label">Всего откликов</div>
-                    </div>
-                    <div class="stat-card stat-new">
-                        <div class="stat-value" th:text="${session.vacancy.newResponses}">0</div>
-                        <div class="stat-label">Новых</div>
-                    </div>
-                    <div class="stat-card stat-in-review">
-                        <div class="stat-value" th:text="${session.vacancy.inReviewResponses}">0</div>
-                        <div class="stat-label">Просмотрено</div>
-                    </div>
-                    <div class="stat-card stat-rejected">
-                        <div class="stat-value" th:text="${session.vacancy.rejectedResponses}">0</div>
-                        <div class="stat-label">Отклонено</div>
-                    </div>
-                    <div class="stat-card stat-accepted">
-                        <div class="stat-value" th:text="${session.vacancy.acceptedResponses}">0</div>
-                        <div class="stat-label">Приглашено</div>
-                    </div>
-                </div>
-
-                <!-- Элементы управления графиком -->
-                <div class="chart-controls">
-                    <select id="timeRange" class="time-range-select">
-                        <option value="7">За 7 дней</option>
-                        <option value="14">За 14 дней</option>
-                        <option value="30">За 30 дней</option>
-                    </select>
-                </div>
-
-                <!-- Индикатор загрузки -->
-                <div id="chartLoading" class="loading-indicator">
-                    Загрузка данных графика...
-                </div>
-
-                <!-- Контейнер для графика -->
-                <div class="chart-container">
-                    <canvas id="responsesChart"></canvas>
-                </div>
-
-                <div style="margin-top: 1rem; text-align: center;">
-                    <a th:href="@{/employer-applications(vacancyId=${session.vacancy.id})}" class="btn btn-primary">
-                        Просмотреть все отклики
-                    </a>
-                </div>
-            </div>
-
-            <!-- Описание и навыки -->
-            <div class="details-card">
-                <h3>Описание вакансии</h3>
-                <div class="description-content" th:utext="${session.vacancy.description}">
-                    <!-- HTML-описание вакансии -->
-                </div>
-            </div>
-
-            <div class="details-card">
-                <h3>Требуемые навыки</h3>
-                <div class="description-content" th:utext="${session.vacancy.skills}">
-                    <!-- HTML-описание вакансии -->
-                </div>
-            </div>
-        </div>
-
-        <div class="form-actions">
-            <button class="btn btn-secondary" onclick="history.back()">Назад к списку</button>
-        </div>
+        </form>
     </section>
 </main>
 
@@ -759,7 +950,7 @@
     const header = document.getElementById('mainHeader');
     const SCROLL_THRESHOLD = 5;
 
-    window.addEventListener('scroll', function () {
+    window.addEventListener('scroll', function() {
         const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
 
         if (currentScroll > lastScroll + SCROLL_THRESHOLD) {
@@ -777,168 +968,48 @@
         lastScroll = currentScroll;
     });
 </script>
-<!-- Подключаем Chart.js для графиков -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // Глобальная переменная для хранения графика
-    let vacancyChart;
-    const vacancyId = [[${session.vacancy.id}]];
+    document.getElementById('editVacancyForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
 
-    // Функция инициализации графика
-    function initChart(labels = [], data = []) {
-        const ctx = document.getElementById('responsesChart').getContext('2d');
-
-        // Если график уже существует - уничтожаем его
-        if (vacancyChart) {
-            vacancyChart.destroy();
-        }
-
-        // Создаем новый график
-        vacancyChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Количество откликов',
-                    data: data,
-                    borderColor: '#ffa500',
-                    backgroundColor: 'rgba(255, 165, 0, 0.1)',
-                    borderWidth: 2,
-                    tension: 0.1,
-                    fill: true,
-                    pointBackgroundColor: '#ffa500',
-                    pointRadius: 4,
-                    pointHoverRadius: 6
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function (context) {
-                                return `${context.parsed.y} откликов`;
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: 'rgba(255, 255, 255, 0.1)'
-                        },
-                        ticks: {
-                            color: 'rgba(255, 255, 255, 0.7)',
-                            precision: 0
-                        }
-                    },
-                    x: {
-                        grid: {
-                            color: 'rgba(255, 255, 255, 0.1)'
-                        },
-                        ticks: {
-                            color: 'rgba(255, 255, 255, 0.7)'
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    // Функция загрузки данных статистики
-    async function loadChartData(days = 30) {
-        const loadingIndicator = document.getElementById('chartLoading');
-        const chartContainer = document.getElementById('responsesChart');
+        const vacancyId = document.getElementById('vacancyId').value;
+        const vacancyData = {
+            title: document.getElementById('title').value,
+            position: document.getElementById('position').value,
+            description: document.getElementById('description').value,
+            skills: document.getElementById('skills').value,
+            salaryFrom: document.getElementById('salaryFrom').value ?
+                parseInt(document.getElementById('salaryFrom').value) : null,
+            salaryTo: document.getElementById('salaryTo').value ?
+                parseInt(document.getElementById('salaryTo').value) : null,
+            currency: document.getElementById('currency').value,
+            experienceLevel: document.getElementById('experienceLevel').value,
+            employmentType: document.getElementById('employmentType').value,
+            workSchedule: document.getElementById('workSchedule').value,
+            location: document.getElementById('location').value,
+            isActive: document.getElementById('isActive').checked
+        };
 
         try {
-            // Показываем индикатор загрузки
-            loadingIndicator.classList.add('active');
-            chartContainer.style.opacity = '0.5';
-
-            // Делаем запрос к API
-            const response = await fetch(`/constellar.tech/api/v1/vacancy/${vacancyId}/stats?days=${days}`);
-
-            // Проверяем статус ответа
-            if (!response.ok) {
-                throw new Error(`Ошибка HTTP: ${response.status}`);
-            }
-
-            const data = await response.json();
-
-            // Обновляем статистические данные
-            if (data.total !== undefined) {
-                document.querySelector('.stat-total .stat-value').textContent = data.total;
-                document.querySelector('.stat-new .stat-value').textContent = data.newCount;
-                document.querySelector('.stat-in-review .stat-value').textContent = data.viewed;
-                document.querySelector('.stat-rejected .stat-value').textContent = data.rejected;
-                document.querySelector('.stat-accepted .stat-value').textContent = data.invited;
-            }
-
-            // Получаем данные для графика
-            const labels = Object.keys(data.chartData || {});
-            const values = Object.values(data.chartData || {});
-
-            // Инициализируем или обновляем график
-            initChart(labels, values);
-
-        } catch (error) {
-            console.error('Ошибка при загрузке данных:', error);
-
-            // Показываем пустой график в случае ошибки
-            initChart([], []);
-
-            // Можно показать сообщение об ошибке
-            alert('Не удалось загрузить данные статистики. Пожалуйста, попробуйте позже.');
-        } finally {
-            // Скрываем индикатор загрузки
-            loadingIndicator.classList.remove('active');
-            chartContainer.style.opacity = '1';
-        }
-    }
-
-    // Обработчик изменения периода
-    document.getElementById('timeRange').addEventListener('change', function (e) {
-        loadChartData(parseInt(e.target.value));
-    });
-
-    // Обработчик изменения статуса вакансии
-    document.getElementById('vacancyStatus').addEventListener('change', function () {
-        const isActive = this.checked;
-        const statusTextElement = document.getElementById('vacancyStatusText');
-
-        fetch(`/constellar.tech/api/v1/vacancy/${vacancyId}/status`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({active: isActive})
-        })
-            .then(response => {
-                if (!response.ok) {
-                    this.checked = !isActive; // Возвращаем чекбокс в предыдущее состояние
-                    throw new Error('Ошибка при изменении статуса');
-                }
-                // Обновляем текст статуса
-                statusTextElement.textContent = isActive ? 'Активна' : 'Неактивна';
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Не удалось изменить статус вакансии');
+            const response = await fetch(`/constellar.tech/api/v1/vacancy/${vacancyId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(vacancyData)
             });
-    });
 
-    // Инициализация при загрузке страницы
-    document.addEventListener('DOMContentLoaded', function () {
-        // Загружаем данные за 30 дней по умолчанию
-        loadChartData(30);
+            if (!response.ok) {
+                throw new Error('Ошибка при сохранении вакансии');
+            }
+        
 
-        // Инициализируем пустой график на случай если данные не загрузятся
-        initChart();
+            alert('Вакансия успешно обновлена');
+            window.location.href = `/employer-view-vacancy`;
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Не удалось сохранить изменения: ' + error.message);
+        }
     });
 </script>
 </body>

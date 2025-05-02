@@ -5,9 +5,13 @@ import org.springframework.stereotype.Service;
 import ru.denis.constellar.tech.application.jpa.ApplicationJpa;
 import ru.denis.constellar.tech.application.model.ApplicationStatus;
 import ru.denis.constellar.tech.vacancy.dto.VacancyDetailsDto;
+import ru.denis.constellar.tech.vacancy.dto.VacancyDto;
 import ru.denis.constellar.tech.vacancy.dto.VacancyStatsResponse;
 import ru.denis.constellar.tech.vacancy.jpa.VacancyJpa;
+import ru.denis.constellar.tech.vacancy.model.EmploymentType;
+import ru.denis.constellar.tech.vacancy.model.ExperienceLevel;
 import ru.denis.constellar.tech.vacancy.model.Vacancy;
+import ru.denis.constellar.tech.vacancy.model.WorkSchedule;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -21,6 +25,7 @@ import java.util.TreeMap;
 public class VacancyService {
 
     private final ApplicationJpa applicationRepository;
+
 
     private final VacancyJpa vacancyJpa;
 
@@ -49,7 +54,6 @@ public class VacancyService {
         setApplicationStatistics(vacancy, dto);
 
 
-
         return dto;
     }
 
@@ -68,7 +72,6 @@ public class VacancyService {
         dto.setAcceptedResponses(applicationRepository.countByVacancyAndStatus(
                 vacancy, ApplicationStatus.INVITED));
     }
-
 
 
     public VacancyStatsResponse getVacancyStats(Long vacancyId, int days) {
@@ -100,5 +103,26 @@ public class VacancyService {
         response.setChartData(chartData);
 
         return response;
+    }
+
+    public void updateVacancy(Long id, VacancyDto vacancyDto) {
+        Vacancy vacancy = vacancyJpa.findById(id).orElseThrow(RuntimeException::new);
+
+        vacancy.setTitle(vacancyDto.getTitle());
+        vacancy.setPosition(vacancyDto.getPosition());
+        vacancy.setSalaryFrom(vacancyDto.getSalaryFrom());
+        vacancy.setSalaryTo(vacancyDto.getSalaryTo());
+        vacancy.setCurrency(vacancyDto.getCurrency());
+        vacancy.setExperienceLevel(ExperienceLevel.valueOf(vacancyDto.getExperienceLevel().name()));
+        vacancy.setEmploymentType(EmploymentType.valueOf(vacancyDto.getEmploymentType().name()));
+        vacancy.setWorkSchedule(WorkSchedule.valueOf(vacancyDto.getWorkSchedule().name()));
+        vacancy.setLocation(vacancyDto.getLocation());
+        vacancy.setDescription(vacancyDto.getDescription());
+        vacancy.setIsActive(vacancyDto.getIsActive());
+        vacancy.setSkills(vacancy.getSkills());
+
+        vacancyJpa.save(vacancy);
+        vacancyJpa.flush();
+
     }
 }
