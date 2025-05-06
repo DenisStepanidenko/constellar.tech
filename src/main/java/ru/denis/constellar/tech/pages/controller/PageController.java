@@ -1,16 +1,27 @@
 package ru.denis.constellar.tech.pages.controller;
 
 import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import ru.denis.constellar.tech.application.jpa.ApplicationJpa;
+import ru.denis.constellar.tech.application.model.Application;
+import ru.denis.constellar.tech.vacancy.dto.VacancyDetailsDto;
 import ru.denis.constellar.tech.vacancy.dto.VacancyDto;
+import ru.denis.constellar.tech.vacancy.service.VacancyService;
 
 import java.util.Objects;
 
 @Controller
+@RequiredArgsConstructor
 //TODO: все страницы с представлениями перенести сюда
 public class PageController {
+
+    private final VacancyService vacancyService;
+
+    private final ApplicationJpa applicationJpa;
 
     @GetMapping("/home")
     public String getHomePage() {
@@ -223,6 +234,105 @@ public class PageController {
 
 
         return "employer-edit-vacancy";
+    }
+
+    @GetMapping("/candidate-vacancies")
+    public String getVacanciesForCandidate(HttpSession session) {
+
+        if (Objects.isNull(session)) {
+            return "home";
+        }
+
+        if (Objects.isNull(session.getAttribute("candidate"))) {
+            return "home";
+        }
+
+        session.setAttribute("vacancies", vacancyService.getAllVacancies());
+
+        return "candidate-vacancies";
+    }
+
+    @GetMapping("/applications-for-employer")
+    public String getAllApplicationsForEmployer(HttpSession session) {
+        if (Objects.isNull(session)) {
+            return "home";
+        }
+
+        if (Objects.isNull(session.getAttribute("employer"))) {
+            return "home";
+        }
+
+        VacancyDetailsDto vacancyDetailsDto = (VacancyDetailsDto) session.getAttribute("vacancy");
+
+        session.setAttribute("applications", applicationJpa.findByVacancyId(vacancyDetailsDto.getId()));
+
+        return "applications-for-employer";
+    }
+
+    @GetMapping("/candidate-profile-for-employer/{applicationId}")
+    public String getCandidateProfileForEmployer(HttpSession session, @PathVariable Long applicationId) {
+
+        if (Objects.isNull(session)) {
+            return "home";
+        }
+
+        if (Objects.isNull(session.getAttribute("employer")) || Objects.isNull(session.getAttribute("vacancy"))) {
+            return "home";
+        }
+
+        Application application = applicationJpa.findById(applicationId).orElseThrow(RuntimeException::new);
+
+        session.setAttribute("candidate", application.getCandidate());
+
+        return "candidate-profile-for-employer-home";
+
+    }
+
+    @GetMapping("/candidate-profile-for-employer")
+    public String getCandidateProfileEmployer2(HttpSession session) {
+
+        if (session == null || session.getAttribute("candidate") == null) {
+            return "home";
+        }
+
+        return "candidate-profile-for-employer-home";
+    }
+
+    @GetMapping("/candidate-profile-for-employer-repositories")
+    public String getCandidateProfileRepositoriesForEmployer(HttpSession session) {
+
+        if (session == null || session.getAttribute("candidate") == null) {
+            return "home";
+        }
+
+
+        return "candidate-profile-for-employer-repositories";
+    }
+
+    @GetMapping("/candidate-repository-page-for-employer")
+    public String getCandidateRepositoryPageForEmployer(HttpSession session) {
+        if (Objects.isNull(session)) {
+            return "home";
+        }
+
+        if (Objects.isNull(session.getAttribute("candidate"))) {
+            return "home";
+        }
+
+        return "candidate-repository-page-for-employer";
+    }
+
+    @GetMapping("/candidate-achievements-for-employer")
+    public String getCandidateAchievementListForEmployer(HttpSession session){
+        if (Objects.isNull(session)) {
+            return "home";
+        }
+
+        if (Objects.isNull(session.getAttribute("candidate"))) {
+            return "home";
+        }
+
+        return "candidate-achievements-list-for-employer";
     }
 
 

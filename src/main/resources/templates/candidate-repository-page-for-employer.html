@@ -239,9 +239,7 @@
 <!-- Шапка -->
 <header class="header" id="mainHeader">
     <a href="/dashboard" class="logo-small">constellar.tech</a>
-    <form th:action="@{/constellar.tech/api/v1/auth/logout-candidate}" method="post">
-        <button type="submit" class="logout-btn">Выйти</button>
-    </form>
+    <a th:href="@{/applications-for-employer}" class="logout-btn">Назад к отклику</a>
 </header>
 
 <!-- Основной контент -->
@@ -256,17 +254,14 @@
             <div th:if="${session.candidate.avatar == null}" class="avatar-placeholder"
                  th:text="${#strings.substring(session.candidate.username, 0, 2)}">
             </div>
-            <a href="/change-avatar-candidate" class="change-avatar-btn">Изменить аватар</a>
             <div class="username" th:text="${session.candidate.username}">Username</div>
             <div class="position" th:text="${session.candidate.position ?: 'Должность не указана'}">Position</div>
         </div>
 
         <ul class="nav-menu">
-            <li class="nav-item"><a href="/candidate-personal-account" class="nav-link">Профиль</a></li>
-            <li class="nav-item"><a href="/candidate-repository-list" class="nav-link">Репозитории</a></li>
-            <li class="nav-item"><a href="/candidate-achievements" class="nav-link">Достижения</a></li>
-            <li class="nav-item"><a href="/candidate-vacancies" class="nav-link">Вакансии</a></li>
-            <li class="nav-item"><a href="#settings" class="nav-link">Настройки</a></li>
+            <li class="nav-item"><a href="/candidate-profile-for-employer" class="nav-link">Профиль</a></li>
+            <li class="nav-item"><a href="/candidate-profile-for-employer-repositories" class="nav-link active" id="repositoriesLink">Репозитории</a></li>
+            <li class="nav-item"><a href="/candidate-achievements-for-employer" class="nav-link">Достижения</a></li>
         </ul>
     </aside>
 
@@ -294,16 +289,9 @@
                     <li th:each="file : ${session.repository.files}" class="file-tree-item"
                         th:classappend="${session.selectedFile != null && file.id == session.selectedFile.id} ? 'active' : ''">
             <span th:text="${file.fileName}"
-                  th:onclick="'location.href=\'/constellar.tech/api/v1/repository/' + ${session.repository.id} + '?fileId=' + ${file.id} + '\''"
+                  th:onclick="'location.href=\'/constellar.tech/api/v1/repository/forEmployer/' + ${session.repository.id} + '?fileId=' + ${file.id} + '\''"
                   style="flex-grow: 1;"></span>
-                        <button class="delete-file-btn"
-                                th:data-fileid="${file.id}"
-                                th:onclick="'deleteFile(' + ${file.id} + ', ' + ${session.repository.id} + ')'">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M6 18L18 6M6 6l12 12"/>
-                            </svg>
-                        </button>
+
                     </li>
                     <li th:if="${session.repository.files.empty}" class="empty-state">Файлы отсутствуют</li>
                 </ul>
@@ -421,28 +409,6 @@
         initCodeHighlighting();
     });
 </script>
-<script>
-    async function deleteFile(fileId, repositoryId) {
-        if (!confirm('Вы уверены, что хотите удалить этот файл?')) return;
 
-        try {
-            const response = await fetch(`/constellar.tech/api/v1/repository/${repositoryId}/file/${fileId}`, {
-                method: 'DELETE'
-            });
-
-            if (response.ok) {
-                // Обновляем страницу после успешного удаления
-                window.location.reload();
-            } else {
-                const error = await response.text();
-                console.error('Ошибка удаления файла:', error);
-                alert('Ошибка при удалении файла: ' + error);
-            }
-        } catch (error) {
-            console.error('Ошибка:', error);
-            alert('Произошла ошибка при удалении файла');
-        }
-    }
-</script>
 </body>
 </html>

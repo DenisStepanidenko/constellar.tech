@@ -1,5 +1,6 @@
 package ru.denis.constellar.tech.repositoryFile.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -27,5 +28,6 @@ public class RepositoryFile {
 
     @ManyToOne
     @JoinColumn(name = "repository_id")
+    @JsonIgnore
     private Repository repository;
 }

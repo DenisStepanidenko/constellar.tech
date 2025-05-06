@@ -1,0 +1,109 @@
+
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>constellar.tech | Личный кабинет</title>
+  <!-- Внешний ресурс через Thymeleaf -->
+  <link th:href="@{https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap}"
+        rel="stylesheet">
+  <!-- Внутренний ресурс через Thymeleaf -->
+  <link th:href="@{/candidate-repository-list.css}" rel="stylesheet">
+</head>
+<body>
+<!-- Звёздный фон -->
+<div th:each="i : ${#numbers.sequence(1, 100)}"
+     class="star"
+     th:style="'top: ' + ${T(java.lang.Math).random() * 100} + '%; ' +
+                  'left: ' + ${T(java.lang.Math).random() * 100} + '%; ' +
+                  'animation-delay: ' + ${T(java.lang.Math).random() * 2} + 's; ' +
+                  'animation-duration: ' + (5 + ${T(java.lang.Math).random() * 10}) + 's;'">
+</div>
+
+<!-- Шапка -->
+<!-- Шапка -->
+<header class="header" id="mainHeader">
+  <a href="/dashboard" class="logo-small">constellar.tech</a>
+  <a th:href="@{/applications-for-employer}" class="logout-btn">Назад к отклику</a>
+</header>
+
+<!-- Основной контент -->
+<div class="dashboard-container">
+  <!-- Боковая панель -->
+  <aside class="sidebar">
+    <div class="profile-card">
+      <div th:if="${session.candidate.avatar != null}">
+        <img th:src="@{/image/candidate/getAvatar/{id}(id = ${session.candidate.id})}" alt="Аватар" class="avatar-image">
+      </div>
+      <div th:if="${session.candidate.avatar == null}" class="avatar-placeholder"
+           th:text="${#strings.substring(session.candidate.username, 0, 2)}">
+      </div>
+      <div class="username" th:text="${session.candidate.username}">Username</div>
+      <div class="position" th:text="${session.candidate.position ?: 'Должность не указана'}">Position</div>
+    </div>
+
+    <ul class="nav-menu">
+      <li class="nav-item"><a href="/candidate-profile-for-employer" class="nav-link">Профиль</a></li>
+      <li class="nav-item"><a href="/candidate-profile-for-employer-repositories" class="nav-link active" id="repositoriesLink">Репозитории</a></li>
+      <li class="nav-item"><a href="/candidate-achievements-for-employer" class="nav-link">Достижения</a></li>
+    </ul>
+  </aside>
+
+  <!-- Основное содержимое -->
+  <main class="main-content">
+    <section class="repositories-section">
+      <h2 class="section-title">Репозитории кандидата</h2>
+
+      <div class="repositories-grid">
+        <!-- Карточки репозиториев -->
+        <div th:each="repo : ${session.candidate.repositories}" class="repo-card"
+             th:onclick="'location.href=\'/constellar.tech/api/v1/repository/forEmployer/' + ${repo.id} + '\''">
+          <div class="repo-name" th:text="${repo.name}">Название репозитория</div>
+          <div class="repo-description" th:text="${repo.description} ?: 'Описание отсутствует'">
+            Описание репозитория. Здесь может быть краткое описание проекта и используемых технологий.
+          </div>
+          <div class="repo-meta">
+            <span th:text="${repo.primaryLanguage} ?: 'Язык не указан'">JavaScript</span>
+            <span th:text="'⭐ ' + (${repo.stars} != null ? ${repo.stars} : '0')">⭐ 42</span>
+            <span th:text="'Обновлён ' + ${#temporals.format(repo.lastUpdated, 'dd MMM yyyy')}">Обновлён 2 дня назад</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+
+</div>
+
+<script>
+  let lastScroll = 0;
+  const header = document.getElementById('mainHeader');
+  const SCROLL_THRESHOLD = 5; // Порог в пикселях для определения скролла
+
+  window.addEventListener('scroll', function() {
+    const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+
+    // Определяем направление скролла с учетом порога
+    if (currentScroll > lastScroll + SCROLL_THRESHOLD) {
+      // Скролл вниз - скрываем шапку
+      header.classList.add('hidden');
+    } else if (currentScroll < lastScroll - SCROLL_THRESHOLD) {
+      // Скролл вверх - показываем шапку только если вверху страницы
+      if (currentScroll <= SCROLL_THRESHOLD) {
+        header.classList.remove('hidden');
+      }
+    }
+
+    // Всегда показываем шапку при достижении верха
+    if (currentScroll <= SCROLL_THRESHOLD) {
+      header.classList.remove('hidden');
+    }
+
+    lastScroll = currentScroll;
+  });
+</script>
+</body>
+</html>

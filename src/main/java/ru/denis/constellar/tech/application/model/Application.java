@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode(of = "id")
 public class Application {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,8 +34,6 @@ public class Application {
     @Column(nullable = false)
     private LocalDateTime appliedAt;
 
-    @Column(length = 2000)
-    private String coverLetter;
 
 
 }

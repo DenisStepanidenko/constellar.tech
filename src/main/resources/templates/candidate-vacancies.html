@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Вакансии | constellar.tech</title>
+  <link th:href="@{https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap}" rel="stylesheet">
+  <link th:href="@{/candidate-personal-account.css}" rel="stylesheet">
+
+  <style>
+
+    .empty-vacancies {
+      text-align: center;
+      padding: 3rem;
+      grid-column: 1 / -1;
+    }
+
+    .empty-vacancies-icon {
+      font-size: 5rem;
+      color: rgba(0, 255, 255, 0.2);
+      margin-bottom: 1.5rem;
+    }
+
+    .empty-vacancies-title {
+      font-size: 1.8rem;
+      color: var(--accent-blue);
+      margin-bottom: 1rem;
+    }
+
+    .empty-vacancies-message {
+      color: rgba(255, 255, 255, 0.7);
+      max-width: 500px;
+      margin: 0 auto 2rem;
+      line-height: 1.6;
+      font-size: 1.1rem;
+    }
+
+    .empty-vacancies-btn {
+      padding: 0.8rem 2rem;
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-green));
+      color: var(--primary-dark);
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: transform 0.3s;
+      font-size: 1rem;
+    }
+
+    .empty-vacancies-btn:hover {
+      transform: scale(1.05);
+    }
+    /* Стили для раздела вакансий */
+    .vacancies-section {
+      background: rgba(10, 15, 43, 0.5);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .vacancies-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .vacancy-card {
+      cursor: default;
+      background: rgba(26, 26, 64, 0.7);
+      border-radius: 10px;
+      padding: 1.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+
+    .vacancy-title,
+    .vacancy-company,
+    .vacancy-details,
+    .vacancy-description,
+    .detail,
+    .detail-label,
+    .detail-value,
+    .skills-tags,
+    .skill-tag {
+      cursor: default; /* Стрелка на всём тексте */
+      user-select: none; /* Запрещаем выделение */
+    }
+
+    .vacancy-card:hover {
+      cursor: default;
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .vacancy-title {
+      font-size: 1.3rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      color: var(--accent-blue);
+    }
+
+    .detail.skills {
+      display: block;
+    }
+
+    .detail.skills .detail-value {
+      display: inline-block;
+      margin-top: 0.3rem;
+      color: var(--accent-yellow);
+      font-size: 0.9rem;
+    }
+
+    .vacancy-company {
+      font-size: 1rem;
+      color: var(--accent-green);
+      margin-bottom: 1rem;
+    }
+
+    .vacancy-details {
+      margin-bottom: 1rem;
+    }
+
+    .detail {
+      display: flex;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .detail-label {
+      color: #aaa;
+      min-width: 120px;
+    }
+
+    .detail-value {
+      color: white;
+    }
+
+    .vacancy-description {
+      font-size: 0.9rem;
+      color: #ccc;
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+
+    .vacancy-title,
+    .vacancy-company,
+    .vacancy-details,
+    .vacancy-description {
+      cursor: default; /* Запрещаем изменение курсора для текста */
+
+    }
+
+    .btn-apply {
+      cursor: pointer;
+      padding: 0.5rem 1.5rem;
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-green));
+      color: var(--primary-dark);
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: transform 0.3s;
+    }
+
+    .btn-apply:hover {
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+<!-- Звёздный фон -->
+<div th:each="i : ${#numbers.sequence(1, 100)}"
+     class="star"
+     th:style="'top: ' + ${T(java.lang.Math).random() * 100} + '%; ' +
+              'left: ' + ${T(java.lang.Math).random() * 100} + '%; ' +
+              'animation-delay: ' + ${T(java.lang.Math).random() * 2} + 's; ' +
+              'animation-duration: ' + (5 + ${T(java.lang.Math).random() * 10}) + 's;'">
+</div>
+
+<!-- Шапка -->
+<header class="header" id="mainHeader">
+  <a href="/dashboard" class="logo-small">constellar.tech</a>
+  <form th:action="@{/constellar.tech/api/v1/auth/logout-candidate}" method="post">
+    <button type="submit" class="logout-btn">Выйти</button>
+  </form>
+</header>
+
+<!-- Основной контент -->
+<div class="dashboard-container">
+  <!-- Боковая панель -->
+  <aside class="sidebar">
+    <div class="profile-card">
+      <div th:if="${session.candidate.avatar != null}">
+        <img th:src="@{/image/candidate/getAvatar/{id}(id = ${session.candidate.id})}" alt="Аватар" class="avatar-image">
+      </div>
+      <div th:if="${session.candidate.avatar == null}" class="avatar-placeholder"
+           th:text="${#strings.substring(session.candidate.username, 0, 2)}">
+      </div>
+      <a href="/change-avatar-candidate" class="change-avatar-btn">Изменить аватар</a>
+      <div class="username" th:text="${session.candidate.username}">Username</div>
+      <div class="position" th:text="${session.candidate.position ?: 'Должность не указана'}">Position</div>
+    </div>
+
+    <ul class="nav-menu">
+      <li class="nav-item"><a href="/candidate-personal-account" class="nav-link">Профиль</a></li>
+      <li class="nav-item"><a href="/candidate-repository-list" class="nav-link" id="repositoriesLink">Репозитории</a></li>
+      <li class="nav-item"><a href="/candidate-achievements" class="nav-link">Достижения</a></li>
+      <li class="nav-item"><a href="/candidate-vacancies" class="nav-link active">Вакансии</a></li>
+      <li class="nav-item"><a href="#settings" class="nav-link">Настройки</a></li>
+    </ul>
+  </aside>
+
+  <!-- Основное содержимое -->
+  <main class="main-content">
+    <section class="vacancies-section">
+      <h2 class="section-title">Доступные вакансии</h2>
+
+      <div class="vacancies-grid" id="vacanciesContainer">
+
+        <!-- Блок для пустого состояния -->
+        <div th:if="${#lists.isEmpty(session.vacancies)}" class="empty-vacancies">
+          <div class="empty-vacancies-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21.5 12H16c-.7 2-2 3-4 3s-3.3-1-4-3H2.5"></path>
+              <path d="M5.5 5.1L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.5-6.9a2 2 0 0 0-3.5 0v0"></path>
+            </svg>
+          </div>
+          <h3 class="empty-vacancies-title">Вакансий не найдено</h3>
+          <p class="empty-vacancies-message">
+            В настоящее время нет доступных вакансий.
+            Пожалуйста, проверьте позже или попробуйте изменить параметры поиска.
+          </p>
+          <button class="empty-vacancies-btn" onclick="location.reload()">
+            Обновить список
+          </button>
+        </div>
+
+        <!-- Вакансии будут загружаться здесь -->
+        <div th:each="vacancy : ${session.vacancies}" class="vacancy-card">
+          <h3 class="vacancy-title" th:text="${vacancy.title}">Название вакансии</h3>
+          <div class="vacancy-company" th:text="${vacancy.employer.companyName}">Компания</div>
+
+          <div class="vacancy-details">
+            <div class="detail">
+              <span class="detail-label">Должность:</span>
+              <span class="detail-value" th:text="${vacancy.position}">Должность</span>
+            </div>
+            <div class="detail">
+              <span class="detail-label">Зарплата:</span>
+              <span class="detail-value"
+                    th:text="${vacancy.salaryFrom} + (${vacancy.salaryTo} != null ? ' - ' + ${vacancy.salaryTo} : '') + ' ' + ${vacancy.currency}">
+                                50 000 - 80 000 ₽
+                            </span>
+            </div>
+            <div class="detail">
+              <span class="detail-label">Опыт:</span>
+              <span class="detail-value" th:text="${vacancy.experienceLevel}">Middle</span>
+            </div>
+            <div class="detail">
+              <span class="detail-label">Тип занятости:</span>
+              <span class="detail-value" th:text="${vacancy.employmentType}">Полная занятость</span>
+            </div>
+          </div>
+
+          <!-- Новый блок для навыков -->
+          <div class="detail" th:if="${vacancy.skills != null and !vacancy.skills.isEmpty()}">
+            <span class="detail-label">Требуемые навыки:</span>
+            <span class="detail-value" th:text="${vacancy.skills}">Java, Spring, SQL</span>
+          </div>
+
+          <div class="vacancy-description"
+               th:text="${#strings.length(vacancy.description) > 150 ?
+              #strings.substring(vacancy.description, 0, 150) + '...' :
+              vacancy.description}">
+            Краткое описание вакансии...
+          </div>
+
+          <button class="btn-apply" th:attr="data-id=${vacancy.id}">Откликнуться</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+
+<script>
+  let lastScroll = 0;
+  const header = document.getElementById('mainHeader');
+  const SCROLL_THRESHOLD = 5; // Порог в пикселях для определения скролла
+
+  window.addEventListener('scroll', function() {
+    const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+
+    // Определяем направление скролла с учетом порога
+    if (currentScroll > lastScroll + SCROLL_THRESHOLD) {
+      // Скролл вниз - скрываем шапку
+      header.classList.add('hidden');
+    } else if (currentScroll < lastScroll - SCROLL_THRESHOLD) {
+      // Скролл вверх - показываем шапку только если вверху страницы
+      if (currentScroll <= SCROLL_THRESHOLD) {
+        header.classList.remove('hidden');
+      }
+    }
+
+    // Всегда показываем шапку при достижении верха
+    if (currentScroll <= SCROLL_THRESHOLD) {
+      header.classList.remove('hidden');
+    }
+
+    lastScroll = currentScroll;
+  });
+</script>
+<script>
+  // Бесконечный скролл
+  window.addEventListener('scroll', function() {
+    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) {
+      // Здесь можно добавить логику подгрузки новых вакансий
+      // если нужно реализовать подгрузку с сервера
+    }
+  });
+
+  // Обработка клика на кнопку "Откликнуться"
+  document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('btn-apply')) {
+      const vacancyId = e.target.getAttribute('data-id');
+      applyForVacancy(vacancyId);
+    }
+  });
+
+  async function applyForVacancy(vacancyId) {
+    try {
+      const response = await fetch(`/constellar.tech/api/v1/vacancy/apply/${vacancyId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Ошибка при отклике на вакансию');
+      }
+
+      alert('Вы успешно откликнулись на вакансию!');
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Не удалось откликнуться на вакансию: ' + error.message);
+    }
+  }
+</script>
+</body>
+</html>

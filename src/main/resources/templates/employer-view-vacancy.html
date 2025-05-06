@@ -630,7 +630,7 @@
                     </svg>
                     Редактировать
                 </a>
-                <button class="btn btn-danger">
+                <button class="btn btn-danger" th:attr="data-id=${session.vacancy.id}">
                     <svg class="btn-icon" viewBox="0 0 24 24">
                         <path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z"/>
                     </svg>
@@ -724,7 +724,7 @@
                 </div>
 
                 <div style="margin-top: 1rem; text-align: center;">
-                    <a th:href="@{/employer-applications(vacancyId=${session.vacancy.id})}" class="btn btn-primary">
+                    <a th:href="@{'/applications-for-employer'}" class="btn btn-primary">
                         Просмотреть все отклики
                     </a>
                 </div>
@@ -752,7 +752,32 @@
     </section>
 </main>
 
+<script>
+    document.querySelector('.btn-danger').addEventListener('click', async function() {
+        const vacancyId = this.getAttribute('data-id');
 
+        if (confirm('Вы уверены, что хотите удалить эту вакансию?')) {
+            try {
+                const response = await fetch(`/constellar.tech/api/v1/vacancy/delete-vacancy/${vacancyId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Ошибка при удалении вакансии');
+                }
+
+                alert('Вакансия успешно удалена');
+                window.location.href = '/employer-list-vacancies'; // Перенаправление после удаления
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Не удалось удалить вакансию: ' + error.message);
+            }
+        }
+    });
+</script>
 <script>
     // Скрытие шапки при скролле
     let lastScroll = 0;

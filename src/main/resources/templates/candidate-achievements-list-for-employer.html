@@ -442,9 +442,7 @@
 <!-- Шапка -->
 <header class="header" id="mainHeader">
     <a href="/dashboard" class="logo-small">constellar.tech</a>
-    <form th:action="@{/constellar.tech/api/v1/auth/logout-candidate}" method="post">
-        <button type="submit" class="logout-btn">Выйти</button>
-    </form>
+    <a th:href="@{/applications-for-employer}" class="logout-btn">Назад к отклику</a>
 </header>
 
 <!-- Основной контент -->
@@ -459,23 +457,21 @@
             <div th:if="${session.candidate.avatar == null}" class="avatar-placeholder"
                  th:text="${#strings.substring(session.candidate.username, 0, 2)}">
             </div>
-            <a href="/change-avatar-candidate" class="change-avatar-btn">Изменить аватар</a>
             <div class="username" th:text="${session.candidate.username}">Username</div>
             <div class="position" th:text="${session.candidate.position ?: 'Должность не указана'}">Position</div>
         </div>
 
         <ul class="nav-menu">
-            <li class="nav-item"><a href="/candidate-personal-account" class="nav-link">Профиль</a></li>
-            <li class="nav-item"><a href="/candidate-repository-list" class="nav-link">Репозитории</a></li>
-            <li class="nav-item"><a href="/candidate-achievements" class="nav-link active">Достижения</a></li>
-            <li class="nav-item"><a href="/candidate-vacancies" class="nav-link">Вакансии</a></li>
-            <li class="nav-item"><a href="#settings" class="nav-link">Настройки</a></li>
+            <li class="nav-item"><a href="/candidate-profile-for-employer" class="nav-link">Профиль</a></li>
+            <li class="nav-item"><a href="/candidate-profile-for-employer-repositories" class="nav-link"
+                                    id="repositoriesLink">Репозитории</a></li>
+            <li class="nav-item"><a href="/candidate-achievements-for-employer" class="nav-link active">Достижения</a></li>
         </ul>
     </aside>
 
     <main class="main-content">
         <section class="achievements-section">
-            <h2 class="section-title">Мои достижения</h2>
+            <h2 class="section-title">Достижения кандидата</h2>
 
             <div class="achievements-grid" id="achievementsContainer">
                 <!-- Список достижений -->
@@ -519,21 +515,10 @@
                                     Скачать
                                 </a>
                             </div>
-                            <button class="delete-btn" th:onclick="'deleteAchievement(' + ${achievement.id} + ')'">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                </svg>
-                            </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Кнопка добавления в сетке -->
-                <div class="add-achievement-card"
-                     onclick="document.getElementById('addAchievementModal').classList.add('active')">
-                    <div class="add-achievement-icon">+</div>
-                </div>
 
                 <!-- Пустое состояние -->
                 <div th:if="${session.candidate.achievements.empty}" class="empty-state">
@@ -542,50 +527,13 @@
                         <path stroke-linecap="round" stroke-linejoin="round"
                               d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
-                    <p>У вас пока нет добавленных достижений</p>
+                    <p>У кандидата нет добавленных достижений</p>
                 </div>
             </div>
         </section>
     </main>
 </div>
 
-<!-- Модальное окно для добавления достижения -->
-<div class="modal-overlay" id="addAchievementModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3 class="modal-title">Добавить достижение</h3>
-            <button class="close-modal" id="closeModalBtn">&times;</button>
-        </div>
-        <form th:action="@{/constellar.tech/api/v1/achievement/add}" method="post" enctype="multipart/form-data"
-              id="achievementForm">
-            <div class="form-group">
-                <label for="achievementTitle" class="form-label">Название достижения *</label>
-                <input type="text" id="achievementTitle" name="title" class="form-input" required>
-            </div>
-
-            <div class="form-group">
-                <label for="achievementDate" class="form-label">Дата получения *</label>
-                <input type="date" id="achievementDate" name="date" class="form-input" required>
-            </div>
-
-            <div class="file-upload" id="fileUploadArea">
-                <div class="file-upload-icon">
-                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                        <polyline points="17 8 12 3 7 8"></polyline>
-                        <line x1="12" y1="3" x2="12" y2="15"></line>
-                    </svg>
-                </div>
-                <p>Перетащите файл сюда или кликните для выбора *</p>
-                <input type="file" id="achievementFile" name="file" accept=".pdf,.jpg,.jpeg,.png" style="display: none;"
-                       required>
-                <div id="fileName" style="margin-top: 10px; color: var(--accent-blue);"></div>
-            </div>
-
-            <button type="submit" class="submit-btn">Добавить достижение</button>
-        </form>
-    </div>
-</div>
 
 <script>
     let lastScroll = 0;
@@ -684,21 +632,6 @@
             }
         }
 
-
-        window.deleteAchievement = async function (id) {
-            if (!confirm('Вы уверены, что хотите удалить это достижение?')) return;
-
-            // Блокируем кнопку на время выполнения
-            const btn = document.querySelector(`button[onclick="deleteAchievement(${id})"]`);
-            if (btn) btn.disabled = true;
-
-            const response = await fetch(`/constellar.tech/api/v1/achievement/delete/${id}`, {
-                method: 'POST', // Изменили на POST
-                credentials: 'include'
-            });
-
-            window.location.reload();
-        };
 
         // Инициализация
         setupModal();

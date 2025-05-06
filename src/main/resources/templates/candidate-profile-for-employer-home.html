@@ -23,9 +23,7 @@
 <!-- Шапка -->
 <header class="header" id="mainHeader">
     <a href="/dashboard" class="logo-small">constellar.tech</a>
-    <form th:action="@{/constellar.tech/api/v1/auth/logout-candidate}" method="post">
-        <button type="submit" class="logout-btn">Выйти</button>
-    </form>
+    <a th:href="@{/applications-for-employer}" class="logout-btn">Назад к отклику</a>
 </header>
 
 <!-- Основной контент -->
@@ -39,17 +37,14 @@
             <div th:if="${session.candidate.avatar == null}" class="avatar-placeholder"
                  th:text="${#strings.substring(session.candidate.username, 0, 2)}">
             </div>
-            <a href="/change-avatar-candidate" class="change-avatar-btn">Изменить аватар</a>
             <div class="username" th:text="${session.candidate.username}">Username</div>
             <div class="position" th:text="${session.candidate.position ?: 'Должность не указана'}">Position</div>
         </div>
 
         <ul class="nav-menu">
-            <li class="nav-item"><a href="/candidate-personal-account" class="nav-link active">Профиль</a></li>
-            <li class="nav-item"><a href="/candidate-repository-list" class="nav-link" id="repositoriesLink">Репозитории</a></li>
-            <li class="nav-item"><a href="/candidate-achievements" class="nav-link">Достижения</a></li>
-            <li class="nav-item"><a href="/candidate-vacancies" class="nav-link">Вакансии</a></li>
-            <li class="nav-item"><a href="#settings" class="nav-link">Настройки</a></li>
+            <li class="nav-item"><a href="/candidate-profile-for-employer" class="nav-link active">Профиль</a></li>
+            <li class="nav-item"><a href="/candidate-profile-for-employer-repositories" class="nav-link" id="repositoriesLink">Репозитории</a></li>
+            <li class="nav-item"><a href="/candidate-achievements-for-employer" class="nav-link">Достижения</a></li>
         </ul>
     </aside>
 
@@ -57,7 +52,7 @@
     <main class="main-content">
         <!-- Секция профиля -->
         <section id="profile" class="profile-section">
-            <h2 class="section-title">Мой профиль</h2>
+            <h2 class="section-title">Профиль кандидата</h2>
 
             <div class="profile-grid">
                 <div class="profile-field">
@@ -97,7 +92,7 @@
                 </div>
             </div>
 
-            <button class="edit-btn" onclick="location.href='/edit-profile-candidate'">Редактировать профиль</button>
+
         </section>
 
 

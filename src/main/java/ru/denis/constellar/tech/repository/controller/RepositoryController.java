@@ -37,6 +37,45 @@ public class RepositoryController {
     private final RepositoryFileJpa repositoryFileJpa;
     private final CandidateRepository candidateRepository;
 
+    @GetMapping("/{repoId}/files")
+    public List<RepositoryFile> getAllRepositoryFiles(@PathVariable Long repoId) {
+
+        Repository repository = repositoryJpa.findById(repoId).orElseThrow(RuntimeException::new);
+
+
+        return repository.getFiles();
+
+    }
+
+    @GetMapping("/{repoId}/file/{fileId}/content")
+    public ResponseEntity<byte[]> getFileContent(@PathVariable Long repoId,
+                                                 @PathVariable Long fileId,
+                                                 HttpSession session) {
+
+        RepositoryFile file = repositoryFileJpa.findById(fileId).orElseThrow(RuntimeException::new);
+
+        // Получаем содержимое файла
+        byte[] content = file.getContent();
+        String contentType = determineContentType(file.getFileType());
+
+        return ResponseEntity.ok()
+                .header("Content-Type", contentType)
+                .body(content);
+    }
+
+    private String determineContentType(String fileName) {
+        // Определяем Content-Type на основе расширения файла
+        if (fileName.endsWith(".png")) return "image/png";
+        if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")) return "image/jpeg";
+        if (fileName.endsWith(".gif")) return "image/gif";
+        if (fileName.endsWith(".pdf")) return "application/pdf";
+        if (fileName.endsWith(".html")) return "text/html";
+        if (fileName.endsWith(".css")) return "text/css";
+        if (fileName.endsWith(".js")) return "text/javascript";
+        if (fileName.endsWith(".json")) return "application/json";
+        return "text/plain";
+    }
+
 
     @PostMapping("/add")
     @Transactional
@@ -81,6 +120,56 @@ public class RepositoryController {
         session.setAttribute("candidate", candidateRepository.findById(candidate.getId()).get());
 
         response.sendRedirect("http://localhost:8080/candidate-repository-list");
+    }
+
+    @GetMapping("/forEmployer/{repositoryId}")
+    public void getRepositoryForEmployer(@PathVariable Long repositoryId,
+                                         @RequestParam(required = false) Long fileId,
+                                         HttpSession session,
+                                         HttpServletResponse response) throws IOException {
+
+
+        session.removeAttribute("repository");
+        session.removeAttribute("contentType");
+        session.removeAttribute("fileContent");
+        session.removeAttribute("selectedFile");
+
+        Candidate candidate = (Candidate) session.getAttribute("candidate");
+
+        //TODO: создать своё собственное исключение
+        Repository repository = repositoryJpa.findById(repositoryId)
+                .orElseThrow(BadRequestException::new);
+
+
+        session.setAttribute("repository", repository);
+
+        if (fileId != null) {
+            repository.getFiles().stream()
+                    .filter(f -> f.getId().equals(fileId))
+                    .findFirst()
+                    .ifPresent(file -> {
+                        session.setAttribute("selectedFile", file);
+
+                        if (isTextFile(file)) {
+                            session.setAttribute("contentType", "text");
+                            session.setAttribute("fileContent", new String(file.getContent(), StandardCharsets.UTF_8));
+                        } else if (isImageFile(file)) {
+                            session.setAttribute("contentType", "image");
+                            String base64 = Base64.getEncoder().encodeToString(file.getContent());
+                            session.setAttribute("fileContent", "data:" + file.getFileType() + ";base64," + base64);
+                        } else if (isPDFFile(file)) {
+                            session.setAttribute("contentType", "pdf");
+                            String base64 = Base64.getEncoder().encodeToString(file.getContent());
+                            session.setAttribute("fileContent", base64);
+                        } else {
+                            session.setAttribute("contentType", "binary");
+                        }
+
+
+                    });
+        }
+
+        response.sendRedirect("http://localhost:8080/candidate-repository-page-for-employer");
     }
 
     @GetMapping("/{repositoryId}")
@@ -194,7 +283,7 @@ public class RepositoryController {
 
         headers.set("Content-Disposition",
                 "attachment; filename=\"" + file.getFileName() + "\"; " +
-                        "filename*=UTF-8''" + encodedFileName);
+                "filename*=UTF-8''" + encodedFileName);
 
 
         return ResponseEntity.ok()
@@ -241,17 +330,17 @@ public class RepositoryController {
 
     private boolean isTextFile(RepositoryFile file) {
         return file.getFileType().startsWith("text/") ||
-                file.getFileName().matches(".*\\.(java|cpp|py|js|html|css|xml|json|kt|ts|md|txt)$");
+               file.getFileName().matches(".*\\.(java|cpp|py|js|html|css|xml|json|kt|ts|md|txt)$");
     }
 
     private boolean isImageFile(RepositoryFile file) {
         return file.getFileType().startsWith("image/") ||
-                file.getFileName().matches(".*\\.(png|jpg|jpeg|gif|svg|bmp)$");
+               file.getFileName().matches(".*\\.(png|jpg|jpeg|gif|svg|bmp)$");
     }
 
     private boolean isPDFFile(RepositoryFile file) {
         return file.getFileType().equals("application/pdf") ||
-                file.getFileName().endsWith(".pdf");
+               file.getFileName().endsWith(".pdf");
     }
 
 

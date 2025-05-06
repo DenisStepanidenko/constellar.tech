@@ -9,7 +9,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import ru.denis.constellar.tech.application.model.Application;
+import ru.denis.constellar.tech.application.model.ApplicationStatus;
 import ru.denis.constellar.tech.auth.exceptions.UnauthorizedAccessException;
+import ru.denis.constellar.tech.candidate.model.Candidate;
 import ru.denis.constellar.tech.employer.jpa.EmployerJpa;
 import ru.denis.constellar.tech.employer.model.Employer;
 import ru.denis.constellar.tech.vacancy.dto.VacancyDetailsDto;
@@ -21,6 +24,7 @@ import ru.denis.constellar.tech.vacancy.service.VacancyService;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor
@@ -128,6 +132,61 @@ public class VacancyController {
         vacancyService.updateVacancy(id, vacancyDto);
 
         session.setAttribute("vacancy", vacancyService.createVacancyDetailsDtoFromVacancy(id));
+    }
+
+    @PostMapping("/delete-vacancy/{id}")
+    public void deleteVacancy(@PathVariable Long id, HttpSession session) {
+
+        if (session == null || session.getAttribute("employer") == null || session.getAttribute("vacancy") == null) {
+            throw new UnauthorizedAccessException();
+        }
+
+        Employer employer = (Employer) session.getAttribute("employer");
+
+        vacancyJpa.deleteById(id);
+        vacancyJpa.flush();
+
+        session.removeAttribute("vacancy");
+
+        session.setAttribute("employer", employerJpa.findById(employer.getId()).get());
+
+    }
+
+    @PostMapping("/apply/{vacancyId}")
+    public void applyVacancy(@PathVariable Long vacancyId, HttpSession session) {
+
+        if (session == null || session.getAttribute("candidate") == null) {
+            throw new UnauthorizedAccessException();
+        }
+
+        Candidate candidate = (Candidate) session.getAttribute("candidate");
+
+        Vacancy vacancy = vacancyJpa.findById(vacancyId).orElseThrow(RuntimeException::new);
+
+        Set<Application> applicationSet = vacancy.getApplications();
+
+        boolean isNeedToApply = true;
+
+        for (Application application : applicationSet) {
+
+            if (application.getCandidate().equals(candidate)) {
+                isNeedToApply = false;
+                break;
+            }
+        }
+
+        if (isNeedToApply) {
+            Application application = new Application();
+            application.setAppliedAt(LocalDateTime.now());
+            application.setStatus(ApplicationStatus.NEW);
+            application.setCandidate(candidate);
+            application.setVacancy(vacancy);
+
+            vacancy.getApplications().add(application);
+            vacancyJpa.save(vacancy);
+        }
+
+
     }
 
 

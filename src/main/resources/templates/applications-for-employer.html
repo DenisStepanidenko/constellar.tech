@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Отклики на вакансию | constellar.tech</title>
+    <link th:href="@{https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap}"
+          rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #ffa500;
+            --primary-dark: #ff8c00;
+            --secondary: #2196F3;
+            --success: #4CAF50;
+            --danger: #F44336;
+            --dark: #0a0f2b;
+            --darker: #1a1a40;
+            --light: #ffffff;
+            --gray: #cccccc;
+            --dark-gray: #333333;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--dark), var(--darker));
+            color: var(--light);
+            font-family: 'Montserrat', sans-serif;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* Звёздный фон */
+        .stars-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: twinkle 4s infinite ease-in-out;
+        }
+
+        @keyframes twinkle {
+            0%, 100% {
+                opacity: 0.8;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.3;
+                transform: scale(1.5);
+            }
+        }
+
+        /* Шапка */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            transition: transform 0.3s ease;
+            border-bottom: 1px solid rgba(255, 165, 0, 0.2);
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .header.hidden {
+            transform: translateY(-100%);
+        }
+
+        .logo-small {
+            color: var(--light);
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo-small i {
+            color: var(--primary);
+        }
+
+        .logout-btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--light);
+            border: none;
+            padding: 0.5rem 1.2rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 2px 10px rgba(255, 165, 0, 0.3);
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 165, 0, 0.4);
+        }
+
+        /* Основной контейнер */
+        .main-content {
+            padding: 6rem 2rem 2rem;
+            position: relative;
+            z-index: 5;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Заголовок секции */
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-bottom: 10px;
+            font-weight: 600;
+            color: var(--light);
+        }
+
+        .section-title::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            border-radius: 2px;
+        }
+
+        /* Хедер вакансии */
+        .vacancy-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .vacancy-title {
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: var(--light);
+        }
+
+        .vacancy-title span {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* Фильтры и кнопки */
+        .filters-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.7rem 1.5rem;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            border: none;
+            font-size: 0.9rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn i {
+            font-size: 0.9rem;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--light);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .select-wrapper {
+            position: relative;
+            min-width: 250px;
+            z-index: 10;
+        }
+
+        .select-wrapper::after {
+            content: "▼";
+            font-size: 0.7rem;
+            color: var(--primary);
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+
+        .status-filter {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            width: 100%;
+            padding: 0.7rem 1.5rem;
+            padding-right: 2.5rem;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--light);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .status-filter:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 165, 0, 0.3);
+        }
+
+        .status-filter:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(255, 165, 0, 0.3);
+        }
+
+        /* Стили для выпадающего списка */
+        .status-filter option {
+            background-color: var(--darker);
+            color: var(--light);
+            padding: 0.5rem;
+        }
+
+        /* Карточки откликов */
+        .applications-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .application-card {
+            background: rgba(26, 26, 64, 0.7);
+            border-radius: 15px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            cursor: default;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .application-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary);
+            transition: all 0.3s ease;
+        }
+
+        .application-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            border-color: rgba(255, 165, 0, 0.3);
+        }
+
+        .application-card:hover::before {
+            width: 6px;
+            background: linear-gradient(to bottom, var(--primary), var(--primary-dark));
+        }
+
+        .application-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+        }
+
+        .application-candidate {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .candidate-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary);
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .candidate-info {
+            flex: 1;
+            min-width: 0; /* Это важно для правильной работы text-overflow */
+            overflow: hidden; /* Скрываем выходящий за пределы текст */
+        }
+
+        .candidate-name {
+            font-weight: 600;
+            color: var(--light);
+            margin-bottom: 0.3rem;
+            font-size: 1.1rem;
+            white-space: nowrap; /* Запрещаем перенос строк */
+            overflow: hidden; /* Скрываем выходящий за пределы текст */
+            text-overflow: ellipsis; /* Добавляем многоточие в конце */
+            max-width: 100%; /* Ограничиваем максимальную ширину */
+        }
+
+        .candidate-position {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+            white-space: nowrap; /* Запрещаем перенос строк */
+            overflow: hidden; /* Скрываем выходящий за пределы текст */
+            text-overflow: ellipsis; /* Добавляем многоточие в конце */
+            max-width: 100%; /* Ограничиваем максимальную ширину */
+        }
+
+        .application-status {
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            flex-shrink: 0;
+        }
+
+        .status-new {
+            background: rgba(255, 165, 0, 0.2);
+            color: var(--primary);
+        }
+
+        .status-viewed {
+            background: rgba(33, 150, 243, 0.2);
+            color: var(--secondary);
+        }
+
+        .status-invited {
+            background: rgba(76, 175, 80, 0.2);
+            color: var(--success);
+        }
+
+        .status-rejected {
+            background: rgba(244, 67, 54, 0.2);
+            color: var(--danger);
+        }
+
+        .application-meta {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .application-date {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .application-date i {
+            color: var(--primary);
+            font-size: 0.9rem;
+        }
+
+        .application-actions {
+            display: flex;
+            gap: 0.8rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-view {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--light);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            flex: 1;
+            min-width: 100px;
+            justify-content: center;
+            transition: all 0.3s ease; /* Добавляем плавный переход */
+        }
+        .btn-invite {
+            background: rgba(76, 175, 80, 0.2);
+            color: var(--success);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            flex: 1;
+            min-width: 100px;
+            justify-content: center;
+        }
+        .btn-view:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-invite:hover {
+            background: rgba(76, 175, 80, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(76, 175, 80, 0.2);
+        }
+
+        .btn-reject {
+            background: rgba(244, 67, 54, 0.2);
+            color: var(--danger);
+            border: 1px solid rgba(244, 67, 54, 0.3);
+            flex: 1;
+            min-width: 100px;
+            justify-content: center;
+        }
+
+        .btn-reject:hover {
+            background: rgba(244, 67, 54, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(244, 67, 54, 0.2);
+        }
+
+        .btn.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        /* Индикатор загрузки */
+        .loading-spinner {
+            text-align: center;
+            padding: 2rem;
+            color: rgba(255, 255, 255, 0.7);
+            display: none;
+        }
+
+        .loading-spinner.active {
+            display: block;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            margin: 0 auto;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 5rem 1rem 1rem;
+            }
+
+            .applications-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filters-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .vacancy-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .application-actions {
+                flex-wrap: wrap;
+            }
+
+            .btn {
+                flex: 1 1 100%;
+                min-width: 100%;
+                justify-content: center;
+                margin-bottom: 0.5rem;
+            }
+        }
+
+        /* Анимации */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .application-card {
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        /* Постепенное появление карточек */
+        .application-card:nth-child(1) { animation-delay: 0.1s; }
+        .application-card:nth-child(2) { animation-delay: 0.2s; }
+        .application-card:nth-child(3) { animation-delay: 0.3s; }
+        .application-card:nth-child(4) { animation-delay: 0.4s; }
+        .application-card:nth-child(5) { animation-delay: 0.5s; }
+        .application-card:nth-child(6) { animation-delay: 0.6s; }
+    </style>
+</head>
+<body>
+<!-- Звёздный фон -->
+<div class="stars-container" id="starsContainer"></div>
+
+<!-- Шапка -->
+<header class="header" id="mainHeader">
+    <a href="/dashboard" class="logo-small">
+        <i class="fas fa-rocket"></i>
+        constellar.tech
+    </a>
+    <form th:action="@{/constellar.tech/api/v1/auth/employer/logout}" method="post">
+        <button type="submit" class="logout-btn">
+            <i class="fas fa-sign-out-alt"></i>
+            Выйти
+        </button>
+    </form>
+</header>
+
+<!-- Основное содержимое -->
+<main class="main-content">
+    <section class="applications-section">
+        <div class="vacancy-header">
+            <h1 class="vacancy-title">Отклики на вакансию: <span th:text="${session.vacancy.title}"></span></h1>
+            <button class="btn btn-secondary" onclick="history.back()">
+                <i class="fas fa-arrow-left"></i>
+                Назад к вакансии
+            </button>
+        </div>
+
+        <!-- Фильтры -->
+        <div class="filters-container">
+            <div class="select-wrapper">
+                <select id="statusFilter" class="status-filter">
+                    <option value="ALL">Все отклики</option>
+                    <option value="NEW">Новые</option>
+                    <option value="VIEWED">Просмотренные</option>
+                    <option value="INVITED">Приглашённые</option>
+                    <option value="REJECTED">Отклонённые</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Список откликов -->
+        <div class="applications-container">
+            <div class="applications-grid" id="applicationsGrid">
+                <!-- Все отклики загружаются сразу, но часть скрыта -->
+                <div th:each="app : ${session.applications}"
+                     class="application-card"
+                     th:attr="data-status=${app.status}, data-id=${app.id}">
+                    <div class="application-header">
+                        <div class="application-candidate">
+                            <img th:if="${app.candidate.avatar != null}"
+                                 th:src="@{/image/candidate/getAvatar/{id}(id=${app.candidate.id})}"
+                                 class="candidate-avatar" alt="Аватар"
+                                 onerror="this.onerror=null; this.parentNode.innerHTML='<div class=\'candidate-avatar\'>${#strings.substring(app.candidate.username, 0, 2)}</div>'">
+                            <div th:if="${app.candidate.avatar == null}"
+                                 class="candidate-avatar"
+                                 th:text="${#strings.substring(app.candidate.username, 0, 2)}">
+                            </div>
+                            <div class="candidate-info">
+                                <div class="candidate-name"
+                                     th:text="${app.candidate.fullName} ?: ${app.candidate.username}"
+                                     title="${app.candidate.fullName} ?: ${app.candidate.username}">
+                                    Иван Иванов
+                                </div>
+                                <div class="candidate-position"
+                                     th:text="${app.candidate.position} ?: 'Должность не указана'"
+                                     title="${app.candidate.position} ?: 'Должность не указана'">
+                                    Java Developer
+                                </div>
+                            </div>
+                        </div>
+                        <div class="application-status" th:switch="${app.status}">
+                            <span th:case="'NEW'" class="status-new" th:text="${app.status}">NEW</span>
+                            <span th:case="'VIEWED'" class="status-viewed" th:text="${app.status}">VIEWED</span>
+                            <span th:case="'INVITED'" class="status-invited" th:text="${app.status}">INVITED</span>
+                            <span th:case="*" class="status-rejected" th:text="${app.status}">REJECTED</span>
+                        </div>
+                    </div>
+
+                    <div class="application-meta">
+                        <div class="application-date">
+                            <i class="far fa-calendar-alt"></i>
+                            <span th:text="${#temporals.format(app.appliedAt, 'dd.MM.yyyy HH:mm')}">
+                                15.05.2023 14:30
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="application-actions">
+                        <button class="btn btn-view"
+                                th:attr="data-id=${app.id}"
+                                onclick="viewCandidate(this.getAttribute('data-id'))">
+                            <i class="far fa-user"></i>
+                            Профиль
+                        </button>
+                        <button class="btn btn-invite"
+                                th:attr="data-id=${app.id}"
+                                th:disabled="${app.status == 'INVITED'}"
+                                th:classappend="${app.status == 'INVITED'} ? 'disabled' : ''"
+                                onclick="changeStatus(this.getAttribute('data-id'), 'INVITED')">
+                            <i class="fas fa-handshake"></i>
+                            Пригласить
+                        </button>
+                        <button class="btn btn-reject"
+                                th:attr="data-id=${app.id}"
+                                th:disabled="${app.status == 'REJECTED'}"
+                                th:classappend="${app.status == 'REJECTED'} ? 'disabled' : ''"
+                                onclick="changeStatus(this.getAttribute('data-id'), 'REJECTED')">
+                            <i class="fas fa-times"></i>
+                            Отклонить
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="loading-spinner" id="loadingSpinner">
+                <div class="spinner"></div>
+                <p>Загрузка...</p>
+            </div>
+        </div>
+    </section>
+</main>
+
+<script>
+    // Создание звёздного фона
+    function createStars() {
+        const container = document.getElementById('starsContainer');
+        const starCount = 100;
+
+        for (let i = 0; i < starCount; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+
+            // Случайные позиции и размеры
+            const size = Math.random() * 3;
+            const posX = Math.random() * 100;
+            const posY = Math.random() * 100;
+            const delay = Math.random() * 5;
+            const duration = 2 + Math.random() * 3;
+
+            star.style.width = `${size}px`;
+            star.style.height = `${size}px`;
+            star.style.left = `${posX}%`;
+            star.style.top = `${posY}%`;
+            star.style.animationDelay = `${delay}s`;
+            star.style.animationDuration = `${duration}s`;
+
+            container.appendChild(star);
+        }
+    }
+
+    // Скрытие шапки при скролле
+    let lastScroll = 0;
+    const header = document.getElementById('mainHeader');
+    const SCROLL_THRESHOLD = 5;
+
+    window.addEventListener('scroll', function () {
+        const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+
+        if (currentScroll > lastScroll + SCROLL_THRESHOLD && currentScroll > 100) {
+            header.classList.add('hidden');
+        } else if (currentScroll < lastScroll - SCROLL_THRESHOLD || currentScroll <= 100) {
+            header.classList.remove('hidden');
+        }
+
+        lastScroll = currentScroll;
+    });
+
+    // Все отклики уже загружены, просто управляем видимостью
+    let allApplications = [];
+    let visibleApplications = 6; // Начальное количество отображаемых откликов
+    let isLoading = false;
+    const applicationsGrid = document.getElementById('applicationsGrid');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    const statusFilter = document.getElementById('statusFilter');
+
+    // Инициализация при загрузке страницы
+    document.addEventListener('DOMContentLoaded', function () {
+        createStars();
+
+        // Получаем все карточки откликов
+        allApplications = Array.from(document.querySelectorAll('.application-card'));
+
+        // Применяем фильтр по умолчанию
+        filterApplications();
+
+        // Показываем только первые visibleApplications
+        updateVisibleApplications();
+    });
+
+    // Фильтрация откликов по статусу
+    statusFilter.addEventListener('change', function () {
+        filterApplications();
+        visibleApplications = 6; // Сбрасываем счетчик
+        updateVisibleApplications();
+    });
+
+    function filterApplications() {
+        const status = statusFilter.value;
+
+        allApplications.forEach(card => {
+            const cardStatus = card.getAttribute('data-status');
+
+            if (status === 'ALL' || cardStatus === status) {
+                card.style.display = 'block';
+                card.classList.remove('filtered');
+            } else {
+                card.style.display = 'none';
+                card.classList.add('filtered');
+            }
+        });
+    }
+
+    // Обновление видимых откликов
+    function updateVisibleApplications() {
+        const filteredCards = allApplications.filter(card => !card.classList.contains('filtered'));
+
+        filteredCards.forEach((card, index) => {
+            if (index < visibleApplications) {
+                card.classList.remove('hidden');
+                card.style.display = 'block';
+            } else {
+                card.classList.add('hidden');
+                card.style.display = 'none';
+            }
+        });
+
+        // Если все отклики показаны, скрываем спиннер
+        if (visibleApplications >= filteredCards.length) {
+            loadingSpinner.classList.remove('active');
+        } else {
+            loadingSpinner.classList.add('active');
+        }
+    }
+
+    // Бесконечный скролл
+    window.addEventListener('scroll', function () {
+        if (isLoading) return;
+
+        const {scrollTop, scrollHeight, clientHeight} = document.documentElement;
+
+        // Если пользователь прокрутил почти до конца
+        if (scrollTop + clientHeight >= scrollHeight - 100) {
+            loadMoreApplications();
+        }
+    });
+
+    function loadMoreApplications() {
+        isLoading = true;
+        loadingSpinner.classList.add('active');
+
+        // Имитация загрузки
+        setTimeout(() => {
+            visibleApplications += 3;
+            updateVisibleApplications();
+            isLoading = false;
+        }, 800);
+    }
+
+    // Просмотр профиля кандидата
+    function viewCandidate(applicationId) {
+        // Находим карточку по ID
+        const card = document.querySelector(`[data-id="${applicationId}"]`).closest('.application-card');
+
+        // Анимация клика
+        card.style.transform = 'scale(0.98)';
+        setTimeout(() => {
+            card.style.transform = '';
+        }, 200);
+
+        // Открываем профиль (замените на ваш URL)
+        window.open(`/candidate-profile-for-employer/${applicationId}`, '_blank');
+    }
+
+    // Изменение статуса отклика
+    async function changeStatus(applicationId, newStatus) {
+        try {
+            const card = document.querySelector(`[data-id="${applicationId}"]`).closest('.application-card');
+
+            // Анимация нажатия
+            card.style.transform = 'scale(0.98)';
+
+            const response = await fetch(`/constellar.tech/api/v1/application/${applicationId}/status`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({status: newStatus})
+            });
+
+            if (!response.ok) {
+                throw new Error('Ошибка при изменении статуса');
+            }
+
+            // Анимация успешного изменения
+            setTimeout(() => {
+                card.style.transform = 'scale(1)';
+                card.style.boxShadow = `0 0 20px ${getStatusColor(newStatus)}`;
+
+                setTimeout(() => {
+                    card.style.boxShadow = '';
+                }, 1000);
+            }, 200);
+
+            // Обновляем UI без перезагрузки страницы
+            const statusElement = card.querySelector('.application-status');
+
+            // Обновляем статус
+            statusElement.textContent = newStatus;
+            statusElement.className = 'application-status ' +
+                (newStatus === 'NEW' ? 'status-new' :
+                    newStatus === 'VIEWED' ? 'status-viewed' :
+                        newStatus === 'INVITED' ? 'status-invited' : 'status-rejected');
+
+            // Обновляем атрибут data-status для фильтрации
+            card.setAttribute('data-status', newStatus);
+
+            // Отключаем кнопки если нужно
+            if (newStatus === 'INVITED' || newStatus === 'REJECTED') {
+                card.querySelectorAll('.btn-invite, .btn-reject').forEach(btn => {
+                    btn.disabled = true;
+                    btn.classList.add('disabled');
+                });
+            }
+
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Не удалось изменить статус отклика');
+        }
+    }
+
+    function getStatusColor(status) {
+        switch(status) {
+            case 'NEW': return 'rgba(255, 165, 0, 0.5)';
+            case 'VIEWED': return 'rgba(33, 150, 243, 0.5)';
+            case 'INVITED': return 'rgba(76, 175, 80, 0.5)';
+            case 'REJECTED': return 'rgba(244, 67, 54, 0.5)';
+            default: return 'rgba(255, 255, 255, 0.2)';
+        }
+    }
+</script>
+</body>
+</html>
