@@ -45,6 +45,7 @@ public class AuthCandidateControllerImpl implements AuthCandidateController {
 
         if(httpSession == null || httpSession.getAttribute("candidate") == null){
             response.sendRedirect("http://localhost:8080/home");
+            return;
         }
 
 
