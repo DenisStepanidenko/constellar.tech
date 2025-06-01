@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -29,6 +30,7 @@ import java.util.Set;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/constellar.tech/api/v1/vacancy")
+@Slf4j
 public class VacancyController {
 
     private final VacancyJpa vacancyJpa;
@@ -83,6 +85,8 @@ public class VacancyController {
                                   HttpSession session,
                                   HttpServletResponse response,
                                   Model model) throws IOException {
+
+        log.info("Обратились к вакансии");
 
         VacancyDetailsDto vacancyDetailsDto = vacancyService.createVacancyDetailsDtoFromVacancy(id);
 

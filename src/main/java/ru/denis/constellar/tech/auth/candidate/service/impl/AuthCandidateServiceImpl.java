@@ -58,6 +58,7 @@ public class AuthCandidateServiceImpl implements AuthCandidateService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
     }
 
 

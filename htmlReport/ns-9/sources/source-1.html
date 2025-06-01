@@ -1,0 +1,168 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1251"> 
+  <title>Coverage Report > AuthCandidateServiceImpl</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">ru.denis.constellar.tech.auth.candidate.service.impl</a>
+</div>
+
+<h1>Coverage Summary for Class: AuthCandidateServiceImpl (ru.denis.constellar.tech.auth.candidate.service.impl)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AuthCandidateServiceImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package ru.denis.constellar.tech.auth.candidate.service.impl;
+&nbsp;
+&nbsp;import jakarta.servlet.http.HttpServletResponse;
+&nbsp;import jakarta.servlet.http.HttpSession;
+&nbsp;import lombok.RequiredArgsConstructor;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;import org.springframework.http.HttpHeaders;
+&nbsp;import org.springframework.http.HttpStatus;
+&nbsp;import org.springframework.http.ResponseEntity;
+&nbsp;import org.springframework.security.crypto.password.PasswordEncoder;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;import ru.denis.constellar.tech.auth.candidate.dto.RequestCandidateLogin;
+&nbsp;import ru.denis.constellar.tech.auth.candidate.dto.RequestCandidateRegistration;
+&nbsp;import ru.denis.constellar.tech.auth.candidate.service.AuthCandidateService;
+&nbsp;import ru.denis.constellar.tech.auth.exceptions.EmailAlreadyExists;
+&nbsp;import ru.denis.constellar.tech.auth.exceptions.PasswordOrEmailIncorrect;
+&nbsp;import ru.denis.constellar.tech.candidate.model.Candidate;
+&nbsp;import ru.denis.constellar.tech.candidate.service.CandidateService;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;
+&nbsp;@Service
+<b class="nc">&nbsp;@RequiredArgsConstructor</b>
+<b class="nc">&nbsp;@Slf4j</b>
+&nbsp;public class AuthCandidateServiceImpl implements AuthCandidateService {
+&nbsp;
+&nbsp;    private final CandidateService candidateService;
+&nbsp;    private final PasswordEncoder passwordEncoder;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void registerCandidate(RequestCandidateRegistration requestRegistration) {
+&nbsp;
+<b class="nc">&nbsp;        boolean isThisEmailAlreadyExists = candidateService.isExistsByEmail(requestRegistration.getEmail());</b>
+&nbsp;
+<b class="nc">&nbsp;        if (isThisEmailAlreadyExists) {</b>
+<b class="nc">&nbsp;            throw new EmailAlreadyExists(&quot;Аккаунт с данным email уже зарегистрирован.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        candidateService.register(requestRegistration);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void loginCandidate(RequestCandidateLogin requestLogin, HttpSession httpSession, HttpServletResponse response) {
+&nbsp;
+<b class="nc">&nbsp;        Candidate candidate = candidateService.findByEmail(requestLogin.getEmail()).orElseThrow(() -&gt; new PasswordOrEmailIncorrect(&quot;Пароль или почта введены неверно.&quot;));</b>
+&nbsp;
+<b class="nc">&nbsp;        String encodedPassword = candidate.getPassword();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!passwordEncoder.matches(requestLogin.getPassword(), encodedPassword)) {</b>
+<b class="nc">&nbsp;            throw new PasswordOrEmailIncorrect(&quot;Пароль или почта введены неверно.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        log.info(&quot;Пользователь с почтой &quot; + requestLogin.getEmail() + &quot; успешно вошёл&quot;);</b>
+<b class="nc">&nbsp;        httpSession.setAttribute(&quot;candidate&quot;, candidate);</b>
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            response.sendRedirect(&quot;http://localhost:8080/candidate-personal-account&quot;);</b>
+<b class="nc">&nbsp;        } catch (IOException e) {</b>
+<b class="nc">&nbsp;            throw new RuntimeException(e);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-05-11 23:40</div>
+</div>
+</body>
+</html>

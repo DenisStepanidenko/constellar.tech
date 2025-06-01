@@ -25,4 +25,6 @@ public interface ApplicationJpa extends JpaRepository<Application, Long> {
     int countByVacancyIdAndAppliedAtBetween(Long vacancyId, LocalDateTime start, LocalDateTime end);
 
     List<Application> findByVacancyId(Long vacancyId);
+
+    List<Application> findByCandidateId(Long candidateId);
 }

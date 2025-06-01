@@ -177,6 +177,7 @@ class VacancyServiceTest {
         dto.setIsActive(true);
         return dto;
     }
+
     @Test
     void createVacancyDetailsDtoFromVacancy_NotFound_ThrowsException() {
         // Arrange

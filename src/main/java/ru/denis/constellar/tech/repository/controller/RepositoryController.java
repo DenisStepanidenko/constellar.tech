@@ -179,9 +179,9 @@ public class RepositoryController {
                               HttpSession session,
                               HttpServletResponse response) throws IOException {
 
-        if (session == null || session.getAttribute("candidate") == null) {
-            response.sendRedirect("http://localhost:8080/home");
-        }
+//        if (session == null || session.getAttribute("candidate") == null) {
+//            response.sendRedirect("http://localhost:8080/home");
+//        }
 
         session.removeAttribute("repository");
         session.removeAttribute("contentType");
@@ -189,15 +189,15 @@ public class RepositoryController {
         session.removeAttribute("selectedFile");
 
 
-        Candidate candidate = (Candidate) session.getAttribute("candidate");
+        //Candidate candidate = (Candidate) session.getAttribute("candidate");
 
         //TODO: создать своё собственное исключение
         Repository repository = repositoryJpa.findById(repositoryId)
                 .orElseThrow(BadRequestException::new);
 
-        if (!repository.getCandidate().getId().equals(candidate.getId())) {
-            throw new AccessDeniedException("Нет доступа к этому репозиторию.");
-        }
+//        if (!repository.getCandidate().getId().equals(candidate.getId())) {
+//            throw new AccessDeniedException("Нет доступа к этому репозиторию.");
+//        }
 
         session.setAttribute("repository", repository);
 

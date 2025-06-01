@@ -1,0 +1,443 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1251"> 
+  <title>Coverage Report > PageController</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">ru.denis.constellar.tech.pages.controller</a>
+</div>
+
+<h1>Coverage Summary for Class: PageController (ru.denis.constellar.tech.pages.controller)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PageController</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/111)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package ru.denis.constellar.tech.pages.controller;
+&nbsp;
+&nbsp;import jakarta.servlet.http.HttpSession;
+&nbsp;import lombok.RequiredArgsConstructor;
+&nbsp;import org.springframework.stereotype.Controller;
+&nbsp;import org.springframework.ui.Model;
+&nbsp;import org.springframework.web.bind.annotation.GetMapping;
+&nbsp;import org.springframework.web.bind.annotation.PathVariable;
+&nbsp;import ru.denis.constellar.tech.application.jpa.ApplicationJpa;
+&nbsp;import ru.denis.constellar.tech.application.model.Application;
+&nbsp;import ru.denis.constellar.tech.vacancy.dto.VacancyDetailsDto;
+&nbsp;import ru.denis.constellar.tech.vacancy.dto.VacancyDto;
+&nbsp;import ru.denis.constellar.tech.vacancy.service.VacancyService;
+&nbsp;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;@Controller
+<b class="nc">&nbsp;@RequiredArgsConstructor</b>
+&nbsp;//TODO: все страницы с представлениями перенести сюда
+&nbsp;public class PageController {
+&nbsp;
+&nbsp;    private final VacancyService vacancyService;
+&nbsp;
+&nbsp;    private final ApplicationJpa applicationJpa;
+&nbsp;
+&nbsp;    @GetMapping(&quot;/home&quot;)
+&nbsp;    public String getHomePage() {
+<b class="nc">&nbsp;        return &quot;home&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/candidate-personal-account&quot;)
+&nbsp;    public String getCandidatePersonalAccountPage(HttpSession session) {
+&nbsp;
+<b class="nc">&nbsp;        if (Objects.isNull(session)) {</b>
+<b class="nc">&nbsp;            return &quot;home&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (Objects.isNull(session.getAttribute(&quot;candidate&quot;))) {</b>
+<b class="nc">&nbsp;            return &quot;home&quot;;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;        return &quot;candidate-personal-account-home&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/change-avatar-candidate&quot;)
+&nbsp;    public String getChangeAvatarCandidate(HttpSession session) {
+<b class="nc">&nbsp;        if (Objects.isNull(session)) {</b>
+<b class="nc">&nbsp;            return &quot;home&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (Objects.isNull(session.getAttribute(&quot;candidate&quot;))) {</b>
+<b class="nc">&nbsp;            return &quot;home&quot;;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;        return &quot;candidate-change-avatar&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/edit-profile-candidate&quot;)
+&nbsp;    public String getEditProfileCandidate(HttpSession session) {
+<b class="nc">&nbsp;        if (Objects.isNull(session)) {</b>
+<b class="nc">&nbsp;            return &quot;home&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (Objects.isNull(session.getAttribute(&quot;candidate&quot;))) {</b>
+<b class="nc">&nbsp;            return &quot;home&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return &quot;edit-profile-candidate&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/candidate-repository-list&quot;)
+&nbsp;    public String getCandidateAllRepositories(HttpSession session) {
+<b class="nc">&nbsp;        if (Objects.isNull(session)) {</b>
+<b class="nc">&nbsp;            return &quot;home&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (Objects.isNull(session.getAttribute(&quot;candidate&quot;))) {</b>
+<b class="nc">&nbsp;            return &quot;home&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return &quot;candidate-repository-list&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/candidate-repository-add&quot;)
+&nbsp;    public String getCandidateAddRepository(HttpSession session) {
+<b class="nc">&nbsp;        if (Objects.isNull(session)) {</b>
+<b class="nc">&nbsp;            return &quot;home&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (Objects.isNull(session.getAttribute(&quot;candidate&quot;))) {</b>
+<b class="nc">&nbsp;            return &quot;home&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return &quot;add-candidate-repository&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/candidate-repository-page&quot;)
+&nbsp;    public String getCandidateRepository(HttpSession session) {
+<b class="nc">&nbsp;        if (Objects.isNull(session)) {</b>
+<b class="nc">&nbsp;            return &quot;home&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (Objects.isNull(session.getAttribute(&quot;candidate&quot;))) {</b>
+<b class="nc">&nbsp;            return &quot;home&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return &quot;candidate-repository&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/candidate-achievements&quot;)
+&nbsp;    public String getAchievements(HttpSession session) {
+<b class="nc">&nbsp;        if (Objects.isNull(session)) {</b>
+<b class="nc">&nbsp;            return &quot;home&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (Objects.isNull(session.getAttribute(&quot;candidate&quot;))) {</b>
+<b class="nc">&nbsp;            return &quot;home&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return &quot;achivements-list&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/login-company&quot;)
+&nbsp;    public String getLoginCompany() {
+&nbsp;
+<b class="nc">&nbsp;        return &quot;login-company&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/register-company&quot;)
+&nbsp;    public String getRegisterCompany() {
+<b class="nc">&nbsp;        return &quot;register-company&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/company-personal-account-home&quot;)
+&nbsp;    public String getCompanyPersonalAccountHome(HttpSession session) {
+&nbsp;
+<b class="nc">&nbsp;        if (Objects.isNull(session)) {</b>
+<b class="nc">&nbsp;            return &quot;home&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (Objects.isNull(session.getAttribute(&quot;employer&quot;))) {</b>
+<b class="nc">&nbsp;            return &quot;home&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return &quot;company-personal-account-home&quot;;</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/edit-employer-profile&quot;)
+&nbsp;    public String getCompanyEditProfile(HttpSession session) {
+&nbsp;
+<b class="nc">&nbsp;        if (Objects.isNull(session)) {</b>
+<b class="nc">&nbsp;            return &quot;home&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (Objects.isNull(session.getAttribute(&quot;employer&quot;))) {</b>
+<b class="nc">&nbsp;            return &quot;home&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return &quot;edit-employer-profile&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/company-change-avatar&quot;)
+&nbsp;    public String getCompanyChangeAvatar(HttpSession session) {
+&nbsp;
+<b class="nc">&nbsp;        if (Objects.isNull(session)) {</b>
+<b class="nc">&nbsp;            return &quot;home&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (Objects.isNull(session.getAttribute(&quot;employer&quot;))) {</b>
+<b class="nc">&nbsp;            return &quot;home&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return &quot;employer-change-avatar&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/employer-list-vacancies&quot;)
+&nbsp;    public String getCompanyListVacancies(HttpSession session) {
+&nbsp;
+<b class="nc">&nbsp;        if (Objects.isNull(session)) {</b>
+<b class="nc">&nbsp;            return &quot;home&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (Objects.isNull(session.getAttribute(&quot;employer&quot;))) {</b>
+<b class="nc">&nbsp;            return &quot;home&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return &quot;employer-list-vacancies&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/employer-add-vacancy&quot;)
+&nbsp;    public String getCompanyAddVacancy(HttpSession session, Model model) {
+&nbsp;
+<b class="nc">&nbsp;        if (Objects.isNull(session)) {</b>
+<b class="nc">&nbsp;            return &quot;home&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (Objects.isNull(session.getAttribute(&quot;employer&quot;))) {</b>
+<b class="nc">&nbsp;            return &quot;home&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        model.addAttribute(&quot;vacancyDto&quot;, new VacancyDto());</b>
+&nbsp;
+<b class="nc">&nbsp;        return &quot;employer-add-vacancy&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/employer-view-vacancy&quot;)
+&nbsp;    public String getCompanyVacancy(HttpSession session) {
+&nbsp;
+<b class="nc">&nbsp;        if (Objects.isNull(session)) {</b>
+<b class="nc">&nbsp;            return &quot;home&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (Objects.isNull(session.getAttribute(&quot;employer&quot;))) {</b>
+<b class="nc">&nbsp;            return &quot;home&quot;;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;        return &quot;employer-view-vacancy&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/employer-edit-vacancy&quot;)
+&nbsp;    public String getCompanyEditVacancy(HttpSession session) {
+&nbsp;
+<b class="nc">&nbsp;        if (Objects.isNull(session)) {</b>
+<b class="nc">&nbsp;            return &quot;home&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (Objects.isNull(session.getAttribute(&quot;employer&quot;))) {</b>
+<b class="nc">&nbsp;            return &quot;home&quot;;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;        return &quot;employer-edit-vacancy&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/candidate-vacancies&quot;)
+&nbsp;    public String getVacanciesForCandidate(HttpSession session) {
+&nbsp;
+<b class="nc">&nbsp;        if (Objects.isNull(session)) {</b>
+<b class="nc">&nbsp;            return &quot;home&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (Objects.isNull(session.getAttribute(&quot;candidate&quot;))) {</b>
+<b class="nc">&nbsp;            return &quot;home&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        session.setAttribute(&quot;vacancies&quot;, vacancyService.getAllVacancies());</b>
+&nbsp;
+<b class="nc">&nbsp;        return &quot;candidate-vacancies&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/applications-for-employer&quot;)
+&nbsp;    public String getAllApplicationsForEmployer(HttpSession session) {
+<b class="nc">&nbsp;        if (Objects.isNull(session)) {</b>
+<b class="nc">&nbsp;            return &quot;home&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (Objects.isNull(session.getAttribute(&quot;employer&quot;))) {</b>
+<b class="nc">&nbsp;            return &quot;home&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        VacancyDetailsDto vacancyDetailsDto = (VacancyDetailsDto) session.getAttribute(&quot;vacancy&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        session.setAttribute(&quot;applications&quot;, applicationJpa.findByVacancyId(vacancyDetailsDto.getId()));</b>
+&nbsp;
+<b class="nc">&nbsp;        return &quot;applications-for-employer&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/candidate-profile-for-employer/{applicationId}&quot;)
+&nbsp;    public String getCandidateProfileForEmployer(HttpSession session, @PathVariable Long applicationId) {
+&nbsp;
+<b class="nc">&nbsp;        if (Objects.isNull(session)) {</b>
+<b class="nc">&nbsp;            return &quot;home&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (Objects.isNull(session.getAttribute(&quot;employer&quot;)) || Objects.isNull(session.getAttribute(&quot;vacancy&quot;))) {</b>
+<b class="nc">&nbsp;            return &quot;home&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Application application = applicationJpa.findById(applicationId).orElseThrow(RuntimeException::new);</b>
+&nbsp;
+<b class="nc">&nbsp;        session.setAttribute(&quot;candidate&quot;, application.getCandidate());</b>
+&nbsp;
+<b class="nc">&nbsp;        return &quot;candidate-profile-for-employer-home&quot;;</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/candidate-profile-for-employer&quot;)
+&nbsp;    public String getCandidateProfileEmployer2(HttpSession session) {
+&nbsp;
+<b class="nc">&nbsp;        if (session == null || session.getAttribute(&quot;candidate&quot;) == null) {</b>
+<b class="nc">&nbsp;            return &quot;home&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return &quot;candidate-profile-for-employer-home&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/candidate-profile-for-employer-repositories&quot;)
+&nbsp;    public String getCandidateProfileRepositoriesForEmployer(HttpSession session) {
+&nbsp;
+<b class="nc">&nbsp;        if (session == null || session.getAttribute(&quot;candidate&quot;) == null) {</b>
+<b class="nc">&nbsp;            return &quot;home&quot;;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;        return &quot;candidate-profile-for-employer-repositories&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/candidate-repository-page-for-employer&quot;)
+&nbsp;    public String getCandidateRepositoryPageForEmployer(HttpSession session) {
+<b class="nc">&nbsp;        if (Objects.isNull(session)) {</b>
+<b class="nc">&nbsp;            return &quot;home&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (Objects.isNull(session.getAttribute(&quot;candidate&quot;))) {</b>
+<b class="nc">&nbsp;            return &quot;home&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return &quot;candidate-repository-page-for-employer&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/candidate-achievements-for-employer&quot;)
+&nbsp;    public String getCandidateAchievementListForEmployer(HttpSession session){
+<b class="nc">&nbsp;        if (Objects.isNull(session)) {</b>
+<b class="nc">&nbsp;            return &quot;home&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (Objects.isNull(session.getAttribute(&quot;candidate&quot;))) {</b>
+<b class="nc">&nbsp;            return &quot;home&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return &quot;candidate-achievements-list-for-employer&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-05-11 23:40</div>
+</div>
+</body>
+</html>

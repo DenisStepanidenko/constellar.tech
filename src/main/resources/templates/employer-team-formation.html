@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>constellar.tech | Подбор команды</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* Основные стили */
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0a0f2b, #1a1a40);
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .star {
+            position: fixed;
+            width: 2px;
+            height: 2px;
+            background: #ffa500;
+            border-radius: 50%;
+            animation: twinkle 4s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Шапка */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 100;
+            transition: transform 0.3s;
+            border-bottom: 1px solid rgba(255, 165, 0, 0.2);
+        }
+
+        .header.hidden {
+            transform: translateY(-100%);
+        }
+
+        .logo-small {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .logout-btn {
+            background: linear-gradient(135deg, #ff4500, #ff8c00);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .logout-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Основной контейнер */
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+            padding-top: 70px;
+        }
+
+        /* Боковая панель */
+        .sidebar {
+            width: 280px;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 2rem 1rem;
+            border-right: 1px solid rgba(255, 165, 0, 0.2);
+        }
+
+        .profile-card {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .company-logo {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 1rem;
+            border: 2px solid #ffa500;
+        }
+
+        .logo-placeholder {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: rgba(255, 165, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 2rem;
+            font-weight: bold;
+            border: 2px solid #ffa500;
+        }
+
+        .company-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .company-industry {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .change-logo-btn {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 165, 0, 0.1);
+            color: #ffa500;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: background 0.3s;
+        }
+
+        .change-logo-btn:hover {
+            background: rgba(255, 165, 0, 0.3);
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 0.8rem 1rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: rgba(255, 165, 0, 0.2);
+            color: white;
+        }
+
+        .nav-link.active {
+            border-left: 3px solid #ffa500;
+        }
+
+        /* Основное содержимое */
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            margin-bottom: 2rem;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .section-title::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, #ffa500, #ff4500);
+        }
+
+        /* Форма подбора команды */
+        .form-container {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 165, 0, 0.2);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 0.8rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 165, 0, 0.3);
+            border-radius: 5px;
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .form-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23ffa500' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.8rem center;
+            background-size: 12px;
+        }
+
+        .form-select option {
+            background: #1a1a40;
+            color: white;
+        }
+
+        .skills-input-container {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .skills-input {
+            flex: 1;
+        }
+
+        .add-skill-btn {
+            background: rgba(255, 165, 0, 0.2);
+            color: #ffa500;
+            border: none;
+            border-radius: 5px;
+            padding: 0 1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .add-skill-btn:hover {
+            background: rgba(255, 165, 0, 0.4);
+        }
+
+        .skills-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .skill-tag {
+            background: rgba(255, 165, 0, 0.2);
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .remove-skill {
+            margin-left: 0.5rem;
+            cursor: pointer;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .remove-skill:hover {
+            color: white;
+        }
+
+        /* Результаты подбора */
+        .team-results {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 165, 0, 0.2);
+        }
+
+        .team-score {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #ffa500;
+            margin-bottom: 1rem;
+        }
+
+        .coverage-info {
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 5px;
+        }
+
+        .covered-skills {
+            color: #4CAF50;
+        }
+
+        .missing-skills {
+            color: #F44336;
+        }
+
+        .skill-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Контейнер участников команды */
+        .team-members-container {
+            max-height: 60vh;
+            overflow-y: auto;
+            padding-right: 10px;
+            margin-top: 1.5rem;
+        }
+
+        .team-members-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .team-members-container::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+
+        .team-members-container::-webkit-scrollbar-thumb {
+            background: rgba(255, 165, 0, 0.5);
+            border-radius: 4px;
+        }
+
+        .team-members-container::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 165, 0, 0.7);
+        }
+
+        /* Карточки участников */
+        .team-members-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .team-member-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 165, 0, 0.1);
+            transition: all 0.3s;
+        }
+
+        .team-member-card:hover {
+            border-color: rgba(255, 165, 0, 0.3);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(255, 165, 0, 0.1);
+        }
+
+        .member-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .member-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 1rem;
+            border: 2px solid #ffa500;
+        }
+
+        .avatar-placeholder {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(255, 165, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-weight: bold;
+            color: #ffa500;
+            border: 2px solid #ffa500;
+        }
+
+        .member-info {
+            flex: 1;
+        }
+
+        .member-name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .member-position {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        .member-experience {
+            font-size: 0.9rem;
+            color: #ffa500;
+            margin-bottom: 1rem;
+        }
+
+        .member-skills {
+            margin: 1rem 0;
+        }
+
+        .skills-title {
+            font-size: 0.9rem;
+            color: #ffa500;
+            margin-bottom: 0.5rem;
+        }
+
+        .member-skill-tag {
+            display: inline-block;
+            background: rgba(255, 165, 0, 0.1);
+            padding: 0.2rem 0.5rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            margin-right: 0.3rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .required-skill {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4CAF50;
+        }
+
+        /* Кнопки */
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ffa500, #ff8c00);
+            color: #0a0f2b;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 0 15px rgba(255, 165, 0, 0.5);
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .dashboard-container {
+                flex-direction: column;
+                padding-top: 60px;
+            }
+
+            .sidebar {
+                width: 100%;
+                padding: 1rem;
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 165, 0, 0.2);
+            }
+
+            .main-content {
+                padding: 1rem;
+            }
+
+            .team-members-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .skills-input-container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Звёздный фон -->
+<div th:each="i : ${#numbers.sequence(1, 150)}"
+     class="star"
+     th:style="'top: ' + ${T(java.lang.Math).random() * 100} + '%; ' +
+              'left: ' + ${T(java.lang.Math).random() * 100} + '%; ' +
+              'animation-delay: ' + ${T(java.lang.Math).random() * 4} + 's;'">
+</div>
+
+<!-- Шапка -->
+<header class="header" id="mainHeader">
+    <a href="/dashboard" class="logo-small">constellar.tech</a>
+    <form th:action="@{/constellar.tech/api/v1/auth/employer/logout}" method="post">
+        <button type="submit" class="logout-btn">Выйти</button>
+    </form>
+</header>
+
+<!-- Основной контент -->
+<div class="dashboard-container">
+    <!-- Боковая панель -->
+    <aside class="sidebar">
+        <div class="profile-card">
+            <div th:if="${session.employer.avatar != null}">
+                <img th:src="@{/image/employer/getAvatar}" alt="Логотип компании" class="company-logo">
+            </div>
+            <div th:if="${session.employer.avatar == null}" class="logo-placeholder"
+                 th:text="${#strings.substring(session.employer.companyName, 0, 2)}">
+            </div>
+            <a href="/company-change-avatar" class="change-logo-btn">Изменить логотип</a>
+            <div class="company-name" th:text="${session.employer.companyName}">Название компании</div>
+            <div class="company-industry" th:text="${session.employer.industry ?: 'Отрасль не указана'}">Отрасль</div>
+        </div>
+
+        <ul class="nav-menu">
+            <li class="nav-item"><a href="/company-personal-account-home" class="nav-link">Профиль компании</a></li>
+            <li class="nav-item"><a href="/employer-list-vacancies" class="nav-link">Вакансии</a></li>
+            <li class="nav-item"><a href="/employer-team-formation" class="nav-link active">Подбор команды</a></li>
+        </ul>
+    </aside>
+
+    <!-- Основное содержимое -->
+    <main class="main-content">
+        <section class="team-formation-section">
+            <h2 class="section-title">Подбор проектной команды</h2>
+
+            <div class="team-formation-container">
+                <!-- Форма для создания команды -->
+                <div class="form-container">
+                    <form id="teamForm">
+                        <div class="form-group">
+                            <label class="form-label">Размер команды</label>
+                            <select class="form-select" id="teamSize">
+                                <option value="3">3 человека</option>
+                                <option value="5" selected>5 человек</option>
+                                <option value="7">7 человек</option>
+                                <option value="10">10 человек</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Требуемые навыки</label>
+                            <div class="skills-input-container">
+                                <input type="text" class="form-input skills-input" id="newSkill" placeholder="Введите навык">
+                                <button type="button" class="add-skill-btn" id="addSkillBtn">+ Добавить</button>
+                            </div>
+                            <div class="skills-tags" id="skillsTags"></div>
+                        </div>
+
+                        <button type="button" class="btn btn-primary" id="formTeamBtn">Сформировать команду</button>
+                    </form>
+                </div>
+
+                <!-- Результаты подбора команды -->
+                <div class="team-results" id="teamResults" style="display: none;">
+                    <div class="team-score">
+                        Оценка команды: <span id="teamScoreValue">0.0</span>/1.0
+                    </div>
+
+                    <div class="coverage-info">
+                        <div class="covered-skills">
+                            Покрытые навыки: <span id="coveredSkillsCount">0</span>/<span id="totalSkillsCount">0</span>
+                        </div>
+                        <div class="skill-list" id="coveredSkillsList"></div>
+
+                        <div class="missing-skills" id="missingSkillsContainer" style="display: none;">
+                            Непокрытые навыки:
+                            <div class="skill-list" id="missingSkillsList"></div>
+                        </div>
+                    </div>
+
+                    <h3>Подобранная команда</h3>
+                    <div class="team-members-container">
+                        <div class="team-members-grid" id="teamMembersGrid"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const skills = new Set();
+        let allTeamMembers = [];
+        let displayedMembers = 6; // Начальное количество отображаемых участников
+
+        // Добавление навыков
+        document.getElementById('addSkillBtn').addEventListener('click', function() {
+            const skillInput = document.getElementById('newSkill');
+            const skill = skillInput.value.trim();
+
+            if (skill && !skills.has(skill)) {
+                skills.add(skill);
+                renderSkills();
+                skillInput.value = '';
+            }
+        });
+
+        // Удаление навыков
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('remove-skill')) {
+                const skill = e.target.getAttribute('data-skill');
+                skills.delete(skill);
+                renderSkills();
+            }
+        });
+
+        // Рендеринг списка навыков
+        function renderSkills() {
+            const container = document.getElementById('skillsTags');
+            container.innerHTML = '';
+
+            skills.forEach(skill => {
+                const tag = document.createElement('div');
+                tag.className = 'skill-tag';
+                tag.innerHTML = `
+                    ${skill}
+                    <span class="remove-skill" data-skill="${skill}">×</span>
+                `;
+                container.appendChild(tag);
+            });
+        }
+
+        // Формирование команды
+        document.getElementById('formTeamBtn').addEventListener('click', function() {
+            const teamSize = parseInt(document.getElementById('teamSize').value);
+
+            if (skills.size === 0) {
+                alert('Пожалуйста, укажите хотя бы один навык');
+                return;
+            }
+
+            fetch('/api/team/form', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    requiredSkills: Array.from(skills),
+                    teamSize: teamSize
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    displayTeamResults(data);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Произошла ошибка при формировании команды');
+                });
+        });
+
+        let currentTeamData = null;
+        // Отображение результатов
+        function displayTeamResults(data) {
+            try {
+                // 1. Получаем DOM-элементы
+                const teamResults = document.getElementById('teamResults');
+                const teamScoreValue = document.getElementById('teamScoreValue');
+                const coveredSkillsCount = document.getElementById('coveredSkillsCount');
+                const totalSkillsCount = document.getElementById('totalSkillsCount');
+                const coveredSkillsList = document.getElementById('coveredSkillsList');
+                const missingContainer = document.getElementById('missingSkillsContainer');
+                const missingSkillsList = document.getElementById('missingSkillsList');
+
+                if (!teamResults || !teamScoreValue || !coveredSkillsCount ||
+                    !totalSkillsCount || !coveredSkillsList || !missingContainer ||
+                    !missingSkillsList) {
+                    throw new Error('Не найдены необходимые DOM-элементы');
+                }
+
+                // 2. Нормализуем данные о навыках
+                const coveredSkills = data.coveredSkills instanceof Set
+                    ? data.coveredSkills
+                    : new Set(data.coveredSkills || []);
+
+                const missingSkills = data.missingSkills instanceof Set
+                    ? data.missingSkills
+                    : new Set(data.missingSkills || []);
+
+                // 3. Обновляем счетчики
+                teamScoreValue.textContent = (data.teamScore || 0).toFixed(2);
+                coveredSkillsCount.textContent = coveredSkills.size;
+                totalSkillsCount.textContent = coveredSkills.size + missingSkills.size;
+
+                // 4. Отображаем покрытые навыки
+                coveredSkillsList.innerHTML = '';
+                coveredSkills.forEach(skill => {
+                    const tag = document.createElement('span');
+                    tag.className = 'member-skill-tag required-skill';
+                    tag.textContent = skill;
+                    coveredSkillsList.appendChild(tag);
+                });
+
+                // 5. Отображаем непокрытые навыки
+                missingSkillsList.innerHTML = '';
+                if (missingSkills.size > 0) {
+                    missingContainer.style.display = 'block';
+                    missingSkills.forEach(skill => {
+                        const tag = document.createElement('span');
+                        tag.className = 'member-skill-tag missing-skill';
+                        tag.textContent = skill;
+                        missingSkillsList.appendChild(tag);
+                    });
+                } else {
+                    missingContainer.style.display = 'none';
+                }
+
+                // 6. Сохраняем данные для рендеринга участников
+                currentTeamData = {
+                    team: data.team || [],
+                    coveredSkills: coveredSkills,
+                    missingSkills: missingSkills,
+                    teamScore: data.teamScore || 0
+                };
+
+                // 7. Инициализируем список участников
+                allTeamMembers = data.team || [];
+                displayedMembers = Math.min(6, allTeamMembers.length);
+
+                // 8. Рендерим участников
+                renderTeamMembers();
+
+                // 9. Показываем результаты
+                teamResults.style.display = 'block';
+
+            } catch (error) {
+                console.error('Ошибка при отображении результатов:', error);
+                alert('Произошла ошибка при отображении результатов: ' + error.message);
+            }
+        }
+
+        // Рендеринг участников команды
+        function renderTeamMembers() {
+            const teamGrid = document.getElementById('teamMembersGrid');
+            if (!teamGrid) return;
+            teamGrid.innerHTML = '';
+
+            if (!allTeamMembers || allTeamMembers.length === 0) return;
+
+            // Гарантируем, что работаем с Set
+            const coveredSkills = currentTeamData?.coveredSkills instanceof Set
+                ? currentTeamData.coveredSkills
+                : new Set(currentTeamData?.coveredSkills || []);
+
+            const missingSkills = currentTeamData?.missingSkills instanceof Set
+                ? currentTeamData.missingSkills
+                : new Set(currentTeamData?.missingSkills || []);
+
+            const allRequiredSkills = new Set([...coveredSkills, ...missingSkills]);
+
+            allTeamMembers.slice(0, displayedMembers).forEach(member => {
+                try {
+                    const memberCard = document.createElement('div');
+                    memberCard.className = 'team-member-card';
+
+                    // Аватар
+                    const avatarHtml = member.avatar
+                        ? `<img src="/image/candidate/getAvatar/${member.id}" class="member-avatar" alt="Аватар">`
+                        : `<div class="avatar-placeholder">${(member.fullName || '??').substring(0, 2)}</div>`;
+
+                    // Навыки участника
+                    let skillsHtml = '';
+                    if (member.skills) {
+                        // Создаем Set навыков участника
+                        const memberSkills = new Set(
+                            member.skills.split(',')
+                                .map(s => s.trim())
+                                .filter(s => s.length > 0)
+                        );
+
+                        // Генерируем HTML для навыков
+                        skillsHtml = Array.from(memberSkills).map(skill => {
+                            const isRequired = allRequiredSkills.has(skill);
+                            const isCovered = coveredSkills.has(skill);
+
+                            if (isRequired) {
+                                return `<span class="member-skill-tag ${isCovered ? 'required-skill' : 'missing-skill'}">${skill}</span>`;
+                            }
+                            return `<span class="member-skill-tag">${skill}</span>`;
+                        }).join('');
+                    }
+
+                    memberCard.innerHTML = `
+                <div class="member-header">
+                    ${avatarHtml}
+                    <div class="member-info">
+                        <div class="member-name">${member.fullName || 'Не указано'}</div>
+                        <div class="member-position">${member.position || 'Должность не указана'}</div>
+                    </div>
+                </div>
+                <div class="member-experience">
+                    Опыт: ${member.experience || 'Не указан'}
+                </div>
+                <div class="member-skills">
+                    <div class="skills-title">Навыки:</div>
+                    ${skillsHtml}
+                </div>
+            `;
+                    teamGrid.appendChild(memberCard);
+                } catch (error) {
+                    console.error('Ошибка при отображении участника:', error, member);
+                }
+            });
+        }
+
+        // Бесконечный скролл
+        const membersContainer = document.querySelector('.team-members-container');
+        if (membersContainer) {
+            membersContainer.addEventListener('scroll', function() {
+                if (this.scrollTop + this.clientHeight >= this.scrollHeight - 100) {
+                    loadMoreMembers();
+                }
+            });
+        }
+
+        function loadMoreMembers() {
+            if (displayedMembers >= allTeamMembers.length) return;
+
+            // Увеличиваем количество отображаемых участников
+            displayedMembers = Math.min(displayedMembers + 3, allTeamMembers.length);
+            renderTeamMembers();
+        }
+
+        // Скрытие шапки при скролле
+        let lastScroll = 0;
+        const header = document.getElementById('mainHeader');
+        const SCROLL_THRESHOLD = 5;
+
+        window.addEventListener('scroll', function() {
+            const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+
+            if (currentScroll > lastScroll + SCROLL_THRESHOLD) {
+                header.classList.add('hidden');
+            } else if (currentScroll < lastScroll - SCROLL_THRESHOLD) {
+                if (currentScroll <= SCROLL_THRESHOLD) {
+                    header.classList.remove('hidden');
+                }
+            }
+
+            if (currentScroll <= SCROLL_THRESHOLD) {
+                header.classList.remove('hidden');
+            }
+
+            lastScroll = currentScroll;
+        });
+    });
+</script>
+</body>
+</html>

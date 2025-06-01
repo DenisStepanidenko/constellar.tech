@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мои отклики | constellar.tech</title>
+    <link th:href="@{https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap}" rel="stylesheet">
+    <link th:href="@{/candidate-personal-account.css}" rel="stylesheet">
+    <style>
+        /* Стили для раздела откликов */
+        .applications-section {
+            background: rgba(10, 15, 43, 0.5);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .applications-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .application-card {
+            background: rgba(26, 26, 64, 0.7);
+            border-radius: 10px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+        }
+
+        .application-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .application-vacancy-title {
+            font-size: 1.3rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--accent-blue);
+        }
+
+        .application-company {
+            font-size: 1rem;
+            color: var(--accent-green);
+            margin-bottom: 1rem;
+        }
+
+        .application-details {
+            margin-bottom: 1rem;
+        }
+
+        .application-detail {
+            display: flex;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .application-detail-label {
+            color: #aaa;
+            min-width: 120px;
+        }
+
+        .application-detail-value {
+            color: white;
+        }
+
+        .application-status {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-new {
+            background: rgba(0, 255, 255, 0.2);
+            color: var(--accent-blue);
+            border: 1px solid var(--accent-blue);
+        }
+
+        .status-viewed {
+            background: rgba(0, 170, 255, 0.2);
+            color: #00aaff;
+            border: 1px solid #00aaff;
+        }
+
+        .status-invited {
+            background: rgba(0, 255, 170, 0.2);
+            color: var(--accent-green);
+            border: 1px solid var(--accent-green);
+        }
+
+        .application-card * {
+            cursor: default; /* Стандартный курсор для всех элементов внутри карточки */
+            user-select: none; /* Запрет выделения текста */
+        }
+
+
+        .status-rejected {
+            background: rgba(255, 0, 85, 0.2);
+            color: #ff0055;
+            border: 1px solid #ff0055;
+        }
+
+        .application-description {
+            font-size: 0.9rem;
+            color: #ccc;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        .application-date {
+            font-size: 0.8rem;
+            color: #aaa;
+            text-align: right;
+        }
+
+        /* Новые стили для курсора */
+        .application-vacancy-title,
+        .application-description,
+        .application-company,
+        .application-detail,
+        .application-detail-label,
+        .application-detail-value,
+        .application-date,
+        .application-status {
+            cursor: default;
+            user-select: none;
+        }
+
+
+
+        /* Пустое состояние */
+        .empty-applications {
+            text-align: center;
+            padding: 3rem;
+            grid-column: 1 / -1;
+        }
+
+        .empty-applications-icon {
+            font-size: 5rem;
+            color: rgba(0, 255, 255, 0.2);
+            margin-bottom: 1.5rem;
+        }
+
+        .empty-applications-title {
+            font-size: 1.8rem;
+            color: var(--accent-blue);
+            margin-bottom: 1rem;
+        }
+
+        .empty-applications-message {
+            color: rgba(255, 255, 255, 0.7);
+            max-width: 500px;
+            margin: 0 auto 2rem;
+            line-height: 1.6;
+            font-size: 1.1rem;
+        }
+
+        .empty-applications-btn {
+            padding: 0.8rem 2rem;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-green));
+            color: var(--primary-dark);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: transform 0.3s;
+            font-size: 1rem;
+        }
+
+        .empty-applications-btn:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+<!-- Звёздный фон -->
+<div th:each="i : ${#numbers.sequence(1, 100)}"
+     class="star"
+     th:style="'top: ' + ${T(java.lang.Math).random() * 100} + '%; ' +
+              'left: ' + ${T(java.lang.Math).random() * 100} + '%; ' +
+              'animation-delay: ' + ${T(java.lang.Math).random() * 2} + 's; ' +
+              'animation-duration: ' + (5 + ${T(java.lang.Math).random() * 10}) + 's;'">
+</div>
+
+<!-- Шапка -->
+<header class="header" id="mainHeader">
+    <a href="/dashboard" class="logo-small">constellar.tech</a>
+    <form th:action="@{/constellar.tech/api/v1/auth/logout-candidate}" method="post">
+        <button type="submit" class="logout-btn">Выйти</button>
+    </form>
+</header>
+
+<!-- Основной контент -->
+<div class="dashboard-container">
+    <!-- Боковая панель -->
+    <aside class="sidebar">
+        <div class="profile-card">
+            <div th:if="${session.candidate.avatar != null}">
+                <img th:src="@{/image/candidate/getAvatar/{id}(id = ${session.candidate.id})}" alt="Аватар" class="avatar-image">
+            </div>
+            <div th:if="${session.candidate.avatar == null}" class="avatar-placeholder"
+                 th:text="${#strings.substring(session.candidate.username, 0, 2)}">
+            </div>
+            <a href="/change-avatar-candidate" class="change-avatar-btn">Изменить аватар</a>
+            <div class="username" th:text="${session.candidate.username}">Username</div>
+            <div class="position" th:text="${session.candidate.position ?: 'Должность не указана'}">Position</div>
+        </div>
+
+        <ul class="nav-menu">
+            <li class="nav-item"><a href="/candidate-personal-account" class="nav-link">Профиль</a></li>
+            <li class="nav-item"><a href="/candidate-repository-list" class="nav-link">Репозитории</a></li>
+            <li class="nav-item"><a href="/candidate-achievements" class="nav-link">Достижения</a></li>
+            <li class="nav-item"><a href="/candidate-vacancies" class="nav-link">Вакансии</a></li>
+            <li class="nav-item"><a href="/candidate-applications" class="nav-link active">Мои отклики</a></li>
+        </ul>
+    </aside>
+
+    <!-- Основное содержимое -->
+    <main class="main-content">
+        <section class="applications-section">
+            <h2 class="section-title">Мои отклики на вакансии</h2>
+
+            <div class="applications-grid" id="applicationsContainer">
+                <!-- Блок для пустого состояния -->
+                <div th:if="${#lists.isEmpty(session.applications)}" class="empty-applications">
+                    <div class="empty-applications-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="empty-applications-title">Откликов не найдено</h3>
+                    <p class="empty-applications-message">
+                        Вы еще не откликались на вакансии. Найдите подходящую вакансию и отправьте отклик!
+                    </p>
+                    <a th:href="@{'/candidate-vacancies'}" class="empty-applications-btn">
+                        Найти вакансии
+                    </a>
+                </div>
+
+                <!-- Отклики будут загружаться здесь -->
+                <div th:each="application1 : ${session.applications}" class="application-card">
+                    <h3 class="application-vacancy-title" th:text="${application1.vacancy.title}">Название вакансии</h3>
+                    <div class="application-company" th:text="${application1.vacancy.employer.companyName}">Компания</div>
+
+                    <div th:classappend="${'application-status ' +
+    (application1.status.name() == 'NEW' ? 'status-new' :
+     application1.status.name() == 'VIEWED' ? 'status-viewed' :
+     application1.status.name() == 'INVITED' ? 'status-invited' :
+     'status-rejected')}">
+    <span th:text="${application1.status.name() == 'NEW' ? 'Новый' :
+                  application1.status.name() == 'VIEWED' ? 'Просмотрен' :
+                  application1.status.name() == 'INVITED' ? 'Приглашение' :
+                  'Отклонён'}"></span>
+                    </div>
+
+                    <div class="application-details">
+                        <div class="application-detail">
+                            <span class="application-detail-label">Должность:</span>
+                            <span class="application-detail-value" th:text="${application1.vacancy.position}">Должность</span>
+                        </div>
+                        <div class="application-detail">
+                            <span class="application-detail-label">Зарплата:</span>
+                            <span class="application-detail-value"
+                                  th:text="${application1.vacancy.salaryFrom} + (${application1.vacancy.salaryTo} != null ? ' - ' + ${application1.vacancy.salaryTo} : '') + ' ' + ${application1.vacancy.currency}">
+                50 000 - 80 000 ₽
+              </span>
+                        </div>
+                        <div class="application-detail">
+                            <span class="application-detail-label">Опыт:</span>
+                            <span class="application-detail-value" th:text="${application1.vacancy.experienceLevel}">Middle</span>
+                        </div>
+                    </div>
+
+                    <div class="application-description"
+                         th:text="${#strings.length(application1.vacancy.description) > 150 ?
+                      #strings.substring(application1.vacancy.description, 0, 150) + '...' :
+                      application1.vacancy.description}">
+                        Краткое описание вакансии...
+                    </div>
+
+                    <div class="application-date" th:text="${#temporals.format(application1.appliedAt, 'dd.MM.yyyy HH:mm')}">
+                        15.05.2023 14:30
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script>
+    let lastScroll = 0;
+    const header = document.getElementById('mainHeader');
+    const SCROLL_THRESHOLD = 5;
+
+    window.addEventListener('scroll', function() {
+        const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+
+        if (currentScroll > lastScroll + SCROLL_THRESHOLD) {
+            header.classList.add('hidden');
+        } else if (currentScroll < lastScroll - SCROLL_THRESHOLD) {
+            if (currentScroll <= SCROLL_THRESHOLD) {
+                header.classList.remove('hidden');
+            }
+        }
+
+        if (currentScroll <= SCROLL_THRESHOLD) {
+            header.classList.remove('hidden');
+        }
+
+        lastScroll = currentScroll;
+    });
+
+    // Бесконечный скролл (если нужно)
+    window.addEventListener('scroll', function() {
+        if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) {
+            // Логика подгрузки, если понадобится
+        }
+    });
+</script>
+</body>
+</html>

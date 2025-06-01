@@ -1,0 +1,181 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1251"> 
+  <title>Coverage Report > EmployerController</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">ru.denis.constellar.tech.employer.controller</a>
+</div>
+
+<h1>Coverage Summary for Class: EmployerController (ru.denis.constellar.tech.employer.controller)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EmployerController</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package ru.denis.constellar.tech.employer.controller;
+&nbsp;
+&nbsp;
+&nbsp;import jakarta.servlet.http.HttpServletResponse;
+&nbsp;import jakarta.servlet.http.HttpSession;
+&nbsp;import lombok.RequiredArgsConstructor;
+&nbsp;import org.springframework.web.bind.annotation.*;
+&nbsp;import org.springframework.web.multipart.MultipartFile;
+&nbsp;import ru.denis.constellar.tech.auth.exceptions.UnauthorizedAccessException;
+&nbsp;import ru.denis.constellar.tech.employer.jpa.EmployerJpa;
+&nbsp;import ru.denis.constellar.tech.employer.model.Employer;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;
+&nbsp;@RestController
+<b class="nc">&nbsp;@RequiredArgsConstructor</b>
+&nbsp;@RequestMapping(&quot;/constellar.tech/api/v1/employer&quot;)
+&nbsp;public class EmployerController {
+&nbsp;
+&nbsp;    private final EmployerJpa employerJpa;
+&nbsp;
+&nbsp;    @PostMapping(&quot;/update&quot;)
+&nbsp;    public void updateEmployer(@ModelAttribute Employer updateEmployer,
+&nbsp;                               HttpSession session,
+&nbsp;                               HttpServletResponse response) throws IOException {
+&nbsp;
+<b class="nc">&nbsp;        if (session == null || session.getAttribute(&quot;employer&quot;) == null) {</b>
+<b class="nc">&nbsp;            throw new UnauthorizedAccessException();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Employer employer = (Employer) session.getAttribute(&quot;employer&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!updateEmployer.getAddress().isBlank()) {</b>
+<b class="nc">&nbsp;            employer.setAddress(updateEmployer.getAddress());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!updateEmployer.getCompanyDescription().isBlank()) {</b>
+<b class="nc">&nbsp;            employer.setCompanyDescription(updateEmployer.getCompanyDescription());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!updateEmployer.getCompanyName().isBlank()) {</b>
+<b class="nc">&nbsp;            employer.setCompanyName(updateEmployer.getCompanyName());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!updateEmployer.getInn().isBlank()) {</b>
+<b class="nc">&nbsp;            employer.setInn(updateEmployer.getInn());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!updateEmployer.getIndustry().isBlank()) {</b>
+<b class="nc">&nbsp;            employer.setIndustry(updateEmployer.getIndustry());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!updateEmployer.getWebsite().isBlank()) {</b>
+<b class="nc">&nbsp;            employer.setWebsite(updateEmployer.getWebsite());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!updateEmployer.getPhoneNumber().isBlank()) {</b>
+<b class="nc">&nbsp;            employer.setPhoneNumber(updateEmployer.getPhoneNumber());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!updateEmployer.getContactPerson().isBlank()) {</b>
+<b class="nc">&nbsp;            employer.setContactPerson(updateEmployer.getContactPerson());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!updateEmployer.getContactPosition().isBlank()) {</b>
+<b class="nc">&nbsp;            employer.setContactPosition(updateEmployer.getContactPosition());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        employerJpa.save(employer);</b>
+<b class="nc">&nbsp;        employerJpa.flush();</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;        session.setAttribute(&quot;employer&quot;, employerJpa.findById(employer.getId()).get());</b>
+&nbsp;
+<b class="nc">&nbsp;        response.sendRedirect(&quot;http://localhost:8080/company-personal-account-home&quot;);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-05-11 23:40</div>
+</div>
+</body>
+</html>

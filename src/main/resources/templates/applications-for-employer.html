@@ -483,6 +483,8 @@
             display: none;
         }
 
+
+
         .loading-spinner.active {
             display: block;
         }
@@ -576,7 +578,7 @@
     <section class="applications-section">
         <div class="vacancy-header">
             <h1 class="vacancy-title">Отклики на вакансию: <span th:text="${session.vacancy.title}"></span></h1>
-            <button class="btn btn-secondary" onclick="history.back()">
+            <button class="btn btn-secondary" onclick="window.location.href='/employer-view-vacancy'">
                 <i class="fas fa-arrow-left"></i>
                 Назад к вакансии
             </button>
@@ -625,11 +627,11 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="application-status" th:switch="${app.status}">
+                        <div class="application-status" th:switch="${#strings.toUpperCase(app.status)}">
                             <span th:case="'NEW'" class="status-new" th:text="${app.status}">NEW</span>
                             <span th:case="'VIEWED'" class="status-viewed" th:text="${app.status}">VIEWED</span>
                             <span th:case="'INVITED'" class="status-invited" th:text="${app.status}">INVITED</span>
-                            <span th:case="*" class="status-rejected" th:text="${app.status}">REJECTED</span>
+                            <span th:case="'REJECTED'" class="status-rejected" th:text="${app.status}">REJECTED</span>
                         </div>
                     </div>
 
@@ -651,19 +653,17 @@
                         </button>
                         <button class="btn btn-invite"
                                 th:attr="data-id=${app.id}"
-                                th:disabled="${app.status == 'INVITED'}"
-                                th:classappend="${app.status == 'INVITED'} ? 'disabled' : ''"
+                                th:classappend="${app.status == 'INVITED'} ? 'active' : ''"
                                 onclick="changeStatus(this.getAttribute('data-id'), 'INVITED')">
                             <i class="fas fa-handshake"></i>
-                            Пригласить
+                            <span th:text="${app.status == 'INVITED'} ? 'Приглашён' : 'Пригласить'"></span>
                         </button>
                         <button class="btn btn-reject"
                                 th:attr="data-id=${app.id}"
-                                th:disabled="${app.status == 'REJECTED'}"
-                                th:classappend="${app.status == 'REJECTED'} ? 'disabled' : ''"
+                                th:classappend="${app.status == 'REJECTED'} ? 'active' : ''"
                                 onclick="changeStatus(this.getAttribute('data-id'), 'REJECTED')">
                             <i class="fas fa-times"></i>
-                            Отклонить
+                            <span th:text="${app.status == 'REJECTED'} ? 'Отклонён' : 'Отклонить'"></span>
                         </button>
                     </div>
                 </div>
@@ -676,6 +676,8 @@
         </div>
     </section>
 </main>
+
+
 
 <script>
     // Создание звёздного фона
@@ -704,6 +706,11 @@
             container.appendChild(star);
         }
     }
+
+    document.querySelectorAll('.application-card').forEach(card => {
+        const status = card.getAttribute('data-status');
+        updateApplicationStatusUI(card, status);
+    });
 
     // Скрытие шапки при скролле
     let lastScroll = 0;
@@ -836,7 +843,7 @@
             // Анимация нажатия
             card.style.transform = 'scale(0.98)';
 
-            const response = await fetch(`/constellar.tech/api/v1/application/${applicationId}/status`, {
+            const response = await fetch(`/${applicationId}/status`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -872,18 +879,25 @@
             // Обновляем атрибут data-status для фильтрации
             card.setAttribute('data-status', newStatus);
 
-            // Отключаем кнопки если нужно
-            if (newStatus === 'INVITED' || newStatus === 'REJECTED') {
-                card.querySelectorAll('.btn-invite, .btn-reject').forEach(btn => {
-                    btn.disabled = true;
-                    btn.classList.add('disabled');
-                });
-            }
 
         } catch (error) {
             console.error('Error:', error);
             alert('Не удалось изменить статус отклика');
         }
+    }
+
+    function updateApplicationStatusUI(card, newStatus) {
+        const statusElement = card.querySelector('.application-status');
+        const inviteBtn = card.querySelector('.btn-invite');
+        const rejectBtn = card.querySelector('.btn-reject');
+
+        // Обновляем статус
+        card.setAttribute('data-status', newStatus);
+
+
+        card.style.boxShadow = `0 0 20px ${getStatusColor(newStatus)}`;
+
+
     }
 
     function getStatusColor(status) {

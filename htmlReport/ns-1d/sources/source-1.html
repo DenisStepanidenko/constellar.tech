@@ -1,0 +1,297 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1251"> 
+  <title>Coverage Report > VacancyController</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">ru.denis.constellar.tech.vacancy.controller</a>
+</div>
+
+<h1>Coverage Summary for Class: VacancyController (ru.denis.constellar.tech.vacancy.controller)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">VacancyController</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/69)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package ru.denis.constellar.tech.vacancy.controller;
+&nbsp;
+&nbsp;
+&nbsp;import jakarta.servlet.http.HttpServletResponse;
+&nbsp;import jakarta.servlet.http.HttpSession;
+&nbsp;import jakarta.validation.Valid;
+&nbsp;import lombok.RequiredArgsConstructor;
+&nbsp;import org.springframework.http.ResponseEntity;
+&nbsp;import org.springframework.ui.Model;
+&nbsp;import org.springframework.validation.BindingResult;
+&nbsp;import org.springframework.web.bind.annotation.*;
+&nbsp;import ru.denis.constellar.tech.application.model.Application;
+&nbsp;import ru.denis.constellar.tech.application.model.ApplicationStatus;
+&nbsp;import ru.denis.constellar.tech.auth.exceptions.UnauthorizedAccessException;
+&nbsp;import ru.denis.constellar.tech.candidate.model.Candidate;
+&nbsp;import ru.denis.constellar.tech.employer.jpa.EmployerJpa;
+&nbsp;import ru.denis.constellar.tech.employer.model.Employer;
+&nbsp;import ru.denis.constellar.tech.vacancy.dto.VacancyDetailsDto;
+&nbsp;import ru.denis.constellar.tech.vacancy.dto.VacancyDto;
+&nbsp;import ru.denis.constellar.tech.vacancy.dto.VacancyStatsResponse;
+&nbsp;import ru.denis.constellar.tech.vacancy.jpa.VacancyJpa;
+&nbsp;import ru.denis.constellar.tech.vacancy.model.Vacancy;
+&nbsp;import ru.denis.constellar.tech.vacancy.service.VacancyService;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.time.LocalDateTime;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;@RestController
+<b class="nc">&nbsp;@RequiredArgsConstructor</b>
+&nbsp;@RequestMapping(&quot;/constellar.tech/api/v1/vacancy&quot;)
+&nbsp;public class VacancyController {
+&nbsp;
+&nbsp;    private final VacancyJpa vacancyJpa;
+&nbsp;    private final EmployerJpa employerJpa;
+&nbsp;
+&nbsp;    private final VacancyService vacancyService;
+&nbsp;
+&nbsp;    @PostMapping(&quot;/create&quot;)
+&nbsp;    public void createVacancy(@Valid @ModelAttribute(&quot;vacancyDto&quot;) VacancyDto vacancyDto,
+&nbsp;                              BindingResult result,
+&nbsp;                              HttpSession session,
+&nbsp;                              HttpServletResponse response) throws IOException {
+&nbsp;
+<b class="nc">&nbsp;        if (session == null || session.getAttribute(&quot;employer&quot;) == null) {</b>
+<b class="nc">&nbsp;            throw new UnauthorizedAccessException();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (result.hasErrors()) {</b>
+<b class="nc">&nbsp;            response.sendRedirect(&quot;http://localhost:8080/employer-add-vacancy&quot;);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Employer employer = (Employer) session.getAttribute(&quot;employer&quot;);</b>
+&nbsp;
+&nbsp;        //TODO:перенести в сервис
+<b class="nc">&nbsp;        Vacancy vacancy = new Vacancy();</b>
+<b class="nc">&nbsp;        vacancy.setEmployer(employer);</b>
+<b class="nc">&nbsp;        vacancy.setTitle(vacancyDto.getTitle());</b>
+<b class="nc">&nbsp;        vacancy.setDescription(vacancyDto.getDescription());</b>
+<b class="nc">&nbsp;        vacancy.setPosition(vacancyDto.getPosition());</b>
+<b class="nc">&nbsp;        vacancy.setSalaryFrom(vacancyDto.getSalaryFrom());</b>
+<b class="nc">&nbsp;        vacancy.setSalaryTo(vacancyDto.getSalaryTo());</b>
+<b class="nc">&nbsp;        vacancy.setCurrency(vacancyDto.getCurrency());</b>
+<b class="nc">&nbsp;        vacancy.setExperienceLevel(vacancyDto.getExperienceLevel());</b>
+<b class="nc">&nbsp;        vacancy.setSkills(vacancyDto.getSkills());</b>
+<b class="nc">&nbsp;        vacancy.setEmploymentType(vacancyDto.getEmploymentType());</b>
+<b class="nc">&nbsp;        vacancy.setWorkSchedule(vacancyDto.getWorkSchedule());</b>
+<b class="nc">&nbsp;        vacancy.setLocation(vacancyDto.getLocation());</b>
+<b class="nc">&nbsp;        vacancy.setCreatedAt(LocalDateTime.now());</b>
+<b class="nc">&nbsp;        vacancy.setIsActive(true);</b>
+&nbsp;
+<b class="nc">&nbsp;        vacancyJpa.save(vacancy);</b>
+<b class="nc">&nbsp;        vacancyJpa.flush();</b>
+&nbsp;
+<b class="nc">&nbsp;        session.setAttribute(&quot;employer&quot;, employerJpa.findById(employer.getId()).get());</b>
+<b class="nc">&nbsp;        response.sendRedirect(&quot;http://localhost:8080/employer-list-vacancies&quot;);</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/{id}&quot;)
+&nbsp;    public void getVacancyDetails(@PathVariable Long id,
+&nbsp;                                  HttpSession session,
+&nbsp;                                  HttpServletResponse response,
+&nbsp;                                  Model model) throws IOException {
+&nbsp;
+<b class="nc">&nbsp;        VacancyDetailsDto vacancyDetailsDto = vacancyService.createVacancyDetailsDtoFromVacancy(id);</b>
+&nbsp;
+<b class="nc">&nbsp;        session.setAttribute(&quot;vacancy&quot;, vacancyDetailsDto);</b>
+&nbsp;
+<b class="nc">&nbsp;        response.sendRedirect(&quot;http://localhost:8080/employer-view-vacancy&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/{id}/stats&quot;)
+&nbsp;    public ResponseEntity&lt;VacancyStatsResponse&gt; getVacancyStats(
+&nbsp;            @PathVariable Long id,
+&nbsp;            @RequestParam(defaultValue = &quot;30&quot;) int days) {
+&nbsp;
+<b class="nc">&nbsp;        VacancyStatsResponse response = vacancyService.getVacancyStats(id, days);</b>
+<b class="nc">&nbsp;        return ResponseEntity.ok(response);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @PutMapping(&quot;/{vacancyId}/status&quot;)
+&nbsp;    public void updateStatus(@PathVariable Long vacancyId, HttpSession session) {
+&nbsp;
+<b class="nc">&nbsp;        if (session == null || session.getAttribute(&quot;employer&quot;) == null) {</b>
+<b class="nc">&nbsp;            throw new UnauthorizedAccessException();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Vacancy vacancy = vacancyJpa.findById(vacancyId).orElseThrow(RuntimeException::new);</b>
+&nbsp;
+<b class="nc">&nbsp;        vacancy.setIsActive(!vacancy.getIsActive());</b>
+<b class="nc">&nbsp;        Vacancy savedVacancy = vacancyJpa.save(vacancy);</b>
+&nbsp;
+<b class="nc">&nbsp;        VacancyDetailsDto vacancyDetailsDto = (VacancyDetailsDto) session.getAttribute(&quot;vacancy&quot;);</b>
+<b class="nc">&nbsp;        vacancyDetailsDto.setActive(savedVacancy.getIsActive());</b>
+&nbsp;
+<b class="nc">&nbsp;        Employer employer = (Employer) session.getAttribute(&quot;employer&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        session.setAttribute(&quot;employer&quot;, employerJpa.findById(employer.getId()).get());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @PutMapping(&quot;/{id}&quot;)
+&nbsp;    public void updateVacancy(@PathVariable Long id,
+&nbsp;                              @RequestBody VacancyDto vacancyDto,
+&nbsp;                              HttpSession session) {
+&nbsp;
+<b class="nc">&nbsp;        if (session == null || session.getAttribute(&quot;employer&quot;) == null || session.getAttribute(&quot;vacancy&quot;) == null) {</b>
+<b class="nc">&nbsp;            throw new UnauthorizedAccessException();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        vacancyService.updateVacancy(id, vacancyDto);</b>
+&nbsp;
+<b class="nc">&nbsp;        session.setAttribute(&quot;vacancy&quot;, vacancyService.createVacancyDetailsDtoFromVacancy(id));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @PostMapping(&quot;/delete-vacancy/{id}&quot;)
+&nbsp;    public void deleteVacancy(@PathVariable Long id, HttpSession session) {
+&nbsp;
+<b class="nc">&nbsp;        if (session == null || session.getAttribute(&quot;employer&quot;) == null || session.getAttribute(&quot;vacancy&quot;) == null) {</b>
+<b class="nc">&nbsp;            throw new UnauthorizedAccessException();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Employer employer = (Employer) session.getAttribute(&quot;employer&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        vacancyJpa.deleteById(id);</b>
+<b class="nc">&nbsp;        vacancyJpa.flush();</b>
+&nbsp;
+<b class="nc">&nbsp;        session.removeAttribute(&quot;vacancy&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        session.setAttribute(&quot;employer&quot;, employerJpa.findById(employer.getId()).get());</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    @PostMapping(&quot;/apply/{vacancyId}&quot;)
+&nbsp;    public void applyVacancy(@PathVariable Long vacancyId, HttpSession session) {
+&nbsp;
+<b class="nc">&nbsp;        if (session == null || session.getAttribute(&quot;candidate&quot;) == null) {</b>
+<b class="nc">&nbsp;            throw new UnauthorizedAccessException();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Candidate candidate = (Candidate) session.getAttribute(&quot;candidate&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        Vacancy vacancy = vacancyJpa.findById(vacancyId).orElseThrow(RuntimeException::new);</b>
+&nbsp;
+<b class="nc">&nbsp;        Set&lt;Application&gt; applicationSet = vacancy.getApplications();</b>
+&nbsp;
+<b class="nc">&nbsp;        boolean isNeedToApply = true;</b>
+&nbsp;
+<b class="nc">&nbsp;        for (Application application : applicationSet) {</b>
+&nbsp;
+<b class="nc">&nbsp;            if (application.getCandidate().equals(candidate)) {</b>
+<b class="nc">&nbsp;                isNeedToApply = false;</b>
+<b class="nc">&nbsp;                break;</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        if (isNeedToApply) {</b>
+<b class="nc">&nbsp;            Application application = new Application();</b>
+<b class="nc">&nbsp;            application.setAppliedAt(LocalDateTime.now());</b>
+<b class="nc">&nbsp;            application.setStatus(ApplicationStatus.NEW);</b>
+<b class="nc">&nbsp;            application.setCandidate(candidate);</b>
+<b class="nc">&nbsp;            application.setVacancy(vacancy);</b>
+&nbsp;
+<b class="nc">&nbsp;            vacancy.getApplications().add(application);</b>
+<b class="nc">&nbsp;            vacancyJpa.save(vacancy);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-05-11 23:40</div>
+</div>
+</body>
+</html>

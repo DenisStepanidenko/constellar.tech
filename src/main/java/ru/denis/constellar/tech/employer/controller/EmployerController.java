@@ -28,7 +28,7 @@ public class EmployerController {
             throw new UnauthorizedAccessException();
         }
 
-        Employer employer = (Employer) session.getAttribute("employer");
+        Employer employer = new Employer();
 
         if (!updateEmployer.getAddress().isBlank()) {
             employer.setAddress(updateEmployer.getAddress());

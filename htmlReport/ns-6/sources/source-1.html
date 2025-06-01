@@ -1,0 +1,161 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1251"> 
+  <title>Coverage Report > AuthCandidateControllerImpl</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">ru.denis.constellar.tech.auth.candidate.controller.impl</a>
+</div>
+
+<h1>Coverage Summary for Class: AuthCandidateControllerImpl (ru.denis.constellar.tech.auth.candidate.controller.impl)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AuthCandidateControllerImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package ru.denis.constellar.tech.auth.candidate.controller.impl;
+&nbsp;
+&nbsp;import jakarta.servlet.http.HttpServletResponse;
+&nbsp;import jakarta.servlet.http.HttpSession;
+&nbsp;import jakarta.validation.Valid;
+&nbsp;import lombok.RequiredArgsConstructor;
+&nbsp;import org.springframework.http.ResponseEntity;
+&nbsp;import org.springframework.stereotype.Controller;
+&nbsp;import org.springframework.web.bind.annotation.PostMapping;
+&nbsp;import org.springframework.web.bind.annotation.RequestBody;
+&nbsp;import org.springframework.web.bind.annotation.RequestMapping;
+&nbsp;import org.springframework.web.bind.annotation.RestController;
+&nbsp;import ru.denis.constellar.tech.auth.candidate.controller.AuthCandidateController;
+&nbsp;import ru.denis.constellar.tech.auth.candidate.dto.RequestCandidateLogin;
+&nbsp;import ru.denis.constellar.tech.auth.candidate.dto.RequestCandidateRegistration;
+&nbsp;import ru.denis.constellar.tech.auth.candidate.service.AuthCandidateService;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;
+&nbsp;@RestController
+&nbsp;@RequestMapping(&quot;/constellar.tech/api/v1/auth&quot;)
+<b class="nc">&nbsp;@RequiredArgsConstructor</b>
+&nbsp;public class AuthCandidateControllerImpl implements AuthCandidateController {
+&nbsp;
+&nbsp;    private final AuthCandidateService authService;
+&nbsp;
+&nbsp;    @PostMapping(&quot;/register-candidate&quot;)
+&nbsp;    @Override
+&nbsp;    public void registerCandidate(@Valid @RequestBody RequestCandidateRegistration requestRegistration) {
+&nbsp;
+<b class="nc">&nbsp;        authService.registerCandidate(requestRegistration);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @PostMapping(&quot;/login-candidate&quot;)
+&nbsp;    @Override
+&nbsp;    public void loginCandidate(@RequestBody RequestCandidateLogin requestLogin, HttpSession httpSession, HttpServletResponse response) {
+&nbsp;
+<b class="nc">&nbsp;        authService.loginCandidate(requestLogin, httpSession, response);</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    @PostMapping(&quot;/logout-candidate&quot;)
+&nbsp;    public void logoutCandidate(HttpSession httpSession, HttpServletResponse response) throws IOException {
+&nbsp;
+<b class="nc">&nbsp;        if(httpSession == null || httpSession.getAttribute(&quot;candidate&quot;) == null){</b>
+<b class="nc">&nbsp;            response.sendRedirect(&quot;http://localhost:8080/home&quot;);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;        httpSession.removeAttribute(&quot;candidate&quot;);</b>
+<b class="nc">&nbsp;        response.sendRedirect(&quot;http://localhost:8080/home&quot;);</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-05-11 23:40</div>
+</div>
+</body>
+</html>

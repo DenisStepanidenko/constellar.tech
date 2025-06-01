@@ -2,12 +2,14 @@ package ru.denis.constellar.tech.pages.controller;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import ru.denis.constellar.tech.application.jpa.ApplicationJpa;
 import ru.denis.constellar.tech.application.model.Application;
+import ru.denis.constellar.tech.application.model.ApplicationStatus;
 import ru.denis.constellar.tech.vacancy.dto.VacancyDetailsDto;
 import ru.denis.constellar.tech.vacancy.dto.VacancyDto;
 import ru.denis.constellar.tech.vacancy.service.VacancyService;
@@ -16,6 +18,7 @@ import java.util.Objects;
 
 @Controller
 @RequiredArgsConstructor
+@Slf4j
 //TODO: все страницы с представлениями перенести сюда
 public class PageController {
 
@@ -23,8 +26,11 @@ public class PageController {
 
     private final ApplicationJpa applicationJpa;
 
+
     @GetMapping("/home")
     public String getHomePage() {
+
+
         return "home";
     }
 
@@ -39,8 +45,9 @@ public class PageController {
             return "home";
         }
 
-
         return "candidate-personal-account-home";
+
+
     }
 
     @GetMapping("/change-avatar-candidate")
@@ -280,7 +287,14 @@ public class PageController {
             return "home";
         }
 
+
         Application application = applicationJpa.findById(applicationId).orElseThrow(RuntimeException::new);
+
+
+        if (application.getStatus() == ApplicationStatus.NEW) {
+            application.setStatus(ApplicationStatus.VIEWED);
+            applicationJpa.save(application);
+        }
 
         session.setAttribute("candidate", application.getCandidate());
 
@@ -323,7 +337,7 @@ public class PageController {
     }
 
     @GetMapping("/candidate-achievements-for-employer")
-    public String getCandidateAchievementListForEmployer(HttpSession session){
+    public String getCandidateAchievementListForEmployer(HttpSession session) {
         if (Objects.isNull(session)) {
             return "home";
         }
@@ -334,6 +348,35 @@ public class PageController {
 
         return "candidate-achievements-list-for-employer";
     }
+
+    @GetMapping("/candidate-applications-page")
+    public String getCandidateApplicationsPage(HttpSession session){
+
+
+        if (Objects.isNull(session)) {
+            return "home";
+        }
+
+        if (Objects.isNull(session.getAttribute("candidate"))) {
+            return "home";
+        }
+        return "candidate-applications";
+    }
+
+    @GetMapping("/employer-team-formation")
+    public String getTeamFormationPage(HttpSession session){
+
+        if (Objects.isNull(session)) {
+            return "home";
+        }
+
+        if (Objects.isNull(session.getAttribute("employer"))) {
+            return "home";
+        }
+
+        return "employer-team-formation";
+    }
+
 
 
 }

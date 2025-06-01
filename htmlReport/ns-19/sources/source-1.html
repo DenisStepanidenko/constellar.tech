@@ -1,0 +1,451 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=windows-1251"> 
+  <title>Coverage Report > RepositoryController</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">ru.denis.constellar.tech.repository.controller</a>
+</div>
+
+<h1>Coverage Summary for Class: RepositoryController (ru.denis.constellar.tech.repository.controller)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RepositoryController</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/150)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package ru.denis.constellar.tech.repository.controller;
+&nbsp;
+&nbsp;import jakarta.servlet.http.HttpServletResponse;
+&nbsp;import jakarta.servlet.http.HttpSession;
+&nbsp;import lombok.RequiredArgsConstructor;
+&nbsp;import org.apache.coyote.BadRequestException;
+&nbsp;import org.springframework.http.*;
+&nbsp;import org.springframework.transaction.annotation.Transactional;
+&nbsp;import org.springframework.web.bind.annotation.*;
+&nbsp;import org.springframework.web.multipart.MultipartFile;
+&nbsp;import ru.denis.constellar.tech.candidate.jpa.CandidateRepository;
+&nbsp;import ru.denis.constellar.tech.candidate.model.Candidate;
+&nbsp;import ru.denis.constellar.tech.candidate.service.CandidateService;
+&nbsp;import ru.denis.constellar.tech.repository.jpa.RepositoryJpa;
+&nbsp;import ru.denis.constellar.tech.repository.model.Repository;
+&nbsp;import ru.denis.constellar.tech.repositoryFile.jpa.RepositoryFileJpa;
+&nbsp;import ru.denis.constellar.tech.repositoryFile.model.RepositoryFile;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.OutputStream;
+&nbsp;import java.io.UnsupportedEncodingException;
+&nbsp;import java.net.URLEncoder;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.nio.file.AccessDeniedException;
+&nbsp;import java.time.LocalDateTime;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Base64;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;@RestController
+<b class="nc">&nbsp;@RequiredArgsConstructor</b>
+&nbsp;@RequestMapping(&quot;/constellar.tech/api/v1/repository&quot;)
+&nbsp;public class RepositoryController {
+&nbsp;
+&nbsp;    private final CandidateService candidateService;
+&nbsp;    private final RepositoryJpa repositoryJpa;
+&nbsp;    private final RepositoryFileJpa repositoryFileJpa;
+&nbsp;    private final CandidateRepository candidateRepository;
+&nbsp;
+&nbsp;    @GetMapping(&quot;/{repoId}/files&quot;)
+&nbsp;    public List&lt;RepositoryFile&gt; getAllRepositoryFiles(@PathVariable Long repoId) {
+&nbsp;
+<b class="nc">&nbsp;        Repository repository = repositoryJpa.findById(repoId).orElseThrow(RuntimeException::new);</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;        return repository.getFiles();</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/{repoId}/file/{fileId}/content&quot;)
+&nbsp;    public ResponseEntity&lt;byte[]&gt; getFileContent(@PathVariable Long repoId,
+&nbsp;                                                 @PathVariable Long fileId,
+&nbsp;                                                 HttpSession session) {
+&nbsp;
+<b class="nc">&nbsp;        RepositoryFile file = repositoryFileJpa.findById(fileId).orElseThrow(RuntimeException::new);</b>
+&nbsp;
+&nbsp;        // Получаем содержимое файла
+<b class="nc">&nbsp;        byte[] content = file.getContent();</b>
+<b class="nc">&nbsp;        String contentType = determineContentType(file.getFileType());</b>
+&nbsp;
+<b class="nc">&nbsp;        return ResponseEntity.ok()</b>
+<b class="nc">&nbsp;                .header(&quot;Content-Type&quot;, contentType)</b>
+<b class="nc">&nbsp;                .body(content);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String determineContentType(String fileName) {
+&nbsp;        // Определяем Content-Type на основе расширения файла
+<b class="nc">&nbsp;        if (fileName.endsWith(&quot;.png&quot;)) return &quot;image/png&quot;;</b>
+<b class="nc">&nbsp;        if (fileName.endsWith(&quot;.jpg&quot;) || fileName.endsWith(&quot;.jpeg&quot;)) return &quot;image/jpeg&quot;;</b>
+<b class="nc">&nbsp;        if (fileName.endsWith(&quot;.gif&quot;)) return &quot;image/gif&quot;;</b>
+<b class="nc">&nbsp;        if (fileName.endsWith(&quot;.pdf&quot;)) return &quot;application/pdf&quot;;</b>
+<b class="nc">&nbsp;        if (fileName.endsWith(&quot;.html&quot;)) return &quot;text/html&quot;;</b>
+<b class="nc">&nbsp;        if (fileName.endsWith(&quot;.css&quot;)) return &quot;text/css&quot;;</b>
+<b class="nc">&nbsp;        if (fileName.endsWith(&quot;.js&quot;)) return &quot;text/javascript&quot;;</b>
+<b class="nc">&nbsp;        if (fileName.endsWith(&quot;.json&quot;)) return &quot;application/json&quot;;</b>
+<b class="nc">&nbsp;        return &quot;text/plain&quot;;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    @PostMapping(&quot;/add&quot;)
+&nbsp;    @Transactional
+&nbsp;    public void addRepository(@RequestParam(&quot;name&quot;) String name,
+&nbsp;                              @RequestParam(&quot;primaryLanguage&quot;) String primaryLanguage,
+&nbsp;                              @RequestParam(&quot;description&quot;) String description,
+&nbsp;                              @RequestParam(&quot;files&quot;) MultipartFile[] files,
+&nbsp;                              HttpSession session,
+&nbsp;                              HttpServletResponse response
+&nbsp;    ) throws IOException {
+&nbsp;
+<b class="nc">&nbsp;        if (session == null || session.getAttribute(&quot;candidate&quot;) == null) {</b>
+<b class="nc">&nbsp;            response.sendRedirect(&quot;http://localhost:8080/home&quot;);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Candidate candidate = (Candidate) session.getAttribute(&quot;candidate&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        Repository repository = new Repository();</b>
+<b class="nc">&nbsp;        repository.setName(name);</b>
+<b class="nc">&nbsp;        repository.setDescription(description);</b>
+<b class="nc">&nbsp;        repository.setPrimaryLanguage(primaryLanguage);</b>
+<b class="nc">&nbsp;        repository.setLastUpdated(LocalDateTime.now());</b>
+<b class="nc">&nbsp;        repository.setStars(0);</b>
+<b class="nc">&nbsp;        repository.setCandidate(candidate);</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;RepositoryFile&gt; repositoryFileList = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (MultipartFile file : files) {</b>
+<b class="nc">&nbsp;            if (!file.isEmpty()) {</b>
+<b class="nc">&nbsp;                RepositoryFile repositoryFile = new RepositoryFile();</b>
+<b class="nc">&nbsp;                repositoryFile.setFileName(file.getOriginalFilename());</b>
+<b class="nc">&nbsp;                repositoryFile.setContent(file.getBytes());</b>
+<b class="nc">&nbsp;                repositoryFile.setRepository(repository);</b>
+<b class="nc">&nbsp;                repositoryFile.setFileType(file.getContentType());</b>
+<b class="nc">&nbsp;                repositoryFileList.add(repositoryFile);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        repository.setFiles(repositoryFileList);</b>
+&nbsp;
+<b class="nc">&nbsp;        repositoryJpa.save(repository);</b>
+&nbsp;
+<b class="nc">&nbsp;        session.setAttribute(&quot;candidate&quot;, candidateRepository.findById(candidate.getId()).get());</b>
+&nbsp;
+<b class="nc">&nbsp;        response.sendRedirect(&quot;http://localhost:8080/candidate-repository-list&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/forEmployer/{repositoryId}&quot;)
+&nbsp;    public void getRepositoryForEmployer(@PathVariable Long repositoryId,
+&nbsp;                                         @RequestParam(required = false) Long fileId,
+&nbsp;                                         HttpSession session,
+&nbsp;                                         HttpServletResponse response) throws IOException {
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;        session.removeAttribute(&quot;repository&quot;);</b>
+<b class="nc">&nbsp;        session.removeAttribute(&quot;contentType&quot;);</b>
+<b class="nc">&nbsp;        session.removeAttribute(&quot;fileContent&quot;);</b>
+<b class="nc">&nbsp;        session.removeAttribute(&quot;selectedFile&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        Candidate candidate = (Candidate) session.getAttribute(&quot;candidate&quot;);</b>
+&nbsp;
+&nbsp;        //TODO: создать своё собственное исключение
+<b class="nc">&nbsp;        Repository repository = repositoryJpa.findById(repositoryId)</b>
+<b class="nc">&nbsp;                .orElseThrow(BadRequestException::new);</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;        session.setAttribute(&quot;repository&quot;, repository);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (fileId != null) {</b>
+<b class="nc">&nbsp;            repository.getFiles().stream()</b>
+<b class="nc">&nbsp;                    .filter(f -&gt; f.getId().equals(fileId))</b>
+<b class="nc">&nbsp;                    .findFirst()</b>
+<b class="nc">&nbsp;                    .ifPresent(file -&gt; {</b>
+<b class="nc">&nbsp;                        session.setAttribute(&quot;selectedFile&quot;, file);</b>
+&nbsp;
+<b class="nc">&nbsp;                        if (isTextFile(file)) {</b>
+<b class="nc">&nbsp;                            session.setAttribute(&quot;contentType&quot;, &quot;text&quot;);</b>
+<b class="nc">&nbsp;                            session.setAttribute(&quot;fileContent&quot;, new String(file.getContent(), StandardCharsets.UTF_8));</b>
+<b class="nc">&nbsp;                        } else if (isImageFile(file)) {</b>
+<b class="nc">&nbsp;                            session.setAttribute(&quot;contentType&quot;, &quot;image&quot;);</b>
+<b class="nc">&nbsp;                            String base64 = Base64.getEncoder().encodeToString(file.getContent());</b>
+<b class="nc">&nbsp;                            session.setAttribute(&quot;fileContent&quot;, &quot;data:&quot; + file.getFileType() + &quot;;base64,&quot; + base64);</b>
+<b class="nc">&nbsp;                        } else if (isPDFFile(file)) {</b>
+<b class="nc">&nbsp;                            session.setAttribute(&quot;contentType&quot;, &quot;pdf&quot;);</b>
+<b class="nc">&nbsp;                            String base64 = Base64.getEncoder().encodeToString(file.getContent());</b>
+<b class="nc">&nbsp;                            session.setAttribute(&quot;fileContent&quot;, base64);</b>
+<b class="nc">&nbsp;                        } else {</b>
+<b class="nc">&nbsp;                            session.setAttribute(&quot;contentType&quot;, &quot;binary&quot;);</b>
+&nbsp;                        }
+&nbsp;
+&nbsp;
+&nbsp;                    });
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        response.sendRedirect(&quot;http://localhost:8080/candidate-repository-page-for-employer&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/{repositoryId}&quot;)
+&nbsp;    @Transactional
+&nbsp;    public void getRepository(@PathVariable Long repositoryId,
+&nbsp;                              @RequestParam(required = false) Long fileId,
+&nbsp;                              HttpSession session,
+&nbsp;                              HttpServletResponse response) throws IOException {
+&nbsp;
+<b class="nc">&nbsp;        if (session == null || session.getAttribute(&quot;candidate&quot;) == null) {</b>
+<b class="nc">&nbsp;            response.sendRedirect(&quot;http://localhost:8080/home&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        session.removeAttribute(&quot;repository&quot;);</b>
+<b class="nc">&nbsp;        session.removeAttribute(&quot;contentType&quot;);</b>
+<b class="nc">&nbsp;        session.removeAttribute(&quot;fileContent&quot;);</b>
+<b class="nc">&nbsp;        session.removeAttribute(&quot;selectedFile&quot;);</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;        Candidate candidate = (Candidate) session.getAttribute(&quot;candidate&quot;);</b>
+&nbsp;
+&nbsp;        //TODO: создать своё собственное исключение
+<b class="nc">&nbsp;        Repository repository = repositoryJpa.findById(repositoryId)</b>
+<b class="nc">&nbsp;                .orElseThrow(BadRequestException::new);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!repository.getCandidate().getId().equals(candidate.getId())) {</b>
+<b class="nc">&nbsp;            throw new AccessDeniedException(&quot;Нет доступа к этому репозиторию.&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        session.setAttribute(&quot;repository&quot;, repository);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (fileId != null) {</b>
+<b class="nc">&nbsp;            repository.getFiles().stream()</b>
+<b class="nc">&nbsp;                    .filter(f -&gt; f.getId().equals(fileId))</b>
+<b class="nc">&nbsp;                    .findFirst()</b>
+<b class="nc">&nbsp;                    .ifPresent(file -&gt; {</b>
+<b class="nc">&nbsp;                        session.setAttribute(&quot;selectedFile&quot;, file);</b>
+&nbsp;
+<b class="nc">&nbsp;                        if (isTextFile(file)) {</b>
+<b class="nc">&nbsp;                            session.setAttribute(&quot;contentType&quot;, &quot;text&quot;);</b>
+<b class="nc">&nbsp;                            session.setAttribute(&quot;fileContent&quot;, new String(file.getContent(), StandardCharsets.UTF_8));</b>
+<b class="nc">&nbsp;                        } else if (isImageFile(file)) {</b>
+<b class="nc">&nbsp;                            session.setAttribute(&quot;contentType&quot;, &quot;image&quot;);</b>
+<b class="nc">&nbsp;                            String base64 = Base64.getEncoder().encodeToString(file.getContent());</b>
+<b class="nc">&nbsp;                            session.setAttribute(&quot;fileContent&quot;, &quot;data:&quot; + file.getFileType() + &quot;;base64,&quot; + base64);</b>
+<b class="nc">&nbsp;                        } else if (isPDFFile(file)) {</b>
+<b class="nc">&nbsp;                            session.setAttribute(&quot;contentType&quot;, &quot;pdf&quot;);</b>
+<b class="nc">&nbsp;                            String base64 = Base64.getEncoder().encodeToString(file.getContent());</b>
+<b class="nc">&nbsp;                            session.setAttribute(&quot;fileContent&quot;, base64);</b>
+<b class="nc">&nbsp;                        } else {</b>
+<b class="nc">&nbsp;                            session.setAttribute(&quot;contentType&quot;, &quot;binary&quot;);</b>
+&nbsp;                        }
+&nbsp;
+&nbsp;
+&nbsp;                    });
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        response.sendRedirect(&quot;http://localhost:8080/candidate-repository-page&quot;);</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/viewpdf/{fileId}&quot;)
+&nbsp;    @Transactional
+&nbsp;    public void viewPdf(@PathVariable Long fileId,
+&nbsp;                        HttpServletResponse response) throws IOException {
+<b class="nc">&nbsp;        RepositoryFile file = repositoryFileJpa.findById(fileId)</b>
+<b class="nc">&nbsp;                .orElseThrow(RuntimeException::new);</b>
+&nbsp;
+<b class="nc">&nbsp;        HttpHeaders headers = new HttpHeaders();</b>
+<b class="nc">&nbsp;        headers.setContentType(MediaType.parseMediaType(file.getFileType()));</b>
+&nbsp;
+&nbsp;        // Устанавливаем Content-Type
+<b class="nc">&nbsp;        response.setContentType(&quot;application/pdf&quot;);</b>
+&nbsp;
+&nbsp;        // Кодируем имя файла в соответствии с RFC 5987
+<b class="nc">&nbsp;        String encodedFileName = URLEncoder.encode(file.getFileName(), StandardCharsets.UTF_8)</b>
+<b class="nc">&nbsp;                .replaceAll(&quot;\\+&quot;, &quot;%20&quot;);</b>
+&nbsp;
+&nbsp;        // Устанавливаем заголовки с кодированным именем файла
+<b class="nc">&nbsp;        String contentDisposition = String.format(</b>
+&nbsp;                &quot;inline; filename=\&quot;%s\&quot;; filename*=UTF-8&#39;&#39;%s&quot;,
+<b class="nc">&nbsp;                file.getFileName(),</b>
+&nbsp;                encodedFileName
+&nbsp;        );
+<b class="nc">&nbsp;        response.setHeader(&quot;Content-Disposition&quot;, contentDisposition);</b>
+<b class="nc">&nbsp;        response.setHeader(&quot;Access-Control-Allow-Origin&quot;, &quot;*&quot;);</b>
+<b class="nc">&nbsp;        response.setHeader(&quot;Access-Control-Allow-Methods&quot;, &quot;GET&quot;);</b>
+<b class="nc">&nbsp;        response.setHeader(&quot;X-Frame-Options&quot;, &quot;ALLOW-FROM http://localhost:8080&quot;);</b>
+<b class="nc">&nbsp;        response.setHeader(&quot;Content-Security-Policy&quot;, &quot;frame-ancestors &#39;self&#39; http://localhost:8080;&quot;);</b>
+&nbsp;
+&nbsp;        // Отправляем содержимое файла
+<b class="nc">&nbsp;        try (OutputStream out = response.getOutputStream()) {</b>
+<b class="nc">&nbsp;            out.write(file.getContent());</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    @GetMapping(&quot;/download-file/{fileId}&quot;)
+&nbsp;    @Transactional
+&nbsp;    public ResponseEntity&lt;byte[]&gt; downloadPdf(@PathVariable Long fileId) throws IOException {
+<b class="nc">&nbsp;        RepositoryFile file = repositoryFileJpa.findById(fileId)</b>
+<b class="nc">&nbsp;                .orElseThrow(() -&gt; new RuntimeException());</b>
+&nbsp;
+<b class="nc">&nbsp;        HttpHeaders headers = new HttpHeaders();</b>
+<b class="nc">&nbsp;        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;        String encodedFileName = URLEncoder.encode(file.getFileName(), StandardCharsets.UTF_8)</b>
+<b class="nc">&nbsp;                .replaceAll(&quot;\\+&quot;, &quot;%20&quot;);</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;        headers.set(&quot;Content-Disposition&quot;,</b>
+<b class="nc">&nbsp;                &quot;attachment; filename=\&quot;&quot; + file.getFileName() + &quot;\&quot;; &quot; +</b>
+&nbsp;                &quot;filename*=UTF-8&#39;&#39;&quot; + encodedFileName);
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;        return ResponseEntity.ok()</b>
+<b class="nc">&nbsp;                .headers(headers)</b>
+<b class="nc">&nbsp;                .body(file.getContent());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    @DeleteMapping(&quot;/{repositoryId}/file/{fileId}&quot;)
+&nbsp;    @Transactional
+&nbsp;    public ResponseEntity&lt;?&gt; deleteFile(@PathVariable Long repositoryId, @PathVariable Long fileId, HttpSession session, HttpServletResponse response) throws IOException {
+&nbsp;
+<b class="nc">&nbsp;        if (session == null || session.getAttribute(&quot;candidate&quot;) == null) {</b>
+<b class="nc">&nbsp;            response.sendRedirect(&quot;http://localhost:8080/home&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Candidate candidate = (Candidate) session.getAttribute(&quot;candidate&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        Repository repository = repositoryJpa.findById(repositoryId).orElseThrow(RuntimeException::new);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!repository.getCandidate().getId().equals(candidate.getId())) {</b>
+<b class="nc">&nbsp;            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(&quot;Нет доступа к репозиторию&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        repository.getFiles().removeIf(file -&gt; file.getId().equals(fileId));</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;        candidate.getRepositories().stream().filter(repo -&gt; repo.getId().equals(repositoryId)).map(repo -&gt; repo.getFiles().removeIf(file -&gt; file.getId().equals(fileId)));</b>
+&nbsp;
+<b class="nc">&nbsp;        repositoryFileJpa.deleteById(fileId);</b>
+&nbsp;
+<b class="nc">&nbsp;        repositoryJpa.save(repository);</b>
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;        session.setAttribute(&quot;repository&quot;, repository);</b>
+<b class="nc">&nbsp;        session.removeAttribute(&quot;contentType&quot;);</b>
+<b class="nc">&nbsp;        session.removeAttribute(&quot;fileContent&quot;);</b>
+<b class="nc">&nbsp;        session.removeAttribute(&quot;selectedFile&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        return ResponseEntity.ok().build();</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    private boolean isTextFile(RepositoryFile file) {
+<b class="nc">&nbsp;        return file.getFileType().startsWith(&quot;text/&quot;) ||</b>
+<b class="nc">&nbsp;               file.getFileName().matches(&quot;.*\\.(java|cpp|py|js|html|css|xml|json|kt|ts|md|txt)$&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean isImageFile(RepositoryFile file) {
+<b class="nc">&nbsp;        return file.getFileType().startsWith(&quot;image/&quot;) ||</b>
+<b class="nc">&nbsp;               file.getFileName().matches(&quot;.*\\.(png|jpg|jpeg|gif|svg|bmp)$&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean isPDFFile(RepositoryFile file) {
+<b class="nc">&nbsp;        return file.getFileType().equals(&quot;application/pdf&quot;) ||</b>
+<b class="nc">&nbsp;               file.getFileName().endsWith(&quot;.pdf&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-05-11 23:40</div>
+</div>
+</body>
+</html>

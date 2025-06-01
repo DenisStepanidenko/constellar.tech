@@ -3,7 +3,7 @@
 <head>
     <!-- Meta tags and styles from previous templates -->
     <style>
-
+        /* Общие стили кнопок */
         .btn {
             padding: 0.6rem 1.2rem;
             border-radius: 5px;
@@ -11,7 +11,7 @@
             font-weight: 500;
             transition: all 0.3s;
             display: inline-block;
-            cursor: pointer; /* Добавляем pointer курсор */
+            cursor: pointer;
             border: none;
             font-family: 'Montserrat', sans-serif;
         }
@@ -38,9 +38,8 @@
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
 
-
         .chart-controls {
-            margin-bottom: 1rem;
+            margin: 1.5rem 0; /* Увеличил отступы сверху и снизу */
             display: flex;
             justify-content: flex-end;
         }
@@ -52,6 +51,8 @@
             border-radius: 4px;
             padding: 0.5rem;
             outline: none;
+            min-width: 120px; /* Фиксированная ширина */
+            box-sizing: border-box;
         }
 
         .time-range-select:focus {
@@ -78,6 +79,7 @@
             color: white;
             font-family: 'Montserrat', sans-serif;
             overflow-x: hidden;
+            -webkit-text-size-adjust: 100%; /* Предотвращает изменение размера текста при масштабировании */
         }
 
         /* Статичные звёзды */
@@ -243,9 +245,10 @@
         /* Основное содержимое */
         .main-content {
             flex: 1;
-            padding: 5rem;
+            padding: 2rem;
             position: relative;
             z-index: 5;
+            box-sizing: border-box;
         }
 
         .section-title {
@@ -339,34 +342,53 @@
             }
 
             .main-content {
-                padding-top: 100px;
                 padding: 1rem;
             }
 
             .profile-grid {
                 grid-template-columns: 1fr;
             }
+
+            .vacancy-details-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .vacancy-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .vacancy-actions {
+                width: 100%;
+                justify-content: flex-start;
+            }
         }
 
         .vacancy-header {
             display: flex;
             justify-content: space-between;
-            align-items: center; /* Изменено с flex-start на center */
+            align-items: flex-start;
             margin-bottom: 2rem;
             padding-bottom: 1rem;
             border-bottom: 1px solid rgba(255, 165, 0, 0.2);
+            flex-wrap: wrap;
+            gap: 1rem;
         }
 
         .vacancy-title {
-            font-size: 2rem;
+            font-size: clamp(1.5rem, 4vw, 2rem); /* Адаптивный размер шрифта */
             margin-bottom: 0.5rem;
             color: #ffa500;
-            margin-bottom: 0; /* Убираем нижний отступ */
+            margin-bottom: 0;
+            line-height: 1.2;
         }
 
         .vacancy-actions {
             display: flex;
-            gap: 0.5rem;
+            gap: 0.8rem;
+            align-items: center;
+            flex-wrap: wrap;
         }
 
         .vacancy-status-switch {
@@ -428,22 +450,17 @@
             margin-bottom: 2rem;
         }
 
-        @media (max-width: 768px) {
-            .vacancy-details-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
         .details-card {
             background: rgba(0, 0, 0, 0.5);
             border-radius: 10px;
             padding: 1.5rem;
             border: 1px solid rgba(255, 165, 0, 0.1);
+            box-sizing: border-box;
         }
 
         .details-card h3 {
             margin-top: 0;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem; /* Увеличил отступ */
             color: #ffa500;
             font-size: 1.2rem;
         }
@@ -451,16 +468,19 @@
         .detail-row {
             display: flex;
             margin-bottom: 0.8rem;
+            flex-wrap: wrap;
         }
 
         .detail-label {
             width: 150px;
             color: rgba(255, 255, 255, 0.7);
+            min-width: 120px; /* Минимальная ширина */
         }
 
         .detail-value {
             flex: 1;
             font-weight: 500;
+            min-width: 150px; /* Минимальная ширина */
         }
 
         .stats-grid {
@@ -476,6 +496,7 @@
             padding: 1rem;
             text-align: center;
             transition: transform 0.3s;
+            min-width: 0; /* Предотвращает переполнение */
         }
 
         .stat-card:hover {
@@ -486,6 +507,7 @@
             font-size: 1.8rem;
             font-weight: 700;
             margin-bottom: 0.3rem;
+            word-break: break-word;
         }
 
         .stat-new .stat-value {
@@ -507,6 +529,7 @@
         .stat-label {
             font-size: 0.8rem;
             color: rgba(255, 255, 255, 0.7);
+            word-break: break-word;
         }
 
         .skills-container {
@@ -514,6 +537,49 @@
             flex-wrap: wrap;
             gap: 0.5rem;
             margin-top: 1rem;
+        }
+
+        .main-content {
+            padding-top: 90px; /* Увеличили с 70px */
+        }
+
+        /* Увеличиваем высоту шапки */
+        .header {
+            height: 70px; /* Фиксированная высота */
+            padding: 0 2rem; /* Уменьшили вертикальные отступы */
+            display: flex;
+            align-items: center;
+        }
+
+        /* Улучшаем отступы в блоке вакансии */
+        .vacancy-section {
+            padding-top: 20px; /* Добавляем отступ сверху */
+        }
+
+        .vacancy-header {
+            margin-bottom: 2.5rem; /* Увеличили отступ снизу */
+            padding-top: 1rem; /* Добавили отступ сверху */
+        }
+
+        /* Улучшаем отступы вокруг заголовка */
+        .vacancy-title {
+            margin-bottom: 1rem !important; /* Добавляем отступ снизу */
+        }
+
+        /* Делаем шапку более компактной на мобильных */
+        @media (max-width: 768px) {
+            .header {
+                height: 60px;
+                padding: 0 1rem;
+            }
+
+            .main-content {
+                padding-top: 80px;
+            }
+
+            .vacancy-header {
+                margin-bottom: 2rem;
+            }
         }
 
         .skill-tag {
@@ -534,13 +600,7 @@
         .chart-container {
             height: 200px;
             margin-top: 1rem;
-        }
-
-
-        .vacancy-actions {
-            display: flex;
-            gap: 1rem;
-            align-items: center;
+            position: relative;
         }
 
         .btn {
@@ -556,6 +616,7 @@
             cursor: pointer;
             border: none;
             font-size: 0.9rem;
+            white-space: nowrap; /* Предотвращает перенос текста */
         }
 
         .btn-secondary {
@@ -587,8 +648,46 @@
             width: 16px;
             height: 16px;
             fill: currentColor;
+            flex-shrink: 0;
+        }
+
+        .form-actions {
+            margin-top: 2rem;
+        }
+
+        /* Улучшения для мобильных устройств */
+        @media (max-width: 480px) {
+            .main-content {
+                padding: 1rem;
+            }
+
+            .vacancy-details-grid {
+                gap: 1rem;
+            }
+
+            .details-card {
+                padding: 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .detail-label, .detail-value {
+                width: 100%;
+            }
+
+            .vacancy-actions {
+                gap: 0.5rem;
+            }
+
+            .btn {
+                padding: 0.5rem 0.8rem;
+                font-size: 0.8rem;
+            }
         }
     </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
 <!-- Статичные звёзды (без движения) -->
@@ -723,7 +822,7 @@
                     <canvas id="responsesChart"></canvas>
                 </div>
 
-                <div style="margin-top: 1rem; text-align: center;">
+                <div style="margin-top: 1.5rem; text-align: center;">
                     <a th:href="@{'/applications-for-employer'}" class="btn btn-primary">
                         Просмотреть все отклики
                     </a>
@@ -747,7 +846,7 @@
         </div>
 
         <div class="form-actions">
-            <button class="btn btn-secondary" onclick="history.back()">Назад к списку</button>
+            <button class="btn btn-secondary" onclick="window.location.href='/employer-list-vacancies'">Назад к списку</button>
         </div>
     </section>
 </main>

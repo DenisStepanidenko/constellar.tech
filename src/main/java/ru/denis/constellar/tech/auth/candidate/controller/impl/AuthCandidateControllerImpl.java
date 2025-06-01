@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,6 +21,7 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/constellar.tech/api/v1/auth")
 @RequiredArgsConstructor
+@Slf4j
 public class AuthCandidateControllerImpl implements AuthCandidateController {
 
     private final AuthCandidateService authService;

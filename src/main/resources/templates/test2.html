@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+<table>
+    <tr>
+        <th>№</th>
+        <th>Тип теста</th>
+        <th>Цель</th>
+        <th>Входные данные</th>
+        <th>Ожидаемый результат</th>
+        <th>Инструмент</th>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td>Модульный</td>
+        <td>Проверка метода createVacancy в VacancyService</td>
+        <td>VacancyDTO (title="Java Developer", description="Middle level")</td>
+        <td>Вакансия сохраняется, возвращается Vacancy с id</td>
+        <td>JUnit 5, Mockito</td>
+    </tr>
+    <tr>
+        <td>2</td>
+        <td>Модульный</td>
+        <td>Проверка метода createVacancyDetailsDtoFromVacancy в VacancyService</td>
+        <td>vacancyId=1, вакансия с 10 заявками</td>
+        <td>Возвращается VacancyDetailsDto с корректной статистикой</td>
+        <td>JUnit 5, Mockito</td>
+    </tr>
+    <tr>
+        <td>3</td>
+        <td>Модульный</td>
+        <td>Проверка обработки EmailAlreadyExists в GlobalExceptionHandler</td>
+        <td>EmailAlreadyExists с сообщением "Email already exists"</td>
+        <td>Код 400, JSON { "errors": ["Email already exists"] }</td>
+        <td>JUnit 5, Mockito</td>
+    </tr>
+    <tr>
+        <td>4</td>
+        <td>Модульный</td>
+        <td>Проверка обработки пустого файла в EmployerImageController</td>
+        <td>Пустой MultipartFile (0 байт)</td>
+        <td>Аватар обновляется как пустой массив, тип сохраняется</td>
+        <td>JUnit 5, Mockito</td>
+    </tr>
+    <tr>
+        <td>5</td>
+        <td>Интеграционный</td>
+        <td>Проверка эндпоинта /api/v1/auth/register-candidate</td>
+        <td>JSON { "email": "new@example.com", "password": "Pass123" }</td>
+        <td>Код 201, кандидат сохранён, сессия создана</td>
+        <td>Spring Boot Test, Postman</td>
+    </tr>
+    <tr>
+        <td>6</td>
+        <td>Интеграционный</td>
+        <td>Проверка сохранения заявки через ApplicationJpa</td>
+        <td>Application (vacancyId=1, candidateId=1, status=NEW)</td>
+        <td>Заявка сохраняется, возвращается Application с id</td>
+        <td>Testcontainers, Spring Boot Test</td>
+    </tr>
+    <tr>
+        <td>7</td>
+        <td>Интеграционный</td>
+        <td>Проверка эндпоинта /api/v1/auth/employer/login</td>
+        <td>JSON { "email": "test@example.com", "password": "password" }</td>
+        <td>Код 200, сессия создана, redirect на /company-personal-account-home</td>
+        <td>MockMvc, Spring Boot Test</td>
+    </tr>
+    <tr>
+        <td>8</td>
+        <td>Интеграционный</td>
+        <td>Проверка загрузки аватара через /image/employer/upload-logo</td>
+        <td>MultipartFile (logo.png, 500 КБ), авторизованный работодатель</td>
+        <td>Код 302, аватар сохранён, redirect на /company-personal-account-home</td>
+        <td>MockMvc, Spring Boot Test</td>
+    </tr>
+    <tr>
+        <td>9</td>
+        <td>Интеграционный</td>
+        <td>Проверка получения аватара через /image/employer/getAvatar</td>
+        <td>Авторизованный работодатель с аватаром (image/png)</td>
+        <td>Код 200, возвращается байтовый массив аватара</td>
+        <td>MockMvc, Spring Boot Test</td>
+    </tr>
+    <tr>
+        <td>10</td>
+        <td>Ручной</td>
+        <td>Проверка отображения профиля компании</td>
+        <td>Авторизация работодателя, переход на /company-personal-account-home</td>
+        <td>Поля (companyName, inn) отображаются, меню активно</td>
+        <td>Chrome, Firefox</td>
+    </tr>
+    <tr>
+        <td>11</td>
+        <td>Ручной</td>
+        <td>Проверка редактирования профиля кандидата</td>
+        <td>Авторизация кандидата, изменение skills на "Java, Spring"</td>
+        <td>Данные обновляются, отображаются на /candidate-personal-account</td>
+        <td>Chrome</td>
+    </tr>
+    <tr>
+        <td>12</td>
+        <td>Ручной</td>
+        <td>Проверка загрузки аватара кандидата</td>
+        <td>Файл JPEG (500 КБ), авторизованный кандидат</td>
+        <td>Код 200, аватар отображается на /candidate-personal-account</td>
+        <td>Postman, Chrome</td>
+    </tr>
+    <tr>
+        <td>13</td>
+        <td>Нагрузочный</td>
+        <td>Проверка API /api/v1/vacancy/list при 50 запросах</td>
+        <td>GET /api/v1/vacancy/list?skills=Java</td>
+        <td>Код 200, время ответа <500 мс</td>
+        <td>JMeter</td>
+    </tr>
+    <tr>
+        <td>14</td>
+        <td>Тест ошибок</td>
+        <td>Проверка обработки UnauthorizedAccessException</td>
+        <td>Запрос без сессии на /image/employer/getAvatar</td>
+        <td>Код 302, redirect на /home</td>
+        <td>MockMvc, Postman</td>
+    </tr>
+    <tr>
+        <td>15</td>
+        <td>Тест ошибок</td>
+        <td>Проверка обработки MethodArgumentNotValidException</td>
+        <td>JSON с пустым title в /api/v1/vacancy/create</td>
+        <td>Код 400, JSON с ошибками валидации</td>
+        <td>Postman, JUnit</td>
+    </tr>
+</table>
+</body>
+</html>
