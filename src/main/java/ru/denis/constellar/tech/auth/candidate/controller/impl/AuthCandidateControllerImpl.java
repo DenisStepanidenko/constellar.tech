@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,6 +25,8 @@ import java.io.IOException;
 @Slf4j
 public class AuthCandidateControllerImpl implements AuthCandidateController {
 
+    @Value("${ip}")
+    private String ip;
     private final AuthCandidateService authService;
 
     @PostMapping("/register-candidate")
@@ -45,14 +48,14 @@ public class AuthCandidateControllerImpl implements AuthCandidateController {
     @PostMapping("/logout-candidate")
     public void logoutCandidate(HttpSession httpSession, HttpServletResponse response) throws IOException {
 
-        if(httpSession == null || httpSession.getAttribute("candidate") == null){
-            response.sendRedirect("http://localhost:8080/home");
+        if (httpSession == null || httpSession.getAttribute("candidate") == null) {
+            response.sendRedirect("http://" + ip + ":8080/home");
             return;
         }
 
 
         httpSession.removeAttribute("candidate");
-        response.sendRedirect("http://localhost:8080/home");
+        response.sendRedirect("http://" + ip + ":8080/home");
 
     }
 

@@ -6,10 +6,13 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import ru.denis.constellar.tech.application.jpa.ApplicationJpa;
 import ru.denis.constellar.tech.application.model.Application;
 import ru.denis.constellar.tech.application.model.ApplicationStatus;
 import ru.denis.constellar.tech.auth.exceptions.UnauthorizedAccessException;
@@ -33,10 +36,13 @@ import java.util.Set;
 @Slf4j
 public class VacancyController {
 
+    @Value("${ip}")
+    private String ip;
     private final VacancyJpa vacancyJpa;
     private final EmployerJpa employerJpa;
 
     private final VacancyService vacancyService;
+    private final ApplicationJpa applicationJpa;
 
     @PostMapping("/create")
     public void createVacancy(@Valid @ModelAttribute("vacancyDto") VacancyDto vacancyDto,
@@ -49,7 +55,7 @@ public class VacancyController {
         }
 
         if (result.hasErrors()) {
-            response.sendRedirect("http://localhost:8080/employer-add-vacancy");
+            response.sendRedirect("http://" + ip + ":8080/employer-add-vacancy");
             return;
         }
 
@@ -76,7 +82,7 @@ public class VacancyController {
         vacancyJpa.flush();
 
         session.setAttribute("employer", employerJpa.findById(employer.getId()).get());
-        response.sendRedirect("http://localhost:8080/employer-list-vacancies");
+        response.sendRedirect("http://" + ip + ":8080/employer-list-vacancies");
 
     }
 
@@ -92,7 +98,7 @@ public class VacancyController {
 
         session.setAttribute("vacancy", vacancyDetailsDto);
 
-        response.sendRedirect("http://localhost:8080/employer-view-vacancy");
+        response.sendRedirect("http://" + ip + ":8080/employer-view-vacancy");
     }
 
     @GetMapping("/{id}/stats")
@@ -139,6 +145,7 @@ public class VacancyController {
     }
 
     @PostMapping("/delete-vacancy/{id}")
+    @Transactional
     public void deleteVacancy(@PathVariable Long id, HttpSession session) {
 
         if (session == null || session.getAttribute("employer") == null || session.getAttribute("vacancy") == null) {
@@ -147,8 +154,10 @@ public class VacancyController {
 
         Employer employer = (Employer) session.getAttribute("employer");
 
+        Vacancy vacancy = vacancyJpa.findById(id).orElseThrow(RuntimeException::new);
+        vacancy.getApplications().clear();  // Hibernate сам выполнит DELETE
+        vacancyJpa.saveAndFlush(vacancy);
         vacancyJpa.deleteById(id);
-        vacancyJpa.flush();
 
         session.removeAttribute("vacancy");
 

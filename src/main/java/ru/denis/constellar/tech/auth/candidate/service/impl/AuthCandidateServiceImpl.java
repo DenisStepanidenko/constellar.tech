@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +25,8 @@ import java.io.IOException;
 @Slf4j
 public class AuthCandidateServiceImpl implements AuthCandidateService {
 
+    @Value("${ip}")
+    private String ip;
     private final CandidateService candidateService;
     private final PasswordEncoder passwordEncoder;
 
@@ -54,7 +57,8 @@ public class AuthCandidateServiceImpl implements AuthCandidateService {
         httpSession.setAttribute("candidate", candidate);
 
         try {
-            response.sendRedirect("http://localhost:8080/candidate-personal-account");
+            System.out.println("http://" + ip + ":8080/candidate-personal-account");
+            response.sendRedirect("http://" + ip + ":8080/candidate-personal-account");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

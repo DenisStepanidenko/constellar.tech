@@ -3,6 +3,7 @@ package ru.denis.constellar.tech.achievement.controller;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -29,6 +30,8 @@ import java.util.Objects;
 @RequestMapping("/constellar.tech/api/v1/achievement")
 public class AchievementController {
 
+    @Value("${ip}")
+    private String ip;
     private final CandidateService candidateService;
     private final AchievementJpa achievementJpa;
     private final CandidateRepository candidateRepository;
@@ -65,7 +68,7 @@ public class AchievementController {
 
         session.setAttribute("candidate", candidateRepository.findById(candidate.getId()).get());
 
-        response.sendRedirect("http://localhost:8080/candidate-achievements");
+        response.sendRedirect("http://" + ip + ":8080/candidate-achievements");
     }
 
     @GetMapping("/view/{achievementId}")
@@ -114,6 +117,7 @@ public class AchievementController {
 
     }
 
+
     @PostMapping("/delete/{achievementId}")
     @Transactional
     public void delete(@PathVariable Long achievementId,
@@ -131,4 +135,5 @@ public class AchievementController {
         candidate.getAchievements().remove(achievement);
         achievementJpa.deleteById(achievementId);
     }
+
 }

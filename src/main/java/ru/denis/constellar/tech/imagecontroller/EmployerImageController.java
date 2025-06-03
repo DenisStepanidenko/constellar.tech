@@ -4,6 +4,7 @@ package ru.denis.constellar.tech.imagecontroller;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,6 +21,9 @@ import java.io.IOException;
 @RequestMapping("/image/employer")
 @RequiredArgsConstructor
 public class EmployerImageController {
+
+    @Value("${ip}")
+    private String ip;
     private final EmployerJpa employerJpa;
 
     @GetMapping("/getAvatar")
@@ -42,7 +46,7 @@ public class EmployerImageController {
 
 
         if (session == null || session.getAttribute("employer") == null) {
-            response.sendRedirect("http://localhost:8080/home");
+            response.sendRedirect("http://" + ip + ":8080/home");
             return;
         }
 
@@ -56,7 +60,7 @@ public class EmployerImageController {
 
         session.setAttribute("employer", employerJpa.findById(employer.getId()).get());
 
-        response.sendRedirect("http://localhost:8080/company-personal-account-home");
+        response.sendRedirect("http://" + ip + ":8080/company-personal-account-home");
 
     }
 }

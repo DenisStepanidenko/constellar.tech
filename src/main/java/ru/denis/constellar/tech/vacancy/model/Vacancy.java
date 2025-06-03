@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import ru.denis.constellar.tech.application.model.Application;
 import ru.denis.constellar.tech.employer.model.Employer;
 
@@ -54,6 +56,7 @@ public class Vacancy {
     private Boolean isActive;
 
     @OneToMany(mappedBy = "vacancy", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<Application> applications = new HashSet<>();
 
 

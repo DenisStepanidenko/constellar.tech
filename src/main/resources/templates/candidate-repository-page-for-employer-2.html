@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${session.repository.name} + ' | constellar.tech'">Репозиторий | constellar.tech</title>
+    <link th:href="@{https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap}"
+          rel="stylesheet">
+    <link th:href="@{/candidate-repository-list.css}" rel="stylesheet">
+    <!-- Highlight.js для подсветки синтаксиса -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github-dark.min.css">
+    <style>
+        /* Стили для страницы репозитория */
+        :root {
+            --primary-dark: #0a0f2b;
+            --secondary-dark: #1a1a40;
+            --accent-blue: #00ffff;
+            --accent-pink: #ff00ff;
+            --accent-green: #00ffaa;
+            --accent-yellow: #ffcc00;
+            --text-light: #f8f9fa;
+            --text-dark: #1a1a2e;
+        }
+
+        .repo-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .repo-title {
+            font-size: 1.8rem;
+            color: var(--accent-blue);
+            margin: 0;
+        }
+
+        .repo-meta {
+            display: flex;
+            gap: 1.5rem;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .repo-description {
+            background: rgba(26, 26, 64, 0.5);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .repo-content {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .file-explorer {
+            width: 300px;
+            background: rgba(10, 15, 43, 0.5);
+            border-radius: 8px;
+            padding: 1rem;
+            height: fit-content;
+        }
+
+        .file-tree {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .file-tree-item {
+            padding: 0.5rem 0;
+            cursor: pointer;
+            transition: color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .file-tree-item:hover {
+            color: var(--accent-blue);
+        }
+
+        .file-tree-item.active {
+            color: var(--accent-green);
+            font-weight: 500;
+        }
+
+        .file-icon {
+            width: 16px;
+            height: 16px;
+        }
+
+        .file-content {
+            flex: 1;
+            background: rgba(10, 15, 43, 0.5);
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+
+        .file-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .file-name {
+            font-size: 1.2rem;
+            color: var(--accent-blue);
+            margin: 0;
+        }
+
+        .file-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .action-btn {
+            background: rgba(26, 26, 64, 0.7);
+            border: 1px solid var(--accent-blue);
+            color: var(--accent-blue);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .action-btn:hover {
+            background: var(--accent-blue);
+            color: var(--primary-dark);
+        }
+
+        /* Стили для различных типов просмотрщиков */
+        .code-viewer {
+            background: #1e1e1e;
+            border-radius: 6px;
+            padding: 1rem;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .code-viewer pre {
+            margin: 0;
+            white-space: pre-wrap;
+        }
+
+        .delete-file-btn {
+            background: none;
+            border: none;
+            color: var(--accent-pink);
+            cursor: pointer;
+            padding: 0.3rem;
+            margin-left: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s;
+            opacity: 0.7;
+        }
+
+        .delete-file-btn:hover {
+            background: rgba(255, 0, 255, 0.1);
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        .file-tree-item {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-radius: 4px;
+        }
+
+        .file-tree-item:hover {
+            background: rgba(26, 26, 64, 0.3);
+        }
+
+        .image-viewer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            border-radius: 8px;
+        }
+
+        .image-viewer img {
+            max-width: 100%;
+            max-height: 70vh;
+            border-radius: 4px;
+        }
+
+        .pdf-viewer {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+            height: 70vh;
+        }
+
+        .pdf-viewer embed {
+            width: 100%;
+            height: 100%;
+        }
+
+        .binary-viewer {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-light);
+        }
+    </style>
+</head>
+<body>
+<!-- Звёздный фон -->
+<div th:each="i : ${#numbers.sequence(1, 100)}"
+     class="star"
+     th:style="'top: ' + ${T(java.lang.Math).random() * 100} + '%; ' +
+              'left: ' + ${T(java.lang.Math).random() * 100} + '%; ' +
+              'animation-delay: ' + ${T(java.lang.Math).random() * 2} + 's; ' +
+              'animation-duration: ' + (5 + ${T(java.lang.Math).random() * 10}) + 's;'">
+</div>
+
+<!-- Шапка -->
+<header class="header" id="mainHeader">
+    <a href="/dashboard" class="logo-small">constellar.tech</a>
+    <a th:href="@{/all-candidates}" class="logout-btn">Назад к кандидатам</a>
+</header>
+
+<!-- Основной контент -->
+<div class="dashboard-container">
+    <!-- Боковая панель -->
+    <aside class="sidebar">
+        <div class="profile-card">
+            <div th:if="${session.candidate.avatar != null}">
+                <img th:src="@{/image/candidate/getAvatar/{id}(id = ${session.candidate.id})}" alt="Аватар"
+                     class="avatar-image">
+            </div>
+            <div th:if="${session.candidate.avatar == null}" class="avatar-placeholder"
+                 th:text="${#strings.substring(session.candidate.username, 0, 2)}">
+            </div>
+            <div class="username" th:text="${session.candidate.username}">Username</div>
+            <div class="position" th:text="${session.candidate.position ?: 'Должность не указана'}">Position</div>
+        </div>
+
+        <ul class="nav-menu">
+            <li class="nav-item"><a href="/candidate-profile-for-employer-2" class="nav-link">Профиль</a></li>
+            <li class="nav-item"><a href="/candidate-profile-for-employer-repositories-2" class="nav-link active" id="repositoriesLink">Репозитории</a></li>
+            <li class="nav-item"><a href="/candidate-achievements-for-employer-2" class="nav-link">Достижения</a></li>
+        </ul>
+    </aside>
+
+    <!-- Основное содержимое -->
+    <main class="main-content">
+        <div class="repo-header">
+            <h1 class="repo-title" th:text="${session.repository.name}">Название репозитория</h1>
+            <div class="repo-meta">
+                <span th:text="${session.repository.primaryLanguage ?: 'Язык не указан'}">JavaScript</span>
+                <span th:text="'⭐ ' + (${session.repository.stars} != null ? ${session.repository.stars} : '0')">⭐ 42</span>
+                <span th:text="'Обновлён ' + ${#temporals.format(session.repository.lastUpdated, 'dd MMM yyyy')}">Обновлён 2 дня назад</span>
+            </div>
+        </div>
+
+        <div class="repo-description" th:if="${session.repository.description}"
+             th:text="${session.repository.description}">
+            Описание репозитория. Здесь может быть краткое описание проекта и используемых технологий.
+        </div>
+
+        <div class="repo-content">
+            <!-- Файловый explorer -->
+            <div class="file-explorer">
+                <h3>Файлы</h3>
+                <ul class="file-tree">
+                    <li th:each="file : ${session.repository.files}" class="file-tree-item"
+                        th:classappend="${session.selectedFile != null && file.id == session.selectedFile.id} ? 'active' : ''">
+            <span th:text="${file.fileName}"
+                  th:onclick="'location.href=\'/constellar.tech/api/v1/repository/forEmployer-2/' + ${session.repository.id} + '?fileId=' + ${file.id} + '\''"
+                  style="flex-grow: 1;"></span>
+
+                    </li>
+                    <li th:if="${session.repository.files.empty}" class="empty-state">Файлы отсутствуют</li>
+                </ul>
+            </div>
+
+            <!-- Контент файла -->
+            <div class="file-content">
+                <div th:if="${session.selectedFile != null}">
+                    <div class="file-header">
+                        <h3 class="file-name" th:text="${session.selectedFile.fileName}">file.txt</h3>
+                        <div class="file-actions">
+                            <a th:href="@{'/constellar.tech/api/v1/repository/download-file/' + ${session.selectedFile.id}}"
+                               class="action-btn">Скачать</a>
+                        </div>
+                    </div>
+
+                    <!-- Отображение содержимого в зависимости от типа -->
+                    <div th:switch="${session.contentType}">
+                        <!-- Текстовые файлы -->
+                        <div th:case="'text'" class="code-viewer">
+                            <pre><code th:text="${session.fileContent}"></code></pre>
+                        </div>
+
+                        <!-- Изображения -->
+                        <div th:case="'image'" class="image-viewer">
+                            <img th:src="${session.fileContent}"
+                                 th:alt="${session.selectedFile.fileName}">
+                        </div>
+
+                        <div th:case="'pdf'">
+                            <embed
+                                    th:src="@{'/constellar.tech/api/v1/repository/viewpdf/' + ${session.selectedFile.id}}"
+                                    type="application/pdf"
+                                    width="100%"
+                                    height="600px"
+                            />
+                        </div>
+
+                        <!-- Неподдерживаемые форматы -->
+                        <div th:case="*" class="binary-viewer">
+                            <div class="empty-state">
+                                <p>Формат файла не поддерживает предпросмотр</p>
+                                <a th:href="@{'/constellar.tech/api/v1/repository/download-file/' + ${session.selectedFile.id}}"
+                                   class="action-btn">Скачать файл</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div th:if="${session.selectedFile == null}" class="empty-state">
+                    <p>Выберите файл для просмотра</p>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Подключение highlight.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/languages/java.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/languages/cpp.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/languages/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/languages/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/languages/xml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/languages/css.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/languages/json.min.js"></script>
+
+<script>
+    // Скрипт для скрытия шапки при скролле
+    let lastScroll = 0;
+    const header = document.getElementById('mainHeader');
+    const SCROLL_THRESHOLD = 5;
+
+    window.addEventListener('scroll', function () {
+        const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+
+        if (currentScroll > lastScroll + SCROLL_THRESHOLD) {
+            header.classList.add('hidden');
+        } else if (currentScroll < lastScroll - SCROLL_THRESHOLD && currentScroll <= SCROLL_THRESHOLD) {
+            header.classList.remove('hidden');
+        }
+
+        if (currentScroll <= SCROLL_THRESHOLD) {
+            header.classList.remove('hidden');
+        }
+
+        lastScroll = currentScroll;
+    });
+
+    // Инициализация подсветки синтаксиса
+    function initCodeHighlighting() {
+        const codeBlocks = document.querySelectorAll('.code-viewer pre code');
+        if (codeBlocks.length > 0) {
+            codeBlocks.forEach((block) => {
+                const fileName = document.querySelector('.file-name').textContent;
+                let language = 'plaintext';
+
+                // Определяем язык по расширению файла
+                if (fileName.endsWith('.java')) language = 'java';
+                else if (fileName.endsWith('.cpp') || fileName.endsWith('.h')) language = 'cpp';
+                else if (fileName.endsWith('.py')) language = 'python';
+                else if (fileName.endsWith('.js')) language = 'javascript';
+                else if (fileName.endsWith('.html')) language = 'html';
+                else if (fileName.endsWith('.css')) language = 'css';
+                else if (fileName.endsWith('.json')) language = 'json';
+
+                block.classList.add(language);
+                hljs.highlightElement(block);
+            });
+        }
+    }
+
+    // Вызываем при загрузке страницы
+    document.addEventListener('DOMContentLoaded', function () {
+        initCodeHighlighting();
+    });
+</script>
+
+</body>
+</html>

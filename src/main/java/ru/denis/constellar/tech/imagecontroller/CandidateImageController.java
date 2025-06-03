@@ -30,7 +30,8 @@ public class CandidateImageController {
 
     @Value("${basePathToCandidateFiles}")
     private String basePathToCandidateFiles;
-
+    @Value("${ip}")
+    private String ip;
     private final CandidateService candidateService;
 
     private final CandidateRepository candidateRepository;
@@ -52,7 +53,7 @@ public class CandidateImageController {
                                       HttpSession session, HttpServletResponse response) throws IOException {
 
         if (session == null || session.getAttribute("candidate") == null) {
-            response.sendRedirect("http://localhost:8080/home");
+            response.sendRedirect("http://" + ip + ":8080/home");
             return;
         }
 
@@ -63,7 +64,7 @@ public class CandidateImageController {
         candidateService.saveCandidate(candidate);
 
 
-        response.sendRedirect("http://localhost:8080/candidate-personal-account");
+        response.sendRedirect("http://" + ip + ":8080/candidate-personal-account");
     }
 
 

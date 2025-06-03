@@ -3,6 +3,7 @@ package ru.denis.constellar.tech.application.controller;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.denis.constellar.tech.application.jpa.ApplicationJpa;
@@ -19,6 +20,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ApplicationController {
 
+    @Value("${ip}")
+    private String ip;
     private final ApplicationJpa applicationJpa;
 
 
@@ -34,7 +37,7 @@ public class ApplicationController {
         List<Application> applications = applicationJpa.findByCandidateId(candidate.getId());
         session.setAttribute("applications", applications);
 
-        response.sendRedirect("http://localhost:8080/candidate-applications-page");
+        response.sendRedirect("http://" + ip + ":8080/candidate-applications-page");
     }
 
     @PutMapping("/{id}/status")

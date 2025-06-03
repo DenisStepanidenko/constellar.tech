@@ -1,5 +1,6 @@
 package ru.denis.constellar.tech.globalHandlerException.handler;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,9 @@ import java.util.List;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @Value("${ip}")
+    private String ip;
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -57,7 +61,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UnauthorizedAccessException.class)
     public ResponseEntity<Void> handleUnauthorized() {
         return ResponseEntity.status(HttpStatus.FOUND)
-                .location(URI.create("http://localhost:8080/home"))
+                .location(URI.create("http://" + ip + ":8080/home"))
                 .build();
     }
 

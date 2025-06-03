@@ -3,6 +3,7 @@ package ru.denis.constellar.tech.auth.employer.service;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.denis.constellar.tech.auth.employer.dto.CompanyRegistrationRequest;
@@ -18,6 +19,8 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class CompanyAuthService {
 
+    @Value("${ip}")
+    private String ip;
     private final EmployerJpa employerJpa;
     private final PasswordEncoder passwordEncoder;
 
@@ -35,7 +38,7 @@ public class CompanyAuthService {
 
 
         try {
-            response.sendRedirect("http://localhost:8080/company-personal-account-home");
+            response.sendRedirect("http://" + ip + ":8080/company-personal-account-home");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

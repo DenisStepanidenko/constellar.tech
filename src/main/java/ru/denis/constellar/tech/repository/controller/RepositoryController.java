@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +33,8 @@ import java.util.List;
 @RequestMapping("/constellar.tech/api/v1/repository")
 public class RepositoryController {
 
+    @Value("${ip}")
+    private String ip;
     private final CandidateService candidateService;
     private final RepositoryJpa repositoryJpa;
     private final RepositoryFileJpa repositoryFileJpa;
@@ -88,7 +91,7 @@ public class RepositoryController {
     ) throws IOException {
 
         if (session == null || session.getAttribute("candidate") == null) {
-            response.sendRedirect("http://localhost:8080/home");
+            response.sendRedirect("http://" + ip + ":8080/home");
             return;
         }
 
@@ -119,7 +122,57 @@ public class RepositoryController {
 
         session.setAttribute("candidate", candidateRepository.findById(candidate.getId()).get());
 
-        response.sendRedirect("http://localhost:8080/candidate-repository-list");
+        response.sendRedirect("http://" + ip + ":8080/candidate-repository-list");
+    }
+
+    @GetMapping("/forEmployer-2/{repositoryId}")
+    public void getRepositoryForEmployer2(@PathVariable Long repositoryId,
+                                         @RequestParam(required = false) Long fileId,
+                                         HttpSession session,
+                                         HttpServletResponse response) throws IOException {
+
+
+        session.removeAttribute("repository");
+        session.removeAttribute("contentType");
+        session.removeAttribute("fileContent");
+        session.removeAttribute("selectedFile");
+
+        Candidate candidate = (Candidate) session.getAttribute("candidate");
+
+        //TODO: создать своё собственное исключение
+        Repository repository = repositoryJpa.findById(repositoryId)
+                .orElseThrow(BadRequestException::new);
+
+
+        session.setAttribute("repository", repository);
+
+        if (fileId != null) {
+            repository.getFiles().stream()
+                    .filter(f -> f.getId().equals(fileId))
+                    .findFirst()
+                    .ifPresent(file -> {
+                        session.setAttribute("selectedFile", file);
+
+                        if (isTextFile(file)) {
+                            session.setAttribute("contentType", "text");
+                            session.setAttribute("fileContent", new String(file.getContent(), StandardCharsets.UTF_8));
+                        } else if (isImageFile(file)) {
+                            session.setAttribute("contentType", "image");
+                            String base64 = Base64.getEncoder().encodeToString(file.getContent());
+                            session.setAttribute("fileContent", "data:" + file.getFileType() + ";base64," + base64);
+                        } else if (isPDFFile(file)) {
+                            session.setAttribute("contentType", "pdf");
+                            String base64 = Base64.getEncoder().encodeToString(file.getContent());
+                            session.setAttribute("fileContent", base64);
+                        } else {
+                            session.setAttribute("contentType", "binary");
+                        }
+
+
+                    });
+        }
+
+        response.sendRedirect("http://" + ip + ":8080/candidate-repository-page-for-employer-2");
     }
 
     @GetMapping("/forEmployer/{repositoryId}")
@@ -169,7 +222,7 @@ public class RepositoryController {
                     });
         }
 
-        response.sendRedirect("http://localhost:8080/candidate-repository-page-for-employer");
+        response.sendRedirect("http://" + ip + ":8080/candidate-repository-page-for-employer");
     }
 
     @GetMapping("/{repositoryId}")
@@ -227,7 +280,7 @@ public class RepositoryController {
                     });
         }
 
-        response.sendRedirect("http://localhost:8080/candidate-repository-page");
+        response.sendRedirect("http://" + ip + ":8080/candidate-repository-page");
 
     }
 
@@ -297,7 +350,7 @@ public class RepositoryController {
     public ResponseEntity<?> deleteFile(@PathVariable Long repositoryId, @PathVariable Long fileId, HttpSession session, HttpServletResponse response) throws IOException {
 
         if (session == null || session.getAttribute("candidate") == null) {
-            response.sendRedirect("http://localhost:8080/home");
+            response.sendRedirect("http://" + ip + ":8080/home");
         }
 
         Candidate candidate = (Candidate) session.getAttribute("candidate");

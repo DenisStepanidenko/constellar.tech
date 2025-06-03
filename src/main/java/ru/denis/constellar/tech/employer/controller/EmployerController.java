@@ -4,6 +4,7 @@ package ru.denis.constellar.tech.employer.controller;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.denis.constellar.tech.auth.exceptions.UnauthorizedAccessException;
@@ -17,6 +18,8 @@ import java.io.IOException;
 @RequestMapping("/constellar.tech/api/v1/employer")
 public class EmployerController {
 
+    @Value("${ip}")
+    private String ip;
     private final EmployerJpa employerJpa;
 
     @PostMapping("/update")
@@ -28,7 +31,7 @@ public class EmployerController {
             throw new UnauthorizedAccessException();
         }
 
-        Employer employer = new Employer();
+        Employer employer =  (Employer) session.getAttribute("employer");
 
         if (!updateEmployer.getAddress().isBlank()) {
             employer.setAddress(updateEmployer.getAddress());
@@ -72,6 +75,8 @@ public class EmployerController {
 
         session.setAttribute("employer", employerJpa.findById(employer.getId()).get());
 
-        response.sendRedirect("http://localhost:8080/company-personal-account-home");
+        response.sendRedirect("http://" + ip + ":8080/company-personal-account-home");
     }
+
+
 }

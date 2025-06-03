@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>constellar.tech | Вакансии компании</title>
+    <title>constellar.tech | Кандидаты</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        /* Основные стили (как в предыдущих шаблонах) */
+        /* Основные стили */
         body {
             margin: 0;
             padding: 0;
@@ -17,6 +17,7 @@
             overflow-x: hidden;
         }
 
+        /* Статичные звёзды */
         .star {
             position: fixed;
             width: 2px;
@@ -31,6 +32,7 @@
             50% { opacity: 0.3; }
         }
 
+        /* Шапка */
         .header {
             position: fixed;
             top: 0;
@@ -71,12 +73,14 @@
             transform: scale(1.05);
         }
 
+        /* Основной контейнер */
         .dashboard-container {
             display: flex;
             min-height: 100vh;
             padding-top: 70px;
         }
 
+        /* Боковая панель */
         .sidebar {
             width: 280px;
             background: rgba(0, 0, 0, 0.6);
@@ -169,6 +173,7 @@
             border-left: 3px solid #ffa500;
         }
 
+        /* Основное содержимое */
         .main-content {
             flex: 1;
             padding: 2rem;
@@ -193,153 +198,160 @@
             background: linear-gradient(90deg, #ffa500, #ff4500);
         }
 
-        /* Стили для вакансий */
-        .vacancies-container {
-            position: relative;
-        }
-
-        .vacancies-grid {
+        /* Стили для списка кандидатов */
+        .candidates-container {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
             gap: 1.5rem;
             margin-bottom: 2rem;
         }
 
-        .vacancy-card {
+        .candidate-card {
             background: rgba(0, 0, 0, 0.5);
             border-radius: 10px;
             padding: 1.5rem;
-            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 0 20px rgba(255, 165, 0, 0.1);
             border: 1px solid rgba(255, 165, 0, 0.1);
-            cursor: pointer;
-            position: relative;
+            transition: transform 0.3s, box-shadow 0.3s;
         }
 
-        .vacancy-card:hover {
+        .candidate-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(255, 165, 0, 0.1);
-            border-color: rgba(255, 165, 0, 0.3);
+            box-shadow: 0 5px 25px rgba(255, 165, 0, 0.3);
         }
 
-        .vacancy-title {
-            font-size: 1.2rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            color: #ffa500;
-        }
-
-        .vacancy-position {
-            font-size: 1rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .vacancy-salary {
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            color: #4CAF50;
-        }
-
-        .vacancy-experience {
-            display: inline-block;
-            padding: 0.2rem 0.5rem;
-            background: rgba(255, 165, 0, 0.2);
-            border-radius: 15px;
-            font-size: 0.8rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .vacancy-description {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 0.9rem;
-            margin-bottom: 1rem;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .vacancy-meta {
+        .candidate-header {
             display: flex;
-            justify-content: space-between;
-            font-size: 0.8rem;
-            color: rgba(255, 255, 255, 0.6);
+            align-items: center;
+            margin-bottom: 1rem;
         }
 
-        .vacancy-status {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            padding: 0.2rem 0.5rem;
-            border-radius: 5px;
-            font-size: 0.7rem;
-            font-weight: 500;
+        .candidate-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 1rem;
+            border: 2px solid #ffa500;
         }
 
-        .status-active {
-            background: rgba(76, 175, 80, 0.2);
-            color: #4CAF50;
-        }
-
-        .status-inactive {
-            background: rgba(244, 67, 54, 0.2);
-            color: #F44336;
-        }
-
-        .add-vacancy-btn {
+        .avatar-placeholder {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(255, 165, 0, 0.2);
             display: flex;
             align-items: center;
             justify-content: center;
+            margin-right: 1rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border: 2px solid #ffa500;
+        }
+
+        .candidate-info {
+            flex: 1;
+        }
+
+        .candidate-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.2rem;
+        }
+
+        .candidate-position {
+            color: #ffa500;
+            font-size: 0.9rem;
+        }
+
+        .candidate-details {
+            margin-top: 1rem;
+        }
+
+        .detail-row {
+            display: flex;
+            margin-bottom: 0.5rem;
+        }
+
+        .detail-label {
+            color: #ffa500;
+            font-size: 0.9rem;
+            width: 100px;
+            flex-shrink: 0;
+        }
+
+        .detail-value {
+            flex: 1;
+            font-size: 0.9rem;
+        }
+
+        .skills-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .skill-tag {
             background: rgba(255, 165, 0, 0.1);
-            border: 2px dashed rgba(255, 165, 0, 0.5);
-            transition: all 0.3s;
-            min-height: 150px;
+            color: #ffa500;
+            padding: 0.3rem 0.6rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
         }
 
-        .add-vacancy-btn:hover {
-            background: rgba(255, 165, 0, 0.2);
-            border-color: rgba(255, 165, 0, 0.8);
-        }
-
-        .add-vacancy-icon {
-            font-size: 2rem;
-            color: rgba(255, 165, 0, 0.8);
-        }
-
-        .btn {
-            padding: 0.6rem 1.2rem;
+        .view-profile-btn {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 165, 0, 0.1);
+            color: #ffa500;
             border-radius: 5px;
             text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s;
-            display: inline-block;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #ffa500, #ff8c00);
-            color: #0a0f2b;
+            font-size: 0.9rem;
+            transition: background 0.3s;
             border: none;
             cursor: pointer;
         }
 
-        .btn-primary:hover {
-            box-shadow: 0 0 15px rgba(255, 165, 0, 0.5);
+        .view-profile-btn:hover {
+            background: rgba(255, 165, 0, 0.3);
         }
 
-        /* Анимация загрузки для бесконечного скролла */
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .search-container {
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
         }
 
-        .loading-spinner {
-            display: none;
-            width: 40px;
-            height: 40px;
-            margin: 20px auto;
-            border: 4px solid rgba(255, 165, 0, 0.3);
-            border-top: 4px solid #ffa500;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
+        .search-input {
+            flex: 1;
+            padding: 0.8rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 165, 0, 0.3);
+            border-radius: 5px;
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #ffa500;
+            box-shadow: 0 0 10px rgba(255, 165, 0, 0.2);
+        }
+
+        .filter-btn {
+            padding: 0.8rem 1.5rem;
+            background: rgba(255, 165, 0, 0.1);
+            color: #ffa500;
+            border: 1px solid rgba(255, 165, 0, 0.3);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-btn:hover {
+            background: rgba(255, 165, 0, 0.3);
         }
 
         /* Адаптивность */
@@ -360,14 +372,18 @@
                 padding: 1rem;
             }
 
-            .vacancies-grid {
+            .candidates-container {
                 grid-template-columns: 1fr;
+            }
+
+            .search-container {
+                flex-direction: column;
             }
         }
     </style>
 </head>
 <body>
-<!-- Звёздный фон -->
+<!-- Статичные звёзды (без движения) -->
 <div th:each="i : ${#numbers.sequence(1, 150)}"
      class="star"
      th:style="'top: ' + ${T(java.lang.Math).random() * 100} + '%; ' +
@@ -401,109 +417,76 @@
 
         <ul class="nav-menu">
             <li class="nav-item"><a href="/company-personal-account-home" class="nav-link">Профиль компании</a></li>
-            <li class="nav-item"><a href="/employer-list-vacancies" class="nav-link active">Вакансии</a></li>
+            <li class="nav-item"><a href="/employer-list-vacancies" class="nav-link">Вакансии</a></li>
             <li class="nav-item"><a href="/employer-team-formation" class="nav-link">Подбор команды</a></li>
-            <li class="nav-item"><a href="/all-candidates" class="nav-link">Кандидаты</a></li>
+            <li class="nav-item"><a href="/all-candidates" class="nav-link active">Кандидаты</a></li>
         </ul>
     </aside>
 
     <!-- Основное содержимое -->
     <main class="main-content">
-        <section class="vacancies-section">
-            <h2 class="section-title">Вакансии компании</h2>
+        <h2 class="section-title">Кандидаты</h2>
 
-            <div class="vacancies-container">
-                <div class="vacancies-grid" id="vacanciesGrid">
-                    <!-- Карточки вакансий -->
-                    <div th:each="vacancy : ${session.employer.vacancies}" class="vacancy-card"
-                         th:onclick="'location.href=\'/constellar.tech/api/v1/vacancy/' + ${vacancy.id} + '\''">
-                        <div class="vacancy-status"
-                             th:class="${vacancy.isActive} ? 'status-active' : 'status-inactive'"
-                             th:text="${vacancy.isActive} ? 'Активна' : 'Неактивна'"></div>
-                        <h3 class="vacancy-title" th:text="${vacancy.title}">Название вакансии</h3>
-                        <div class="vacancy-position" th:text="${vacancy.position}">Должность</div>
-                        <div class="vacancy-salary"
-                             th:text="${vacancy.salaryFrom} + ' - ' + ${vacancy.salaryTo} + ' ' + ${vacancy.currency}">Зарплата</div>
-                        <div class="vacancy-experience" th:text="${vacancy.experienceLevel}">Опыт</div>
-                        <div class="vacancy-description" th:text="${vacancy.description}">Описание вакансии...</div>
-                        <div class="vacancy-meta">
-                            <span th:text="${vacancy.employmentType}">Тип занятости</span>
-                            <span th:text="${vacancy.location}">Локация</span>
-                        </div>
+
+        <div class="candidates-container" id="candidatesContainer">
+            <!-- Карточки кандидатов через Thymeleaf -->
+            <div th:each="candidate : ${candidates}" class="candidate-card">
+                <div class="candidate-header">
+                    <div th:if="${candidate.avatar != null}">
+                        <img th:src="@{'/image/candidate/getAvatar/' + ${candidate.id}}" alt="Аватар" class="candidate-avatar">
                     </div>
-
-                    <!-- Кнопка добавления новой вакансии -->
-                    <div class="vacancy-card add-vacancy-btn" onclick="location.href='/employer-add-vacancy'">
-                        <div class="add-vacancy-icon">+</div>
-                        <div>Добавить вакансию</div>
+                    <div th:if="${candidate.avatar == null}" class="avatar-placeholder"
+                         th:text="${#strings.substring(candidate.fullName ?: candidate.username ?: '??', 0, 2)}">
+                    </div>
+                    <div class="candidate-info">
+                        <div class="candidate-name" th:text="${candidate.fullName ?: candidate.username ?: 'Не указано'}"></div>
+                        <div class="candidate-position" th:text="${candidate.position ?: 'Должность не указана'}"></div>
                     </div>
                 </div>
 
-                <div class="loading-spinner" id="loadingSpinner"></div>
+                <div class="candidate-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Опыт:</span>
+                        <span class="detail-value" th:text="${candidate.experience ?: 'Не указан'}"></span>
+                    </div>
+
+                    <div class="detail-row">
+                        <span class="detail-label">GitHub:</span>
+                        <span class="detail-value">
+                        <a th:if="${candidate.githubUsername}"
+                           th:href="@{'https://github.com/' + ${candidate.githubUsername}}"
+                           target="_blank"
+                           th:text="${candidate.githubUsername}"></a>
+                        <span th:unless="${candidate.githubUsername}">Не указан</span>
+                    </span>
+                    </div>
+
+                    <div class="detail-row">
+                        <span class="detail-label">Навыки:</span>
+                        <div class="detail-value">
+                            <div class="skills-container">
+                            <span th:if="${!#strings.isEmpty(candidate.skills)}"
+                                  th:each="skill : ${#strings.arraySplit(candidate.skills, ',')}">
+                                <span class="skill-tag" th:text="${skill.trim()}"></span>
+                            </span>
+                                <span th:if="${#strings.isEmpty(candidate.skills)}">Не указаны</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="detail-row">
+                        <span class="detail-label">О себе:</span>
+                        <span class="detail-value" th:text="${candidate.about ?: 'Не указано'}"></span>
+                    </div>
+                </div>
+
+                <a th:href="@{'/candidate-profile-for-employer-2/' + ${candidate.id}}" class="view-profile-btn">Просмотреть профиль</a>
             </div>
-        </section>
+        </div>
     </main>
 </div>
 
 <script>
-    // Бесконечный скролл (без дополнительных запросов)
-    let allVacancies = [];
-    let visibleVacancies = 6; // Начальное количество отображаемых вакансий
-    let isLoading = false;
-    const vacanciesGrid = document.getElementById('vacanciesGrid');
-    const loadingSpinner = document.getElementById('loadingSpinner');
-
-    // Инициализация - скрываем все вакансии кроме первых visibleVacancies
-    document.addEventListener('DOMContentLoaded', function() {
-        const vacancyCards = document.querySelectorAll('.vacancy-card:not(.add-vacancy-btn)');
-        allVacancies = Array.from(vacancyCards);
-
-        // Сначала скрываем все
-        allVacancies.forEach((card, index) => {
-            if (index >= visibleVacancies) {
-                card.style.display = 'none';
-            }
-        });
-
-        // Если вакансий меньше, чем visibleVacancies, скрываем спиннер
-        if (allVacancies.length <= visibleVacancies) {
-            loadingSpinner.style.display = 'none';
-        }
-    });
-
-    // Обработка скролла
-    window.addEventListener('scroll', function() {
-        if (isLoading || allVacancies.length <= visibleVacancies) return;
-
-        const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
-
-        // Если пользователь прокрутил почти до конца
-        if (scrollTop + clientHeight >= scrollHeight - 100) {
-            loadMoreVacancies();
-        }
-    });
-
-    function loadMoreVacancies() {
-        isLoading = true;
-        loadingSpinner.style.display = 'block';
-
-        // Имитация загрузки (можно убрать setTimeout в реальном коде)
-        setTimeout(() => {
-            const nextBatch = allVacancies.slice(visibleVacancies, visibleVacancies + 3);
-            nextBatch.forEach(card => {
-                card.style.display = 'block';
-            });
-
-            visibleVacancies += 3;
-
-            // Если показали все вакансии, скрываем спиннер
-            if (visibleVacancies >= allVacancies.length) {
-                loadingSpinner.style.display = 'none';
-            }
-
-            isLoading = false;
-        }, 500);
-    }
 
     // Скрытие шапки при скролле
     let lastScroll = 0;

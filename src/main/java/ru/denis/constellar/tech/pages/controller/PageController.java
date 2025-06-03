@@ -10,10 +10,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import ru.denis.constellar.tech.application.jpa.ApplicationJpa;
 import ru.denis.constellar.tech.application.model.Application;
 import ru.denis.constellar.tech.application.model.ApplicationStatus;
+import ru.denis.constellar.tech.candidate.jpa.CandidateRepository;
+import ru.denis.constellar.tech.candidate.model.Candidate;
+import ru.denis.constellar.tech.employer.jpa.EmployerJpa;
+import ru.denis.constellar.tech.employer.model.Employer;
 import ru.denis.constellar.tech.vacancy.dto.VacancyDetailsDto;
 import ru.denis.constellar.tech.vacancy.dto.VacancyDto;
 import ru.denis.constellar.tech.vacancy.service.VacancyService;
 
+import java.util.List;
 import java.util.Objects;
 
 @Controller
@@ -25,6 +30,9 @@ public class PageController {
     private final VacancyService vacancyService;
 
     private final ApplicationJpa applicationJpa;
+
+    private final CandidateRepository candidateRepository;
+    private final EmployerJpa employerJpa;
 
 
     @GetMapping("/home")
@@ -194,6 +202,10 @@ public class PageController {
             return "home";
         }
 
+        Employer employer = (Employer) session.getAttribute("employer");
+
+        session.setAttribute("employer", employerJpa.findById(employer.getId()).get());
+
         return "employer-list-vacancies";
     }
 
@@ -302,6 +314,27 @@ public class PageController {
 
     }
 
+    @GetMapping("/candidate-profile-for-employer-2/{candidateId}")
+    public String getCandidateProfileForEmployer2(HttpSession session, @PathVariable Long candidateId) {
+
+        if (Objects.isNull(session)) {
+            return "home";
+        }
+
+        if (Objects.isNull(session.getAttribute("employer"))) {
+            return "home";
+        }
+
+
+        Candidate candidate = candidateRepository.findById(candidateId).orElseThrow(RuntimeException::new);
+
+
+        session.setAttribute("candidate", candidate);
+
+        return "candidate-profile-for-employer-home-2";
+
+    }
+
     @GetMapping("/candidate-profile-for-employer")
     public String getCandidateProfileEmployer2(HttpSession session) {
 
@@ -311,6 +344,17 @@ public class PageController {
 
         return "candidate-profile-for-employer-home";
     }
+
+    @GetMapping("/candidate-profile-for-employer-2")
+    public String getCandidateProfileEmployer3(HttpSession session) {
+
+        if (session == null || session.getAttribute("candidate") == null) {
+            return "home";
+        }
+
+        return "candidate-profile-for-employer-home-2";
+    }
+
 
     @GetMapping("/candidate-profile-for-employer-repositories")
     public String getCandidateProfileRepositoriesForEmployer(HttpSession session) {
@@ -322,6 +366,29 @@ public class PageController {
 
         return "candidate-profile-for-employer-repositories";
     }
+
+    @GetMapping("/candidate-profile-for-employer-repositories-2")
+    public String getCandidateProfileRepositoriesForEmployer3(HttpSession session) {
+
+        if (session == null || session.getAttribute("candidate") == null) {
+            return "home";
+        }
+
+
+        return "candidate-profile-for-employer-repositories-2";
+    }
+
+    @GetMapping("/candidate-repository-page-for-employer-2")
+    public String getCandidateProfileRepositoriesForEmployer2(HttpSession session) {
+
+        if (session == null || session.getAttribute("candidate") == null) {
+            return "home";
+        }
+
+
+        return "candidate-repository-page-for-employer-2";
+    }
+
 
     @GetMapping("/candidate-repository-page-for-employer")
     public String getCandidateRepositoryPageForEmployer(HttpSession session) {
@@ -349,8 +416,22 @@ public class PageController {
         return "candidate-achievements-list-for-employer";
     }
 
+    @GetMapping("/candidate-achievements-for-employer-2")
+    public String getCandidateAchievementListForEmployer2(HttpSession session) {
+        if (Objects.isNull(session)) {
+            return "home";
+        }
+
+        if (Objects.isNull(session.getAttribute("candidate"))) {
+            return "home";
+        }
+
+        return "candidate-achievements-list-for-employer-2";
+    }
+
+
     @GetMapping("/candidate-applications-page")
-    public String getCandidateApplicationsPage(HttpSession session){
+    public String getCandidateApplicationsPage(HttpSession session) {
 
 
         if (Objects.isNull(session)) {
@@ -364,7 +445,7 @@ public class PageController {
     }
 
     @GetMapping("/employer-team-formation")
-    public String getTeamFormationPage(HttpSession session){
+    public String getTeamFormationPage(HttpSession session) {
 
         if (Objects.isNull(session)) {
             return "home";
@@ -377,6 +458,22 @@ public class PageController {
         return "employer-team-formation";
     }
 
+    @GetMapping("/all-candidates")
+    public String getAllCandidatesPages(HttpSession session, Model model) {
+
+
+        if (Objects.isNull(session)) {
+            return "home";
+        }
+
+        if (Objects.isNull(session.getAttribute("employer"))) {
+            return "home";
+        }
+
+        List<Candidate> allCandidates = candidateRepository.findAll();
+        model.addAttribute("candidates", allCandidates);
+        return "all-candidates-page";
+    }
 
 
 }
